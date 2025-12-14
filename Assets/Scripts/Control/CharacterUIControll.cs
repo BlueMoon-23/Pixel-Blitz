@@ -53,7 +53,7 @@ public class CharacterUIControll : MonoBehaviour
             if (CurrentCharacter.GetUpgradeCost(CurrentCharacter.GetLevel()) <= EconomyManager.instance.PlayerCoin) 
             {
                 CurrentCharacter.Upgrade();
-                SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Upgrade_Sound);
+                if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Upgrade_Sound);
                 EconomyManager.instance.Purchase(CurrentCharacter.GetUpgradeCost(CurrentCharacter.GetLevel() - 1));
                 EconomyManager.instance.Change_CurrentCoin();
             }
@@ -72,6 +72,7 @@ public class CharacterUIControll : MonoBehaviour
             EconomyManager.instance.AddCoin(CurrentCharacter.GetSellCost()); 
             EconomyManager.instance.Change_CurrentCoin();
         }
+        if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Sell_Sound);
         CharacterManager.instance.RemoveCharacter(CurrentCharacter);
         Destroy(CurrentCharacter.gameObject);
         gameObject.SetActive(false);

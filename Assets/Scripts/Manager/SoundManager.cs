@@ -8,6 +8,11 @@ public class SoundManager : MonoBehaviour
     public AudioSource audioSource;
     // Cac sound
     public AudioClip Upgrade_Sound;
+    public AudioClip Place_Sound;
+    public AudioClip Sell_Sound;
+    public AudioClip EarnCoin_Sound;
+    public AudioClip BaseGetHit_Sound;
+    public AudioClip Skip_Sound;
     private void Awake()
     {
         if (Instance == null)

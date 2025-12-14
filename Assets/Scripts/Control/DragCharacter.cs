@@ -85,6 +85,7 @@ public class DragCharacter : MonoBehaviour, IPointerDownHandler, IBeginDragHandl
                 {
                     if (GetDropPosition(eventData.position) != Vector3.zero && !(CharacterManager.instance.hasCharacterinPosition(GetDropPosition(eventData.position))))
                     {
+                        if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Place_Sound);
                         GameObject newCharacter = Instantiate(CharacterPrefab, GetDropPosition(eventData.position), Quaternion.identity);
                         CharacterManager.instance.AddCharacterWithPosition(newCharacter.GetComponent<BaseCharacter>(), GetDropPosition(eventData.position));
                         EconomyManager.instance.Purchase(character.GetCost());

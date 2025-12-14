@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 public class EconomyManager : MonoBehaviour
 {
@@ -28,9 +29,13 @@ public class EconomyManager : MonoBehaviour
     public TextMeshProUGUI Announcement;
     public TextMeshProUGUI EarnCoin;
     public Image EarnCoinIcon;
+    public TextMeshProUGUI WaveReward;
+    public CanvasGroup WaveRewardAnnounecement;
+    public TextMeshProUGUI WaveClearBonus;
+    public CanvasGroup WaveClearBonusAnnounecement;
     void Start()
     {
-        _PlayerCoin = 100000f;
+        _PlayerCoin = 600f;
         Change_CurrentCoin();
     }
 
@@ -45,7 +50,6 @@ public class EconomyManager : MonoBehaviour
     }
     public void Purchase(float Cost)
     {
-        Debug.Log("Da tru " + Cost + " tien");
         _PlayerCoin -= Cost;
     }
     public void AddCoin(float Bonus)
@@ -54,6 +58,7 @@ public class EconomyManager : MonoBehaviour
         EarnCoin.text = "+ " + Bonus.ToString();
         ShowBonusCoin(EarnCoin);
         ShowBonusCoin(EarnCoinIcon);
+        if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.EarnCoin_Sound);
     }
     public void Announce_CantPlace(float Cost)
     {
@@ -67,7 +72,6 @@ public class EconomyManager : MonoBehaviour
     }
     private void ShowAnnounce()
     {
-        DOTween.KillAll();
         Announcement.gameObject.SetActive(true);
         Vector3 original_position = Announcement.transform.position;
         Sequence sequence = DOTween.Sequence();
@@ -88,6 +92,7 @@ public class EconomyManager : MonoBehaviour
     // +337.8 - 406.9
     private void ShowBonusCoin(MaskableGraphic graphic)
     {
+        graphic.DOKill(true);
         graphic.gameObject.SetActive(true);
         Vector3 original_position = graphic.transform.position;
         Sequence sequence = DOTween.Sequence();
@@ -103,6 +108,42 @@ public class EconomyManager : MonoBehaviour
         {
             graphic.transform.position = original_position;
             graphic.gameObject.SetActive(false);
+        });
+    }
+    public void EarnCoinEachWave(int wave)
+    {
+        AddCoin(200 + wave * 150);
+        Change_CurrentCoin();
+        WaveReward.text = "Wave Reward: $" + (200 + wave * 150);
+        ShowAnnounce(WaveRewardAnnounecement);
+        // Wave clear bonus
+        if (EnemyManager.instance != null && EnemyManager.instance.GetEnemyListCount() == 0)
+        {
+            AddCoin((int)((200 + wave * 150) / 3));
+            Change_CurrentCoin();
+            WaveClearBonus.text = "Wave Clear Bonus: $" + (int)((200 + wave * 150) / 3);
+            WaveClearBonusAnnounecement.gameObject.SetActive(true);
+            ShowAnnounce(WaveClearBonusAnnounecement);
+        }
+    }
+    private void ShowAnnounce(CanvasGroup canvasGroup)
+    {
+        canvasGroup.DOComplete(withCallbacks: true);
+        canvasGroup.gameObject.SetActive(true);
+        Vector3 original_position = canvasGroup.transform.position;
+        Sequence sequence = DOTween.Sequence();
+        sequence.AppendCallback(() =>
+        {
+            canvasGroup.DOFade(1f, 0.25f).From(0f);
+        }).Join(canvasGroup.transform.DOMove(new Vector3(canvasGroup.transform.position.x, canvasGroup.transform.position.y - 25f, canvasGroup.transform.position.z), 0.25f));
+        sequence.AppendInterval(1f).Append(canvasGroup.transform.DOMove(new Vector3(canvasGroup.transform.position.x, canvasGroup.transform.position.y + 25f, canvasGroup.transform.position.z), 0.25f)).AppendInterval(0.25f).JoinCallback(() =>
+        {
+            canvasGroup.DOFade(0f, 0.25f).From(1f);
+        });
+        sequence.OnComplete(() =>
+        {
+            canvasGroup.transform.position = original_position;
+            canvasGroup.gameObject.SetActive(false);
         });
     }
 }

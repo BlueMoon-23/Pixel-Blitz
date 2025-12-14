@@ -36,7 +36,7 @@ public class BaseCharacter : MonoBehaviour
         characterUI = FindObjectOfType<CharacterUIControll>(true);
         UpgradeCost = new float[] { 0, 0, 0, 0};
         range = Range_Prefab.GetComponent<RangeScript>();
-        Clock = Cooldown;
+        Clock = Cooldown - 0.1f;
         // Animation
         SPUM_Prefabs = GetComponent<SPUM_Prefabs>();
         if (SPUM_Prefabs == null)
@@ -270,6 +270,30 @@ public class BaseCharacter : MonoBehaviour
             bullet.SetEnemy(first_enemy);
             yield return new WaitForSeconds(Attack_Duration - (Attack_Duration / 2 + 0.1f));
             SPUM_Prefabs._anim.speed = 1;
+        }
+    }
+    public virtual void AttackWithoutAnimation()
+    {
+        Clock += Time.deltaTime;
+        if (Clock >= Cooldown)
+        {
+            BaseEnemy first_enemy = FindFirstEnemy();
+            if (first_enemy != null)
+            {
+                if (first_enemy.transform.position.x < transform.position.x)
+                {
+                    transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
+                }
+                else
+                {
+                    transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
+                }
+                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, transform.rotation);
+                BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
+                bullet.SetCharacter(this);
+                bullet.SetEnemy(first_enemy);
+            }
+            Clock = 0f;
         }
     }
 }

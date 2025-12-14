@@ -4,7 +4,16 @@ using UnityEngine;
 
 public class Freezer : GroundCharacter
 {
-    private float FreezeTime;
+    private float _FreezeTime;
+    public float FreezeTime
+    {
+        get { return _FreezeTime; }
+    }
+    private int _FreezeCount;
+    public int FreezeCount
+    {
+        get { return _FreezeCount; }
+    }
     void Start()
     {
         Range = 5f;
@@ -16,18 +25,24 @@ public class Freezer : GroundCharacter
         canStrikethrough = false;
         UpgradeCost = new float[] { 600, 800, 1750, 5000 };
         SellCost = (int)(Cost / 3);
-        FreezeTime = 0.5f;
+        _FreezeTime = 0.5f;
+        _FreezeCount = 3;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        AttackWithoutAnimation();
     }
     public override float GetRange()
     {
         if (Range <= 5f) { return 5f; } // <= la chua duoc khoi tao
         else return Range;
+    }
+    public override float GetCost()
+    {
+        if (Cost != 650f) { return 650f; }
+        else return Cost;
     }
     public override void UpgradeToLevel1()
     {
@@ -38,18 +53,17 @@ public class Freezer : GroundCharacter
     public override void UpgradeToLevel2()
     {
         Range = 7f;
-        FreezeTime = 1f;
+        _FreezeTime = 1f;
         Level = 2;
     }
     public override void UpgradeToLevel3()
     {
         canStrikethrough = true;
-        // Freeze hit count: 3 => 2 o script enemy
+        _FreezeCount = 2;
         Level = 3;
     }
     public override void UpgradeToLevel4()
     {
-        Cooldown = 1f;
         Damage = 5f;
         Level = 4;
         // Explode
@@ -70,7 +84,7 @@ public class Freezer : GroundCharacter
                 }
             case 2:
                 {
-                    characterUI.upgradeName.text = "Ice Blade";
+                    characterUI.upgradeName.text = "Piercing Shards";
                     characterUI.Info1.text = "Freeze hit count: 3 => 2";
                     characterUI.Info2.text = "+ Strikethrough";
                     characterUI.Info3.text = "";
@@ -78,10 +92,10 @@ public class Freezer : GroundCharacter
                 }
             case 3:
                 {
-                    characterUI.upgradeName.text = "Snowy Deluge";
+                    characterUI.upgradeName.text = "Glacial Glowing";
                     characterUI.Info1.text = "Bullets now explode";
                     characterUI.Info2.text = "Damage: 2 => 5";
-                    characterUI.Info3.text = "Cooldown: 2 => 1";
+                    characterUI.Info3.text = "";
                     break;
                 }
             case 4:
@@ -103,5 +117,41 @@ public class Freezer : GroundCharacter
         }
         base.SetUpgradeInformation();
     }
-
+    public override void AttackWithoutAnimation()
+    {
+        Clock += Time.deltaTime;
+        if (Clock >= Cooldown)
+        {
+            StartCoroutine(Burst());
+            Clock = 0f;
+        }
+    }
+    private IEnumerator Burst()
+    {
+        for (int i = 1; i <= 3; i++)
+        {
+            BaseEnemy first_enemy = FindFirstEnemy();
+            if (first_enemy != null)
+            {
+                if (first_enemy.transform.position.x < transform.position.x)
+                {
+                    transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
+                }
+                else
+                {
+                    transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
+                }
+                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, transform.rotation);
+                if (Level < 3)
+                {
+                    newBullet.transform.localScale *= 0.5f;
+                }
+                BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
+                bullet.SetCharacter(this);
+                bullet.SetEnemy(first_enemy);
+            }
+            yield return new WaitForSeconds(0.25f);
+        }
+        yield break;
+    }
 }

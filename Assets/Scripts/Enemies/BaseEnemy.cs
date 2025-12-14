@@ -19,13 +19,20 @@ public class BaseEnemy : MonoBehaviour
     public Dictionary<PlayerState, int> IndexPair = new();
     // Distance
     protected float _Distance;
-    // HP Bar;
-    [SerializeField] protected GameObject HP_RedBar;
-    protected float Original_x_HPScale;
     public float Distance
     {
         get { return _Distance; }
     }
+    // HP Bar;
+    [SerializeField] protected GameObject HP_RedBar;
+    protected float Original_x_HPScale;
+    // Rotate
+    public GameObject EnemyRoot;
+    // FreezeEffect
+    public GameObject FreezeEffect; // MagicChargeBlue
+    public int FreezeStack = 3;
+    [SerializeField] private int FreezeCurrentStack = 0;
+    private bool isFrozen = false;
     protected void Awake()
     {
         // Move road
@@ -49,6 +56,10 @@ public class BaseEnemy : MonoBehaviour
         }
         // HP Bar
         Original_x_HPScale = HP_RedBar.transform.localScale.x;
+        // Distance
+        _Distance = 0f;
+        // EnemyManager
+        if (EnemyManager.instance != null) { EnemyManager.instance.AddEnemy(this); }
     }
     void Start()
     {
@@ -89,41 +100,70 @@ public class BaseEnemy : MonoBehaviour
                 EconomyManager.instance.Change_CurrentCoin();
             }
             Destroy(this.gameObject);
-            // Remove enemy from enemy manager
         }
     }
     public void Move()
     {
-        SPUM_Prefabs.PlayAnimation(PlayerState.MOVE, IndexPair[PlayerState.MOVE]);
-        SPUM_Prefabs._anim.speed = 25 * Speed / 38 + 7 / 38;
-        if (Waypoint_CurrentIndex != Waypoints.Length)
+        if (!isFrozen)
         {
-            if (Vector3.Distance(transform.position, Waypoints[Waypoint_CurrentIndex].transform.position) >= 0.05f)
+            SPUM_Prefabs.PlayAnimation(PlayerState.MOVE, IndexPair[PlayerState.MOVE]);
+            SPUM_Prefabs._anim.speed = 25 * Speed / 38 + 7 / 38;
+            if (Waypoint_CurrentIndex != Waypoints.Length)
             {
-                // Không được so sánh tuyệt đối bởi vì time.deltatime gây ra 1 độ lệch (1/fps)
-                Vector3 Direction = (Waypoints[Waypoint_CurrentIndex].transform.position - transform.position).normalized;
-                transform.position += Direction * Speed * Time.deltaTime;
-                if (Direction.x >= 0)
+                if (Vector3.Distance(transform.position, Waypoints[Waypoint_CurrentIndex].transform.position) >= 0.05f)
                 {
-                    transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
+                    // Không được so sánh tuyệt đối bởi vì time.deltatime gây ra 1 độ lệch (1/fps)
+                    Vector3 Direction = (Waypoints[Waypoint_CurrentIndex].transform.position - transform.position).normalized;
+                    transform.position += Direction * Speed * Time.deltaTime;
+                    if (Direction.x >= 0)
+                    {
+                        EnemyRoot.transform.localScale = new Vector3(-1f * Mathf.Abs(EnemyRoot.transform.localScale.x), Mathf.Abs(EnemyRoot.transform.localScale.y), Mathf.Abs(EnemyRoot.transform.localScale.z));
+                    }
+                    else
+                    {
+                        EnemyRoot.transform.localScale = new Vector3(Mathf.Abs(EnemyRoot.transform.localScale.x), Mathf.Abs(EnemyRoot.transform.localScale.y), Mathf.Abs(EnemyRoot.transform.localScale.z));
+                    }
                 }
                 else
                 {
-                    transform.localScale = new Vector3( Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
+                    Waypoint_CurrentIndex++;
                 }
             }
-            else
+            else // == nghia la da cham nha chinh
             {
-                Waypoint_CurrentIndex++;
+                GameManager.instance.BaseGetHit(HP);
+                Destroy(this.gameObject);
+                // Remove enemy from enemy manager
             }
+            // Distance
+            _Distance += Speed * Time.deltaTime;
         }
-        else // == nghia la da cham nha chinh
+        else
         {
-            GameManager.instance.BaseGetHit(HP);
-            Destroy(this.gameObject);
-            // Remove enemy from enemy manager
+            SPUM_Prefabs._anim.speed = 0f;
         }
-        // Distance
-        _Distance = Speed * Time.deltaTime;
+    }
+    private void OnDestroy()
+    {
+        if (EnemyManager.instance != null) { EnemyManager.instance.RemoveEnemy(this); }
+    }
+    public void GetFreeze(float FreezeTime, int FreezeCount)
+    {
+        FreezeCurrentStack++;
+        FreezeStack = FreezeCount;
+        if (FreezeCurrentStack == FreezeStack)
+        {
+            StartCoroutine(BeFrozen(FreezeTime));
+        }
+    }
+    private IEnumerator BeFrozen(float FreezeTime)
+    {
+        isFrozen = true;
+        GameObject effect = Instantiate(FreezeEffect, transform.position, Quaternion.identity);
+        Destroy(effect, FreezeTime);
+        yield return new WaitForSeconds(FreezeTime);
+        isFrozen = false;
+        FreezeCurrentStack = 0;
+        yield break;
     }
 }

@@ -22,12 +22,13 @@ public class BaseBullets : MonoBehaviour
     }
     public void SetCharacter(BaseCharacter character)
     { 
-        this.character = character; }
+        this.character = character; 
+    }
     public void SetEnemy(BaseEnemy enemy)
     {
         this.enemy = enemy;
     }
-    private void Move()
+    protected void Move()
     {
         if (enemy != null)
         {
@@ -41,7 +42,7 @@ public class BaseBullets : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         BaseEnemy baseEnemy = collision.gameObject.GetComponent<BaseEnemy>();
         if (baseEnemy != null && baseEnemy == enemy)

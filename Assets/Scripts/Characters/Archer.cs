@@ -13,7 +13,7 @@ public class Archer : GroundCharacter
         Level = 0;
         hasHiddenDetection = false;
         canStrikethrough = false;
-        UpgradeCost = new float[] { 300, 600, 1500, 4500 };
+        UpgradeCost = new float[] { 300, 900, 2750, 9000 };
         SellCost = (int)(Cost / 3);
     }
 

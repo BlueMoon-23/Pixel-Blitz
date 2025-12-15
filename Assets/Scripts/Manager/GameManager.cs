@@ -67,8 +67,8 @@ public class GameManager : MonoBehaviour
     }
     void Update()
     {
-        // Defeat luon neu base health = 0
-        if (BaseHealth == 0)
+        // Defeat luon neu base health <= 0
+        if (BaseHealth <= 0)
         {
             Defeat();
         }
@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(14f);
         // Show Skip annouonce
-        DOTween.KillAll();
+        //DOTween.KillAll();
         Sequence sequence = DOTween.Sequence();
         sequence.AppendCallback(() =>
         {
@@ -158,7 +158,7 @@ public class GameManager : MonoBehaviour
         BaseHealth -= Damage;
         if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.BaseGetHit_Sound);
         BaseHealthText.text = BaseHealth.ToString() + " / 100";
-        DOTween.KillAll();
+        //DOTween.KillAll();
         Sequence sequence = DOTween.Sequence();
         sequence.AppendCallback(() =>
         {
@@ -167,7 +167,7 @@ public class GameManager : MonoBehaviour
     }
     private IEnumerator GetReady()
     {
-        DOTween.KillAll();
+        //DOTween.KillAll();
         Sequence sequence = DOTween.Sequence();
         sequence.AppendCallback(() =>
         {

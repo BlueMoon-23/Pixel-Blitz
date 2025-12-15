@@ -63,7 +63,10 @@ public class BaseEnemy : MonoBehaviour
     }
     void Start()
     {
-
+        /*// Bỏ vào awake thì bị lỗi nếu instantiate từ necromancer và boss mystery
+        if (Waypoint_CurrentIndex == 0) // Đảm bảo việc gán từ bên ngoài
+        {
+        }*/
     }
 
     // Update is called once per frame

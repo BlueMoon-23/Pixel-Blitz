@@ -29,6 +29,8 @@ public class EconomyManager : MonoBehaviour
     public TextMeshProUGUI Announcement;
     public TextMeshProUGUI EarnCoin;
     public Image EarnCoinIcon;
+    private Vector3 original_position1;
+    private Vector3 original_position2;
     public TextMeshProUGUI WaveReward;
     public CanvasGroup WaveRewardAnnounecement;
     public TextMeshProUGUI WaveClearBonus;
@@ -36,6 +38,8 @@ public class EconomyManager : MonoBehaviour
     void Start()
     {
         _PlayerCoin = 600f;
+        original_position1 = EarnCoin.transform.position;
+        original_position2 = EarnCoinIcon.transform.position;
         Change_CurrentCoin();
     }
 
@@ -90,24 +94,40 @@ public class EconomyManager : MonoBehaviour
         });
     }
     // +337.8 - 406.9
-    private void ShowBonusCoin(MaskableGraphic graphic)
+    private void ShowBonusCoin(TextMeshProUGUI EarnCoin)
     {
-        graphic.DOKill(true);
-        graphic.gameObject.SetActive(true);
-        Vector3 original_position = graphic.transform.position;
+        EarnCoin.gameObject.SetActive(true);
         Sequence sequence = DOTween.Sequence();
         sequence.AppendCallback(() =>
         {
-            graphic.DOFade(1f, 0.25f).From(0f);
-        }).Join(graphic.transform.DOMove(new Vector3(graphic.transform.position.x, graphic.transform.position.y - CurrentCoin.transform.position.y / 2, graphic.transform.position.z), 0.25f));
+            EarnCoin.DOFade(1f, 0.25f).From(0f);
+        }).Join(EarnCoin.transform.DOMove(new Vector3(EarnCoin.transform.position.x, EarnCoin.transform.position.y - CurrentCoin.transform.position.y / 2, EarnCoin.transform.position.z), 0.25f));
         sequence.AppendCallback(() =>
         {
-            graphic.DOFade(0f, 0.25f).From(1f);
+            EarnCoin.DOFade(0f, 0.25f).From(1f);
         });
         sequence.OnComplete(() =>
         {
-            graphic.transform.position = original_position;
-            graphic.gameObject.SetActive(false);
+            EarnCoin.transform.position = original_position1;
+            EarnCoin.gameObject.SetActive(false);
+        });
+    }
+    private void ShowBonusCoin(Image EarnCoin)
+    {
+        EarnCoin.gameObject.SetActive(true);
+        Sequence sequence = DOTween.Sequence();
+        sequence.AppendCallback(() =>
+        {
+            EarnCoin.DOFade(1f, 0.25f).From(0f);
+        }).Join(EarnCoin.transform.DOMove(new Vector3(EarnCoin.transform.position.x, EarnCoin.transform.position.y - CurrentCoin.transform.position.y / 2, EarnCoin.transform.position.z), 0.25f));
+        sequence.AppendCallback(() =>
+        {
+            EarnCoin.DOFade(0f, 0.25f).From(1f);
+        });
+        sequence.OnComplete(() =>
+        {
+            EarnCoin.transform.position = original_position2;
+            EarnCoin.gameObject.SetActive(false);
         });
     }
     public void EarnCoinEachWave(int wave)

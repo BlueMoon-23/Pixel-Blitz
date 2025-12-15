@@ -280,7 +280,7 @@ public class CharacterManager : MonoBehaviour
     }
     public void LimitPlacement_Announce()
     {
-        DOTween.KillAll();
+        //DOTween.KillAll();
         Announcement.gameObject.SetActive(true);
         Vector3 original_position = Announcement.transform.position;
         Sequence sequence = DOTween.Sequence();
@@ -301,7 +301,7 @@ public class CharacterManager : MonoBehaviour
     private void Show_Limit_for_1_Character_Text(CharacterName name, BaseCharacter character)
     {
         Limit_for_1_Character_Text.text = "You can only place " + Limit_for_1_Character[name] + " " + character.GetType().Name + "s.";
-        DOTween.KillAll();
+        //DOTween.KillAll();
         Limit_for_1_Character_Text.gameObject.SetActive(true);
         Vector3 original_position = Limit_for_1_Character_Text.transform.position;
         Sequence sequence = DOTween.Sequence();

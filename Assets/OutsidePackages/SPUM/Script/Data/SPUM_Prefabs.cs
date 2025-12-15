@@ -37,18 +37,36 @@ public class SPUM_Prefabs : MonoBehaviour
     public void OverrideControllerInit()
     {
         Animator animator = _anim;
-        OverrideController = new AnimatorOverrideController();
-        OverrideController.runtimeAnimatorController= animator.runtimeAnimatorController;
-
+        // --- BƯỚC SỬA LỖI CHÍNH ---
+        // 1. Lấy Animator Controller cơ sở GỐC
+        RuntimeAnimatorController baseController = animator.runtimeAnimatorController;
+        // Kiểm tra xem controller hiện tại có phải là một OverrideController lồng nhau không.
+        // Nếu phải, hãy lấy controller gốc của nó để tránh lỗi nesting.
+        if (baseController is AnimatorOverrideController existingOverride)
+        {
+            // Trích xuất controller gốc mà existingOverride đang override.
+            baseController = existingOverride.runtimeAnimatorController;
+        }
+        // Kiểm tra an toàn: Đảm bảo rằng luôn có một controller cơ sở hợp lệ
+        if (baseController == null)
+        {
+            Debug.LogError("Animator Controller gốc (baseController) bị thiếu. Hãy gán một Animator Controller vào component Animator.");
+            return;
+        }
+        // Kiểm tra an toàn: Nếu đã thiết lập và controller gốc không đổi, thoát.
+        if (OverrideController != null && animator.runtimeAnimatorController == OverrideController)
+        {
+            return;
+        }
+        // --- KẾT THÚC BƯỚC SỬA LỖI CHÍNH ---
+        OverrideController = new AnimatorOverrideController(baseController);
         // 모든 애니메이션 클립을 가져옵니다
-        AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
-
+        AnimationClip[] clips = baseController.animationClips;
         foreach (AnimationClip clip in clips)
         {
             // 복제된 클립으로 오버라이드합니다
             OverrideController[clip.name] = clip;
         }
-
         animator.runtimeAnimatorController= OverrideController;
         foreach (PlayerState state in Enum.GetValues(typeof(PlayerState)))
         {

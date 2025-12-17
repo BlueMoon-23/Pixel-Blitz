@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,14 +13,16 @@ public class Archer : GroundCharacter
         Level = 0;
         hasHiddenDetection = false;
         canStrikethrough = false;
-        UpgradeCost = new float[] { 300, 900, 2750, 9000 };
+        UpgradeCost = new float[] { 150, 900, 2500, 9000 };
         SellCost = (int)(Cost / 3);
+        _hasAbility = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        AttackWithCooldown(Bow_Attack_Duration);
+        if (!isStunned) { AttackWithCooldown(Bow_Attack_Duration); }
+        // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
     }
     public override float GetRange() 
     {
@@ -111,7 +113,7 @@ public class Archer : GroundCharacter
         if (Level < 4)
         {
             BaseEnemy first_enemy = FindFirstEnemy();
-            if (first_enemy != null)
+            if (first_enemy != null && !first_enemy.isDieOrNot())
             {
                 if (first_enemy.transform.position.x < transform.position.x)
                 {
@@ -125,7 +127,10 @@ public class Archer : GroundCharacter
                 SPUM_Prefabs.PlayAnimation(PlayerState.ATTACK, IndexPair[PlayerState.ATTACK]);
                 SPUM_Prefabs._anim.speed = 2 * Attack_Duration / Cooldown;
                 yield return new WaitForSeconds(Attack_Duration / 2 + 0.1f);
-                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, transform.rotation);
+                // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
+                float Angle_in_Radian = Mathf.Atan2(first_enemy.transform.position.y - transform.position.y, first_enemy.transform.position.x - transform.position.x);
+                Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
+                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
                 BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
                 bullet.SetCharacter(this);
                 bullet.SetEnemy(first_enemy);
@@ -136,7 +141,7 @@ public class Archer : GroundCharacter
         else
         {
             BaseEnemy[] first_3_enemies = FindThreeFirstEnemies();
-            if (first_3_enemies[0] != null)
+            if (first_3_enemies[0] != null && !first_3_enemies[0].isDieOrNot())
             {
                 if (first_3_enemies[0].transform.position.x < transform.position.x)
                 {
@@ -152,7 +157,7 @@ public class Archer : GroundCharacter
                 yield return new WaitForSeconds(Attack_Duration / 2 + 0.1f);
                 for (int i = 0; i < first_3_enemies.Length; i++)
                 {
-                    GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, transform.rotation);
+                    GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Quaternion.identity * Quaternion.Euler(0, 0, -90f));
                     BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
                     bullet.SetCharacter(this);
                     bullet.SetEnemy(first_3_enemies[i]);

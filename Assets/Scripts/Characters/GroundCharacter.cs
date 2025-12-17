@@ -4,15 +4,32 @@ using UnityEngine;
 
 public class GroundCharacter : BaseCharacter
 {
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         isCliff = false;
     }
-
-    // Update is called once per frame
-    void Update()
+    public override void UpgradeToLevel1()
     {
-        
+
+    }
+    public override void UpgradeToLevel2()
+    {
+
+    }
+    public override void UpgradeToLevel3()
+    {
+
+    }
+    public override void UpgradeToLevel4()
+    {
+
+    }
+    public override void SetAbilityIcon()
+    {
+
+    }
+    public override void Ability(Vector3 position)
+    {
+
     }
 }

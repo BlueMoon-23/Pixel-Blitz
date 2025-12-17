@@ -37,6 +37,9 @@ public class CharacterUIControll : MonoBehaviour
     public BaseCharacter CurrentCharacter;
     public CanvasGroup HiddenDetectionIcon;
     public CanvasGroup StrikethroughIcon;
+    public Button AbilityButton;
+    public Image AbilityCurrentIcon;
+    public Sprite[] AbilityIcons;
     public void UI_Off()
     {
         gameObject.SetActive(false);
@@ -76,5 +79,9 @@ public class CharacterUIControll : MonoBehaviour
         CharacterManager.instance.RemoveCharacter(CurrentCharacter);
         Destroy(CurrentCharacter.gameObject);
         gameObject.SetActive(false);
+    }
+    public void UseAbility()
+    {
+        //
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 public class Easy : MonoBehaviour
 {
     // Chứa logic sinh ra quái theo từng wave
-    public enum EnemyName { Normal, Quick, Enraged, NormalBoss, Hidden, Armored, NormalMystery, Necromancer, NecromancerMinion, SkeletonBoss, HiddenBoss, Speed, SpeedyBoss, BossMystery}
+    public enum EnemyName { Normal, Quick, Enraged, NormalBoss, Hidden, Armored, NormalMystery, Necromancer, NecromancerMinion, SkeletonBoss, HiddenBoss, Speed, SpeedyBoss, BossMystery, EasyFinalBoss}
     public List<EnemyEntry> enemyEntries = new List<EnemyEntry>();
     private Dictionary<EnemyName, BaseEnemy> EnemyList = new Dictionary<EnemyName, BaseEnemy>(14);
     public GameObject EnemySpawner;
@@ -231,6 +231,14 @@ public class Easy : MonoBehaviour
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 11));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SpeedyBoss, 12));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 13));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.EasyFinalBoss, 1));
+                    if (GameManager.instance != null)
+                    {
+                        GameManager.instance.BossHPGroup.SetActive(true);
+                        GameManager.instance.BossName.text = "Scarlet Knight";
+                        GameManager.instance.BossHPText.text = "25000 / 25000";
+                        
+                    }
                     break;
                 }
             default:

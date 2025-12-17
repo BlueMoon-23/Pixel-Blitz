@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
-public class BaseCharacter : MonoBehaviour
+public abstract class BaseCharacter : MonoBehaviour
 {
     // Basic stats
     protected float Range = 1; // Range = 1 <=> tầm bắn là hình tròn nằm trong 1 ô tilemap
@@ -17,6 +18,11 @@ public class BaseCharacter : MonoBehaviour
     protected bool isCliff;
     protected bool hasHiddenDetection;
     protected bool canStrikethrough;
+    protected bool _hasAbility = false;
+    public bool hasAbility
+    {
+        get { return _hasAbility; }
+    }
     // Other references
     public GameObject Range_Prefab;
     protected CharacterUIControll characterUI;
@@ -29,6 +35,9 @@ public class BaseCharacter : MonoBehaviour
     protected float Bow_Attack_Duration = 0.833f;
     protected float Staff_Attack_Duration = 0.417f;
     public GameObject Bullet_StartPosition;
+    // Stunned Effect
+    public GameObject StunnedEffect;
+    protected bool isStunned = false;
     private void Awake()
     {
         CircleScale = new Vector3(Range_Prefab.transform.localScale.x, Range_Prefab.transform.localScale.y, Range_Prefab.transform.localScale.z);
@@ -53,15 +62,14 @@ public class BaseCharacter : MonoBehaviour
             IndexPair[state] = 0;
         }
     }
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // Abstract methods
+    public abstract void UpgradeToLevel1();
+    public abstract void UpgradeToLevel2();
+    public abstract void UpgradeToLevel3();
+    public abstract void UpgradeToLevel4();
+    public abstract void SetAbilityIcon();
+    public abstract void Ability(Vector3 position);
+    // Normal methods
     public virtual float GetRange() { return 1f; }
     public bool hasHiddenDetectionOrNot()
     {
@@ -131,22 +139,6 @@ public class BaseCharacter : MonoBehaviour
         {
             characterUI.StrikethroughIcon.alpha = 0f;
         }
-    }
-    public virtual void UpgradeToLevel1()
-    {
-        //
-    }
-    public virtual void UpgradeToLevel2()
-    {
-        //
-    }
-    public virtual void UpgradeToLevel3()
-    {
-        //
-    }
-    public virtual void UpgradeToLevel4()
-    {
-        //
     }
     public void Upgrade()
     {
@@ -240,6 +232,7 @@ public class BaseCharacter : MonoBehaviour
     }
     public virtual void AttackWithCooldown(float Attack_Duration)
     {
+        if (isStunned) { return; }
         Clock += Time.deltaTime;
         if (Clock >= Cooldown)
         {
@@ -250,7 +243,7 @@ public class BaseCharacter : MonoBehaviour
     public virtual IEnumerator AttackWithAnimation(float Attack_Duration)
     {
         BaseEnemy first_enemy = FindFirstEnemy();
-        if (first_enemy != null)
+        if (first_enemy != null && !first_enemy.isDieOrNot())
         {
             if (first_enemy.transform.position.x < transform.position.x)
             {
@@ -264,7 +257,10 @@ public class BaseCharacter : MonoBehaviour
             SPUM_Prefabs.PlayAnimation(PlayerState.ATTACK, IndexPair[PlayerState.ATTACK]);
             SPUM_Prefabs._anim.speed = 2 * Attack_Duration / Cooldown;
             yield return new WaitForSeconds(Attack_Duration / 2 + 0.1f);
-            GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, transform.rotation);
+            // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
+            float Angle_in_Radian = Mathf.Atan2(first_enemy.transform.position.y - transform.position.y, first_enemy.transform.position.x - transform.position.x);
+            Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
+            GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
             BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
             bullet.SetCharacter(this);
             bullet.SetEnemy(first_enemy);
@@ -274,11 +270,12 @@ public class BaseCharacter : MonoBehaviour
     }
     public virtual void AttackWithoutAnimation()
     {
+        if (isStunned) { return; }
         Clock += Time.deltaTime;
         if (Clock >= Cooldown)
         {
             BaseEnemy first_enemy = FindFirstEnemy();
-            if (first_enemy != null)
+            if (first_enemy != null && !first_enemy.isDieOrNot())
             {
                 if (first_enemy.transform.position.x < transform.position.x)
                 {
@@ -288,12 +285,23 @@ public class BaseCharacter : MonoBehaviour
                 {
                     transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
                 }
-                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, transform.rotation);
+                // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
+                float Angle_in_Radian = Mathf.Atan2(first_enemy.transform.position.y - transform.position.y, first_enemy.transform.position.x - transform.position.x);
+                Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
+                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
                 BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
                 bullet.SetCharacter(this);
                 bullet.SetEnemy(first_enemy);
             }
             Clock = 0f;
         }
+    }
+    public IEnumerator GetStunned(float duration)
+    {
+        isStunned = true;
+        GameObject newEffect = Instantiate(StunnedEffect, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
+        Destroy(newEffect, duration);
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
     }
 }

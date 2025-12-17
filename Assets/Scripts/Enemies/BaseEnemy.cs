@@ -22,6 +22,7 @@ public class BaseEnemy : MonoBehaviour
     public float Distance
     {
         get { return _Distance; }
+        set { if (value >= 0) _Distance = value; }
     }
     // HP Bar;
     [SerializeField] protected GameObject HP_RedBar;
@@ -30,9 +31,11 @@ public class BaseEnemy : MonoBehaviour
     public GameObject EnemyRoot;
     // FreezeEffect
     public GameObject FreezeEffect; // MagicChargeBlue
-    public int FreezeStack = 3;
-    [SerializeField] private int FreezeCurrentStack = 0;
-    private bool isFrozen = false;
+    protected int FreezeStack = 3;
+    [SerializeField] protected int FreezeCurrentStack = 0;
+    protected bool isFrozen = false;
+    // Boss
+    protected bool isFinalBoss = false;
     protected void Awake()
     {
         // Move road
@@ -79,10 +82,10 @@ public class BaseEnemy : MonoBehaviour
     {
         return isHidden;
     }
-    public void TakeDamage(float Damage, bool canStrikethrough)
+    public virtual void TakeDamage(float Damage, bool canStrikethrough) // Boss còn phải cập nhật lên text nên để virtual
     {
-        // Hidden: neu khong co hidden detection thi KHONG NHAM
-        // Armored: neu khong xuyen giap duoc thi KHONG TRU MAU
+        // Hidden: nếu không có hidden detection thì KHÔNG NHẮM VÀO
+        // Armored: nếu không xuyên giáp được thì KHÔNG TRỪ MÁU
         if ((isArmored && !canStrikethrough))
         {
             //
@@ -93,7 +96,7 @@ public class BaseEnemy : MonoBehaviour
             HP_RedBar.transform.localScale = new Vector3(Original_x_HPScale * HP / MaxHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
         }
     }
-    public void Die()
+    public virtual void Die()
     {
         if (HP <= 0)
         {
@@ -104,6 +107,10 @@ public class BaseEnemy : MonoBehaviour
             }
             Destroy(this.gameObject);
         }
+    }
+    public bool isDieOrNot()
+    {
+        return (HP <= 0);
     }
     public void Move()
     {
@@ -152,11 +159,14 @@ public class BaseEnemy : MonoBehaviour
     }
     public void GetFreeze(float FreezeTime, int FreezeCount)
     {
-        FreezeCurrentStack++;
-        FreezeStack = FreezeCount;
-        if (FreezeCurrentStack == FreezeStack)
+        if (!isFinalBoss)
         {
-            StartCoroutine(BeFrozen(FreezeTime));
+            FreezeCurrentStack++;
+            FreezeStack = FreezeCount;
+            if (FreezeCurrentStack == FreezeStack)
+            {
+                StartCoroutine(BeFrozen(FreezeTime));
+            }
         }
     }
     private IEnumerator BeFrozen(float FreezeTime)

@@ -26,11 +26,12 @@ public class CharacterManager : MonoBehaviour
     private int Character_LimitPlacement = 20;
     public TextMeshProUGUI CurrentCharacter;
     public TextMeshProUGUI Announcement;
-    public enum CharacterName { Archer, Freezer, Minigunner, Ranger, Rocketeer, Summoner, Accelerator, Wizard};
+    public enum CharacterName { Archer, Freezer, Minigunner, MinigunnerClone, Ranger, Rocketeer, Summoner, Accelerator, Wizard};
     private Dictionary<CharacterName, int> Limit_for_1_Character = new Dictionary<CharacterName, int> { 
         { CharacterName.Archer, 8 },
         { CharacterName.Freezer, 4 },
         { CharacterName.Minigunner, 4 },
+        { CharacterName.MinigunnerClone, 4 },
         { CharacterName.Ranger, 5 },
         { CharacterName.Rocketeer, 5 },
         { CharacterName.Summoner, 3 },
@@ -41,6 +42,7 @@ public class CharacterManager : MonoBehaviour
         { CharacterName.Archer, 0 },
         { CharacterName.Freezer, 0 },
         { CharacterName.Minigunner, 0 },
+        { CharacterName.MinigunnerClone, 0 },
         { CharacterName.Ranger, 0 },
         { CharacterName.Rocketeer, 0 },
         { CharacterName.Summoner, 0 },
@@ -199,6 +201,22 @@ public class CharacterManager : MonoBehaviour
                         }
                         break;
                     }
+                case "MinigunnerClone":
+                    {
+                        if (CharacterQuantity[CharacterName.MinigunnerClone] < Limit_for_1_Character[CharacterName.MinigunnerClone])
+                        {
+                            CharacterQuantity[CharacterName.MinigunnerClone]++;
+                        }
+                        else
+                        {
+                            characterList.Remove(character);
+                            CharacterPositions.Remove(position);
+                            Destroy(character.gameObject);
+                            Change_CurrentCharacter();
+                            Show_Limit_for_1_Character_Text(CharacterName.MinigunnerClone, character);
+                        }
+                        break;
+                    }
                 default:
                     {
                         break;
@@ -239,6 +257,11 @@ public class CharacterManager : MonoBehaviour
             case "Minigunner":
                 {
                     CharacterQuantity[CharacterName.Minigunner]--;
+                    break;
+                }
+            case "MinigunnerClone":
+                {
+                    CharacterQuantity[CharacterName.MinigunnerClone]--;
                     break;
                 }
             case "Ranger":
@@ -319,7 +342,6 @@ public class CharacterManager : MonoBehaviour
             Limit_for_1_Character_Text.gameObject.SetActive(false);
         });
     }
-
     public void DestroyAllCharacters()
     {
         for (int i = 0; i < characterList.Count; i++)

@@ -37,7 +37,7 @@ public class EconomyManager : MonoBehaviour
     public CanvasGroup WaveClearBonusAnnounecement;
     void Start()
     {
-        _PlayerCoin = 600f;
+        _PlayerCoin = 1000000f;
         original_position1 = EarnCoin.transform.position;
         original_position2 = EarnCoinIcon.transform.position;
         Change_CurrentCoin();
@@ -132,16 +132,17 @@ public class EconomyManager : MonoBehaviour
     }
     public void EarnCoinEachWave(int wave)
     {
-        AddCoin(200 + wave * 150);
+        float Formula = 15 * wave * wave + 50 * wave;
+        AddCoin(Formula);
         Change_CurrentCoin();
-        WaveReward.text = "Wave Reward: $" + (200 + wave * 150);
+        WaveReward.text = "Wave Reward: $" + (Formula);
         ShowAnnounce(WaveRewardAnnounecement);
         // Wave clear bonus
         if (EnemyManager.instance != null && EnemyManager.instance.GetEnemyListCount() == 0)
         {
-            AddCoin((int)((200 + wave * 150) / 3));
+            AddCoin((int)((Formula / 3)));
             Change_CurrentCoin();
-            WaveClearBonus.text = "Wave Clear Bonus: $" + (int)((200 + wave * 150) / 3);
+            WaveClearBonus.text = "Wave Clear Bonus: $" + (int)(Formula / 3);
             WaveClearBonusAnnounecement.gameObject.SetActive(true);
             ShowAnnounce(WaveClearBonusAnnounecement);
         }

@@ -13,6 +13,9 @@ public class SoundManager : MonoBehaviour
     public AudioClip EarnCoin_Sound;
     public AudioClip BaseGetHit_Sound;
     public AudioClip Skip_Sound;
+    public AudioClip Victory_Sound; // pianoairy
+    public AudioClip Defeat_Sound; // airystring
+    public AudioClip StompGround_Sound;
     private void Awake()
     {
         if (Instance == null)

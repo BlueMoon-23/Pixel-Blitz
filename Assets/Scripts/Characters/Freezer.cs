@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,12 +27,14 @@ public class Freezer : GroundCharacter
         SellCost = (int)(Cost / 3);
         _FreezeTime = 0.5f;
         _FreezeCount = 3;
+        _hasAbility = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        AttackWithoutAnimation();
+        if (!isStunned) { AttackWithoutAnimation(); }
+        // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
     }
     public override float GetRange()
     {
@@ -131,7 +133,7 @@ public class Freezer : GroundCharacter
         for (int i = 1; i <= 3; i++)
         {
             BaseEnemy first_enemy = FindFirstEnemy();
-            if (first_enemy != null)
+            if (first_enemy != null && !first_enemy.isDieOrNot())
             {
                 if (first_enemy.transform.position.x < transform.position.x)
                 {
@@ -141,7 +143,10 @@ public class Freezer : GroundCharacter
                 {
                     transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
                 }
-                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, transform.rotation);
+                // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
+                float Angle_in_Radian = Mathf.Atan2(first_enemy.transform.position.y - transform.position.y, first_enemy.transform.position.x - transform.position.x);
+                Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
+                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
                 if (Level < 3)
                 {
                     newBullet.transform.localScale *= 0.5f;

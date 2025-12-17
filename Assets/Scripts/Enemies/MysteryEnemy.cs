@@ -22,6 +22,7 @@ public class MysteryEnemy : BaseEnemy
         GameObject newEnemy = Instantiate(EnemyList[i], transform.position, Quaternion.identity);
         BaseEnemy enemy = newEnemy.GetComponent<BaseEnemy>();
         enemy.Waypoint_CurrentIndex = this.Waypoint_CurrentIndex;
+        enemy.Distance = this.Distance;
         if (EnemyManager.instance != null) { EnemyManager.instance.RemoveEnemy(this); }
     }
 }

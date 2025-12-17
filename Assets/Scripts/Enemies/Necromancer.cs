@@ -33,6 +33,7 @@ public class Necromancer : BaseEnemy
                 GameObject newEnemy = Instantiate(Minion, transform.position, Quaternion.identity);
                 BaseEnemy enemy = newEnemy.GetComponent<BaseEnemy>();
                 enemy.Waypoint_CurrentIndex = this.Waypoint_CurrentIndex;
+                enemy.Distance = this.Distance;
                 yield return new WaitForSeconds(0.5f);
             }
             yield return new WaitForSeconds(3f);

@@ -1,4 +1,4 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -39,7 +39,11 @@ public class GameManager : MonoBehaviour
     public CanvasGroup DefeatInfo;
     public CanvasGroup DefeatOptions;
     public TextMeshProUGUI Defeat_TimePlayedText;
-    private Coroutine startGame;
+    // Boss HP
+    public GameObject BossHPGroup;
+    public TextMeshProUGUI BossName;
+    public TextMeshProUGUI BossHPText;
+    public Image BossHPBar;
     // Singleton
     public static GameManager instance;
     private void Awake()
@@ -62,15 +66,14 @@ public class GameManager : MonoBehaviour
     private IEnumerator StartGame()
     {
         yield return StartCoroutine(GetReady());
-        startGame = StartCoroutine(SpawnEnemyWave());
-        yield return startGame;
+        yield return StartCoroutine(SpawnEnemyWave());
     }
     void Update()
     {
         // Defeat luon neu base health <= 0
         if (BaseHealth <= 0)
         {
-            Defeat();
+            Defeated = true;
         }
     }
     IEnumerator SpawnEnemyWave()
@@ -78,7 +81,7 @@ public class GameManager : MonoBehaviour
         ReadyUI.gameObject.SetActive(false);
         Coroutine coroutine = TimeManager.instance.StartCoroutine(TimeManager.instance.TimeCount());
         TimeManager.instance.SetCoroutine(coroutine);
-        for (int i = 1; i <= MaxWave; i++)
+        for (int i = 25; i <= MaxWave; i++)
         {
             if (!Defeated) // khong co if nay thi vong while bi break, wavetext bi lap lai nhieu lan
             {
@@ -111,7 +114,9 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                break;
+                StopAllCoroutines(); // Lệnh hủy diệt, chú ý tốc độ game
+                Defeat();
+                yield break;
             }
         }
         yield return new WaitForSeconds(5f);
@@ -192,6 +197,7 @@ public class GameManager : MonoBehaviour
     }
     private void Victory()
     {
+        if (SoundManager.Instance != null) { SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Victory_Sound); }
         DOTween.KillAll();
         Sequence sequence = DOTween.Sequence();
         sequence.AppendCallback(() =>
@@ -214,34 +220,36 @@ public class GameManager : MonoBehaviour
     }
     private void Defeat()
     {
-        Defeated = true;
-        StopCoroutine(startGame);
-        if (EnemyManager.instance != null) { EnemyManager.instance.DestroyAllEnemies(); }
-        if (CharacterManager.instance != null) {  CharacterManager.instance.DestroyAllCharacters(); }
-        BaseBullets[] BulletsOnScreen = GameObject.FindObjectsOfType<BaseBullets>();
-        for (int i = 0; i  < BulletsOnScreen.Length; i++)
+        if (Defeated)
         {
-            Destroy(BulletsOnScreen[i]);
+            if (EnemyManager.instance != null) { EnemyManager.instance.DestroyAllEnemies(); }
+            if (CharacterManager.instance != null) {  CharacterManager.instance.DestroyAllCharacters(); }
+            BaseBullets[] BulletsOnScreen = GameObject.FindObjectsOfType<BaseBullets>();
+            for (int i = 0; i  < BulletsOnScreen.Length; i++)
+            {
+                Destroy(BulletsOnScreen[i]);
+            }
+            // UI
+            if (SoundManager.Instance != null) { SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Defeat_Sound); }
+            DOTween.KillAll();
+            Sequence sequence = DOTween.Sequence();
+            sequence.AppendCallback(() =>
+            {
+                TitleBar1.gameObject.SetActive(true);
+                DefeatDimed.gameObject.SetActive(true);
+                DefeatDimed.transform.DOScaleY(DefeatDimed.transform.localScale.y, 2f).From(0f);
+            });
+            sequence.AppendInterval(2f).AppendCallback(() =>
+            {
+                DefeatInfo.gameObject.SetActive(true);
+                Defeat_TimePlayedText.text = "Time Played: " + (TimeManager.instance.Get_TimePlayed() / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
+                DefeatInfo.DOFade(1f, 1f).From(0f);
+            });
+            sequence.AppendInterval(1f).AppendCallback(() =>
+            {
+                DefeatOptions.gameObject.SetActive(true);
+                DefeatOptions.DOFade(1f, 1f).From(0f);
+            });
         }
-        // UI
-        DOTween.KillAll();
-        Sequence sequence = DOTween.Sequence();
-        sequence.AppendCallback(() =>
-        {
-            TitleBar1.gameObject.SetActive(true);
-            DefeatDimed.gameObject.SetActive(true);
-            DefeatDimed.transform.DOScaleY(DefeatDimed.transform.localScale.y, 2f).From(0f);
-        });
-        sequence.AppendInterval(2f).AppendCallback(() =>
-        {
-            DefeatInfo.gameObject.SetActive(true);
-            Defeat_TimePlayedText.text = "Time Played: " + (TimeManager.instance.Get_TimePlayed() / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
-            DefeatInfo.DOFade(1f, 1f).From(0f);
-        });
-        sequence.AppendInterval(1f).AppendCallback(() =>
-        {
-            DefeatOptions.gameObject.SetActive(true);
-            DefeatOptions.DOFade(1f, 1f).From(0f);
-        });
     }
 }

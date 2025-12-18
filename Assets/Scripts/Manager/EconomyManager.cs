@@ -37,7 +37,7 @@ public class EconomyManager : MonoBehaviour
     public CanvasGroup WaveClearBonusAnnounecement;
     void Start()
     {
-        _PlayerCoin = 1000000f;
+        _PlayerCoin = 600f;
         original_position1 = EarnCoin.transform.position;
         original_position2 = EarnCoinIcon.transform.position;
         Change_CurrentCoin();

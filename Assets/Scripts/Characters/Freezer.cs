@@ -154,6 +154,9 @@ public class Freezer : GroundCharacter
                 BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
                 bullet.SetCharacter(this);
                 bullet.SetEnemy(first_enemy);
+                // Tạo hiệu ứng nổ đạn (muzzle)
+                GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
+                Destroy(muzzle, 0.25f);
             }
             yield return new WaitForSeconds(0.25f);
         }

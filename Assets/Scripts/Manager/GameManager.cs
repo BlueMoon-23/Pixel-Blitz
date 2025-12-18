@@ -71,9 +71,11 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         // Defeat luon neu base health <= 0
-        if (BaseHealth <= 0)
+        if (BaseHealth <= 0 && !Defeated)
         {
             Defeated = true;
+            StopAllCoroutines();
+            Defeat();
         }
     }
     IEnumerator SpawnEnemyWave()
@@ -114,8 +116,6 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                StopAllCoroutines(); // Lệnh hủy diệt, chú ý tốc độ game
-                Defeat();
                 yield break;
             }
         }
@@ -161,6 +161,7 @@ public class GameManager : MonoBehaviour
     public void BaseGetHit(float Damage)
     {
         BaseHealth -= Damage;
+        if (BaseHealth < 0) BaseHealth = 0;
         if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.BaseGetHit_Sound);
         BaseHealthText.text = BaseHealth.ToString() + " / 100";
         //DOTween.KillAll();
@@ -220,36 +221,33 @@ public class GameManager : MonoBehaviour
     }
     private void Defeat()
     {
-        if (Defeated)
+        if (EnemyManager.instance != null) { EnemyManager.instance.DestroyAllEnemies(); }
+        if (CharacterManager.instance != null) { CharacterManager.instance.DestroyAllCharacters(); }
+        BaseBullets[] BulletsOnScreen = GameObject.FindObjectsOfType<BaseBullets>();
+        for (int i = 0; i < BulletsOnScreen.Length; i++)
         {
-            if (EnemyManager.instance != null) { EnemyManager.instance.DestroyAllEnemies(); }
-            if (CharacterManager.instance != null) {  CharacterManager.instance.DestroyAllCharacters(); }
-            BaseBullets[] BulletsOnScreen = GameObject.FindObjectsOfType<BaseBullets>();
-            for (int i = 0; i  < BulletsOnScreen.Length; i++)
-            {
-                Destroy(BulletsOnScreen[i]);
-            }
-            // UI
-            if (SoundManager.Instance != null) { SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Defeat_Sound); }
-            DOTween.KillAll();
-            Sequence sequence = DOTween.Sequence();
-            sequence.AppendCallback(() =>
-            {
-                TitleBar1.gameObject.SetActive(true);
-                DefeatDimed.gameObject.SetActive(true);
-                DefeatDimed.transform.DOScaleY(DefeatDimed.transform.localScale.y, 2f).From(0f);
-            });
-            sequence.AppendInterval(2f).AppendCallback(() =>
-            {
-                DefeatInfo.gameObject.SetActive(true);
-                Defeat_TimePlayedText.text = "Time Played: " + (TimeManager.instance.Get_TimePlayed() / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
-                DefeatInfo.DOFade(1f, 1f).From(0f);
-            });
-            sequence.AppendInterval(1f).AppendCallback(() =>
-            {
-                DefeatOptions.gameObject.SetActive(true);
-                DefeatOptions.DOFade(1f, 1f).From(0f);
-            });
+            Destroy(BulletsOnScreen[i]);
         }
+        // UI
+        if (SoundManager.Instance != null) { SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Defeat_Sound); }
+        DOTween.KillAll();
+        Sequence sequence = DOTween.Sequence();
+        sequence.AppendCallback(() =>
+        {
+            TitleBar1.gameObject.SetActive(true);
+            DefeatDimed.gameObject.SetActive(true);
+            DefeatDimed.transform.DOScaleY(DefeatDimed.transform.localScale.y, 2f).From(0f);
+        });
+        sequence.AppendInterval(2f).AppendCallback(() =>
+        {
+            DefeatInfo.gameObject.SetActive(true);
+            Defeat_TimePlayedText.text = "Time Played: " + (TimeManager.instance.Get_TimePlayed() / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
+            DefeatInfo.DOFade(1f, 1f).From(0f);
+        });
+        sequence.AppendInterval(1f).AppendCallback(() =>
+        {
+            DefeatOptions.gameObject.SetActive(true);
+            DefeatOptions.DOFade(1f, 1f).From(0f);
+        });
     }
 }

@@ -8,6 +8,10 @@ public class GroundCharacter : BaseCharacter
     {
         isCliff = false;
     }
+    public override float GetCost()
+    {
+        return 0;
+    }
     public override void UpgradeToLevel1()
     {
 

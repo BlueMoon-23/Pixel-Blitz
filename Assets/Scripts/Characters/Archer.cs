@@ -13,7 +13,7 @@ public class Archer : GroundCharacter
         Level = 0;
         hasHiddenDetection = false;
         canStrikethrough = false;
-        UpgradeCost = new float[] { 150, 900, 2500, 9000 };
+        UpgradeCost = new float[] { 150, 750, 1500, 9000 };
         SellCost = (int)(Cost / 3);
         _hasAbility = false;
     }
@@ -127,10 +127,8 @@ public class Archer : GroundCharacter
                 SPUM_Prefabs.PlayAnimation(PlayerState.ATTACK, IndexPair[PlayerState.ATTACK]);
                 SPUM_Prefabs._anim.speed = 2 * Attack_Duration / Cooldown;
                 yield return new WaitForSeconds(Attack_Duration / 2 + 0.1f);
-                // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
-                float Angle_in_Radian = Mathf.Atan2(first_enemy.transform.position.y - transform.position.y, first_enemy.transform.position.x - transform.position.x);
-                Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
-                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
+                // Bắn đạn: đạn archer cong cong cho đẹp
+                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Quaternion.identity);
                 BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
                 bullet.SetCharacter(this);
                 bullet.SetEnemy(first_enemy);
@@ -157,7 +155,7 @@ public class Archer : GroundCharacter
                 yield return new WaitForSeconds(Attack_Duration / 2 + 0.1f);
                 for (int i = 0; i < first_3_enemies.Length; i++)
                 {
-                    GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Quaternion.identity * Quaternion.Euler(0, 0, -90f));
+                    GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Quaternion.identity);
                     BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
                     bullet.SetCharacter(this);
                     bullet.SetEnemy(first_3_enemies[i]);

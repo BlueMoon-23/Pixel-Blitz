@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour
         ReadyUI.gameObject.SetActive(false);
         Coroutine coroutine = TimeManager.instance.StartCoroutine(TimeManager.instance.TimeCount());
         TimeManager.instance.SetCoroutine(coroutine);
-        for (int i = 25; i <= MaxWave; i++)
+        for (int i = 1; i <= MaxWave; i++)
         {
             if (!Defeated) // khong co if nay thi vong while bi break, wavetext bi lap lai nhieu lan
             {

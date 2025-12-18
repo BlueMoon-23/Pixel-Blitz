@@ -35,6 +35,7 @@ public abstract class BaseCharacter : MonoBehaviour
     protected float Bow_Attack_Duration = 0.833f;
     protected float Staff_Attack_Duration = 0.417f;
     public GameObject Bullet_StartPosition;
+    public GameObject BulletMuzzle;
     // Stunned Effect
     public GameObject StunnedEffect;
     protected bool isStunned = false;
@@ -63,6 +64,7 @@ public abstract class BaseCharacter : MonoBehaviour
         }
     }
     // Abstract methods
+    public abstract float GetCost();
     public abstract void UpgradeToLevel1();
     public abstract void UpgradeToLevel2();
     public abstract void UpgradeToLevel3();
@@ -82,10 +84,6 @@ public abstract class BaseCharacter : MonoBehaviour
     public float GetDamage()
     {
         return Damage;
-    }
-    public virtual float GetCost()
-    {
-        return Cost;
     }
     public int GetLevel()
     {
@@ -264,6 +262,9 @@ public abstract class BaseCharacter : MonoBehaviour
             BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
             bullet.SetCharacter(this);
             bullet.SetEnemy(first_enemy);
+            // Tạo hiệu ứng nổ đạn (muzzle)
+            GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
+            Destroy(muzzle, 0.25f);
             yield return new WaitForSeconds(Attack_Duration - (Attack_Duration / 2 + 0.1f));
             SPUM_Prefabs._anim.speed = 1;
         }
@@ -277,6 +278,7 @@ public abstract class BaseCharacter : MonoBehaviour
             BaseEnemy first_enemy = FindFirstEnemy();
             if (first_enemy != null && !first_enemy.isDieOrNot())
             {
+                // Xoay bản thân
                 if (first_enemy.transform.position.x < transform.position.x)
                 {
                     transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
@@ -292,6 +294,9 @@ public abstract class BaseCharacter : MonoBehaviour
                 BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
                 bullet.SetCharacter(this);
                 bullet.SetEnemy(first_enemy);
+                // Tạo hiệu ứng nổ đạn (muzzle)
+                GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
+                Destroy(muzzle, 0.25f);
             }
             Clock = 0f;
         }

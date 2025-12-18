@@ -8,6 +8,10 @@ public class CliffCharacter : BaseCharacter
     {
         isCliff = true;
     }
+    public override float GetCost()
+    {
+        return 0;
+    }
     public override void UpgradeToLevel1()
     {
 

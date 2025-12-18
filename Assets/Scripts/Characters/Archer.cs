@@ -13,7 +13,7 @@ public class Archer : GroundCharacter
         Level = 0;
         hasHiddenDetection = false;
         canStrikethrough = false;
-        UpgradeCost = new float[] { 150, 750, 1500, 9000 };
+        UpgradeCost = new float[] { 250, 750, 2500, 9000 };
         SellCost = (int)(Cost / 3);
         _hasAbility = false;
     }
@@ -132,6 +132,9 @@ public class Archer : GroundCharacter
                 BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
                 bullet.SetCharacter(this);
                 bullet.SetEnemy(first_enemy);
+                // Tạo hiệu ứng nổ đạn (muzzle)
+                GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Quaternion.identity);
+                Destroy(muzzle, 0.25f);
                 yield return new WaitForSeconds(Attack_Duration - (Attack_Duration / 2 + 0.1f));
                 SPUM_Prefabs._anim.speed = 1;
             }
@@ -160,6 +163,9 @@ public class Archer : GroundCharacter
                     bullet.SetCharacter(this);
                     bullet.SetEnemy(first_3_enemies[i]);
                 }
+                // Tạo hiệu ứng nổ đạn (muzzle)
+                GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Quaternion.identity);
+                Destroy(muzzle, 0.25f);
                 yield return new WaitForSeconds(Attack_Duration - (Attack_Duration / 2 + 0.1f));
                 SPUM_Prefabs._anim.speed = 1;
             }

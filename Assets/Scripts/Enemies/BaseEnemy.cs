@@ -36,6 +36,9 @@ public class BaseEnemy : MonoBehaviour
     protected bool isFrozen = false;
     // Boss
     protected bool isFinalBoss = false;
+    // Stun effect
+    public GameObject StunEffect;
+    protected bool isStunned = false;
     protected void Awake()
     {
         // Move road
@@ -114,7 +117,7 @@ public class BaseEnemy : MonoBehaviour
     }
     public void Move()
     {
-        if (!isFrozen)
+        if (!isFrozen && !isStunned)
         {
             SPUM_Prefabs.PlayAnimation(PlayerState.MOVE, IndexPair[PlayerState.MOVE]);
             SPUM_Prefabs._anim.speed = 25 * Speed / 38 + 7 / 38;
@@ -150,6 +153,7 @@ public class BaseEnemy : MonoBehaviour
         }
         else
         {
+            SPUM_Prefabs.PlayAnimation(PlayerState.IDLE, IndexPair[PlayerState.IDLE]);
             SPUM_Prefabs._anim.speed = 0f;
         }
     }
@@ -167,6 +171,17 @@ public class BaseEnemy : MonoBehaviour
             {
                 StartCoroutine(BeFrozen(FreezeTime));
             }
+        }
+    }
+    public IEnumerator GetStunned(float StunDuration)
+    {
+        if (!isFinalBoss)
+        {
+            isStunned = true;
+            StunEffect.SetActive(true);
+            yield return new WaitForSeconds(StunDuration);
+            isStunned = false;
+            StunEffect.SetActive(false);
         }
     }
     private IEnumerator BeFrozen(float FreezeTime)

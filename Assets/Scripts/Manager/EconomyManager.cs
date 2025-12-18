@@ -132,7 +132,7 @@ public class EconomyManager : MonoBehaviour
     }
     public void EarnCoinEachWave(int wave)
     {
-        float Formula = 15 * wave * wave + 50 * wave;
+        float Formula = 15 * wave * wave + 25 * wave + 150;
         AddCoin(Formula);
         Change_CurrentCoin();
         WaveReward.text = "Wave Reward: $" + (Formula);

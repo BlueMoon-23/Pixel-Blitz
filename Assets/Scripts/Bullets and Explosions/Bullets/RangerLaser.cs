@@ -19,9 +19,9 @@ public class RangerLaser : BaseBullets
     // Update is called once per frame
     void LateUpdate() // LateUpdate để tính toán cho chính xác
     {
-        if (!hasDealtDamage) Stretch();
+        if (!hasDealtDamage) StartCoroutine(Stretch());
     }
-    protected void Stretch()
+    protected IEnumerator Stretch()
     {
         lineRenderer.SetPosition(0, HeadGun.transform.position);
         if (enemy != null)
@@ -30,7 +30,16 @@ public class RangerLaser : BaseBullets
             float Angle = Mathf.Atan2(enemy.transform.position.y - transform.position.y, enemy.transform.position.x - transform.position.x) * Mathf.Rad2Deg;
             Quaternion targetDirection = Quaternion.Euler(0, 0, Angle - 90f);
             transform.rotation = targetDirection;
-            //RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, 50f);
+            yield return new WaitForSeconds(0.25f);
+            DealDamage();
+        }
+        yield break;
+    }
+    protected void DealDamage()
+    {
+        //RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, 50f);
+        if (enemy != null)
+        {
             Collider2D hit = Physics2D.OverlapCircle(enemy.transform.position, 0.5f); // Khi chạm tạo 1 vùng collider hình tròn bán kính 0.5f
             if (hit != null)
             {

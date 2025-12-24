@@ -8,7 +8,7 @@ public class Archer : GroundCharacter
     {
         Range = 6f;
         Damage = 3f;
-        Cooldown = 2f;
+        Cooldown = 1.5f;
         Cost = 600f;
         Level = 0;
         hasHiddenDetection = false;
@@ -16,12 +16,14 @@ public class Archer : GroundCharacter
         UpgradeCost = new float[] { 250, 750, 2500, 9000 };
         SellCost = (int)(Cost / 3);
         _hasAbility = false;
+        Bow_Attack_Duration = 0.833f;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!isStunned) { AttackWithCooldown(Bow_Attack_Duration); }
+        float min_duration = Bow_Attack_Duration < Cooldown ? Bow_Attack_Duration : Cooldown;
+        if (!isStunned) { AttackWithCooldown(min_duration); }
         // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
     }
     public override float GetRange() 
@@ -37,7 +39,7 @@ public class Archer : GroundCharacter
     public override void UpgradeToLevel1()
     {
         Range = 7f;
-        Cooldown = 1.5f;
+        Cooldown = 1f;
         Level = 1;
     }
     public override void UpgradeToLevel2()
@@ -76,7 +78,7 @@ public class Archer : GroundCharacter
             case 2:
                 {
                     characterUI.upgradeName.text = "Quick Shot";
-                    characterUI.Info1.text = "Cooldown: 1.5s => 0.5s";
+                    characterUI.Info1.text = "Cooldown: 1s => 0.5s";
                     characterUI.Info2.text = "Damage: 3 => 6";
                     characterUI.Info3.text = "";
                     break;
@@ -101,7 +103,7 @@ public class Archer : GroundCharacter
                 {
                     characterUI.upgradeName.text = "Better Gloves";
                     characterUI.Info1.text = "Range: 6 => 7";
-                    characterUI.Info2.text = "Cooldown: 2s => 1.5s";
+                    characterUI.Info2.text = "Cooldown: 1.5s => 1s";
                     characterUI.Info3.text = "";
                     break;
                 }
@@ -115,27 +117,17 @@ public class Archer : GroundCharacter
             BaseEnemy first_enemy = FindFirstEnemy();
             if (first_enemy != null && !first_enemy.isDieOrNot())
             {
-                if (first_enemy.transform.position.x < transform.position.x)
-                {
-                    transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
-                else
-                {
-                    transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
-                // Play animation
-                SPUM_Prefabs.PlayAnimation(PlayerState.ATTACK, IndexPair[PlayerState.ATTACK]);
-                SPUM_Prefabs._anim.speed = 2 * Attack_Duration / Cooldown;
-                yield return new WaitForSeconds(Attack_Duration / 2 + 0.1f);
+                SelfRotate(first_enemy);
+                PlayAttackAmination(Attack_Duration);
+                yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
                 // Bắn đạn: đạn archer cong cong cho đẹp
                 GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Quaternion.identity);
                 BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
                 bullet.SetCharacter(this);
                 bullet.SetEnemy(first_enemy);
                 // Tạo hiệu ứng nổ đạn (muzzle)
-                GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Quaternion.identity);
-                Destroy(muzzle, 0.25f);
-                yield return new WaitForSeconds(Attack_Duration - (Attack_Duration / 2 + 0.1f));
+                MuzzleEffect(Quaternion.identity);
+                yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
                 SPUM_Prefabs._anim.speed = 1;
             }
         }
@@ -144,18 +136,10 @@ public class Archer : GroundCharacter
             BaseEnemy[] first_3_enemies = FindThreeFirstEnemies();
             if (first_3_enemies[0] != null && !first_3_enemies[0].isDieOrNot())
             {
-                if (first_3_enemies[0].transform.position.x < transform.position.x)
-                {
-                    transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
-                else
-                {
-                    transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
+                SelfRotate(first_3_enemies[0]);
                 // Play animation
-                SPUM_Prefabs.PlayAnimation(PlayerState.ATTACK, IndexPair[PlayerState.ATTACK]);
-                SPUM_Prefabs._anim.speed = 2 * Attack_Duration / Cooldown;
-                yield return new WaitForSeconds(Attack_Duration / 2 + 0.1f);
+                PlayAttackAmination(Attack_Duration);
+                yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
                 for (int i = 0; i < first_3_enemies.Length; i++)
                 {
                     GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Quaternion.identity);
@@ -164,9 +148,8 @@ public class Archer : GroundCharacter
                     bullet.SetEnemy(first_3_enemies[i]);
                 }
                 // Tạo hiệu ứng nổ đạn (muzzle)
-                GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Quaternion.identity);
-                Destroy(muzzle, 0.25f);
-                yield return new WaitForSeconds(Attack_Duration - (Attack_Duration / 2 + 0.1f));
+                MuzzleEffect(Quaternion.identity);
+                yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
                 SPUM_Prefabs._anim.speed = 1;
             }
         }

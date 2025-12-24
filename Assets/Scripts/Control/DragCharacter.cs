@@ -7,6 +7,10 @@ using UnityEngine.Tilemaps;
 
 public class DragCharacter : DragThing
 {
+    void Start()
+    {
+        baseCharacter = CharacterPrefab.GetComponent<BaseCharacter>();
+    }
     protected override void OnPointerDown_Specific(PointerEventData eventData)
     {
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -62,6 +66,7 @@ public class DragCharacter : DragThing
                     {
                         if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Place_Sound);
                         GameObject newCharacter = Instantiate(CharacterPrefab, GetDropPosition(eventData.position), Quaternion.identity);
+                        newCharacter.SetActive(true);
                         CharacterManager.instance.AddCharacterWithPosition(newCharacter.GetComponent<BaseCharacter>(), GetDropPosition(eventData.position));
                         EconomyManager.instance.Purchase(character.GetCost());
                         EconomyManager.instance.Change_CurrentCoin();

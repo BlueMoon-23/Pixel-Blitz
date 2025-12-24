@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Easy : MonoBehaviour
+public class Easy : Gamemodes
 {
+
     // Chứa logic sinh ra quái theo từng wave
     public enum EnemyName { Normal, Quick, Enraged, NormalBoss, Hidden, Armored, NormalMystery, Necromancer, NecromancerMinion, SkeletonBoss, HiddenBoss, Speed, SpeedyBoss, BossMystery, EasyFinalBoss}
     public List<EnemyEntry> enemyEntries = new List<EnemyEntry>();
     private Dictionary<EnemyName, BaseEnemy> EnemyList = new Dictionary<EnemyName, BaseEnemy>(14);
-    public GameObject EnemySpawner;
+    // EnemySpawner
+    private GameObject EnemySpawner;
     private void Awake()
     {
         for (int i = 0; i < enemyEntries.Count; i++)
@@ -26,7 +29,6 @@ public class Easy : MonoBehaviour
     }
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -55,10 +57,21 @@ public class Easy : MonoBehaviour
         for (int i = 0; i < Quantity; i++)
         {
             yield return new WaitForSeconds(1f);
-            Instantiate(GetEnemyWithName(name).gameObject, EnemySpawner.transform.position, Quaternion.identity);
+            // Set lại EnemySpawner một cách tự động
+            if (WaypointManager.instance != null)
+            {
+                GameObject[] Waypoints = WaypointManager.instance.GetWaypoints(out int Waypoints_index);
+                EnemySpawner = Waypoints[0];
+                GameObject newEnemy = Instantiate(GetEnemyWithName(name).gameObject, EnemySpawner.transform.position, Quaternion.identity);
+                BaseEnemy baseEnemy = newEnemy.GetComponent<BaseEnemy>();
+                if (baseEnemy != null)
+                {
+                    baseEnemy.Waypoint_SelectedIndex = Waypoints_index;
+                }
+            }
         }
     }
-    public IEnumerator SpawnEnemyWave(int Wave) 
+    public override IEnumerator SpawnEnemyWave(int Wave) 
     {
         switch (Wave)
         {
@@ -91,9 +104,9 @@ public class Easy : MonoBehaviour
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Normal, 4));
                     break;
                 }
-            case 6: // 20 enraged
+            case 6: // 15 enraged
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 20));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 15));
                     break;
                 }
             case 7: // 10 enraged, 1 normal boss

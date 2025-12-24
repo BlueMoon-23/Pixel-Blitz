@@ -14,6 +14,7 @@ public class RangerLaser : BaseBullets
     }
     void Start()
     {
+        StartCoroutine(DestroyAfter1Second());
     }
 
     // Update is called once per frame
@@ -26,8 +27,8 @@ public class RangerLaser : BaseBullets
         lineRenderer.SetPosition(0, HeadGun.transform.position);
         if (enemy != null)
         {
-            lineRenderer.SetPosition(1, enemy.transform.position + new Vector3(0, 0.25f, 0));
-            float Angle = Mathf.Atan2(enemy.transform.position.y - transform.position.y, enemy.transform.position.x - transform.position.x) * Mathf.Rad2Deg;
+            lineRenderer.SetPosition(1, enemy.Center.transform.position + new Vector3(0, 0.25f, 0));
+            float Angle = Mathf.Atan2(enemy.Center.transform.position.y - transform.position.y, enemy.Center.transform.position.x - transform.position.x) * Mathf.Rad2Deg;
             Quaternion targetDirection = Quaternion.Euler(0, 0, Angle - 90f);
             transform.rotation = targetDirection;
             yield return new WaitForSeconds(0.25f);
@@ -40,7 +41,7 @@ public class RangerLaser : BaseBullets
         //RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, 50f);
         if (enemy != null)
         {
-            Collider2D hit = Physics2D.OverlapCircle(enemy.transform.position, 0.5f); // Khi chạm tạo 1 vùng collider hình tròn bán kính 0.5f
+            Collider2D hit = Physics2D.OverlapCircle(enemy.Center.transform.position, 0.5f); // Khi chạm tạo 1 vùng collider hình tròn bán kính 0.5f
             if (hit != null)
             {
                 BaseEnemy baseEnemy = hit.GetComponent<BaseEnemy>();
@@ -67,5 +68,11 @@ public class RangerLaser : BaseBullets
                 Destroy(this.gameObject, 0.5f);
             }
         }
+    }
+    private IEnumerator DestroyAfter1Second()
+    {
+        yield return new WaitForSeconds(1f);
+        Destroy(this.gameObject);
+        yield break;
     }
 }

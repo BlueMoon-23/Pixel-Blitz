@@ -116,17 +116,9 @@ public class Ranger : CliffCharacter
             BaseEnemy first_enemy = FindFirstEnemy();
             if (first_enemy != null && !first_enemy.isDieOrNot())
             {
-                // Xoay bản thân
-                if (first_enemy.transform.position.x < transform.position.x)
-                {
-                    transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
-                else
-                {
-                    transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
+                SelfRotate(first_enemy);
                 // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
-                float Angle_in_Radian = Mathf.Atan2(first_enemy.transform.position.y - transform.position.y, first_enemy.transform.position.x - transform.position.x);
+                float Angle_in_Radian = Mathf.Atan2(first_enemy.Center.transform.position.y - transform.position.y, first_enemy.Center.transform.position.x - transform.position.x);
                 Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
                 GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
                 Destroy(newBullet, 1f);
@@ -137,8 +129,7 @@ public class Ranger : CliffCharacter
                 RangerLaser rangerLaser = bullet.GetComponent<RangerLaser>();
                 rangerLaser.HeadGun = Bullet_StartPosition;
                 // Tạo hiệu ứng nổ đạn (muzzle)
-                GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
-                Destroy(muzzle, 0.25f);
+                MuzzleEffect(Angle_in_Quaternion);
             }
             Clock = 0f;
         }

@@ -7,6 +7,11 @@ public class EasyFinalBoss : FinalBoss
     // Easy: 25k HP, dậm sàn gây choáng toàn map
     void Start()
     {
+        // Move road
+        if (WaypointManager.instance != null)
+        {
+            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
+        }
         isFinalBoss = true;
         StartCoroutine(StompGround());
     }

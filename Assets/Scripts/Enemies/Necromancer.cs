@@ -8,6 +8,11 @@ public class Necromancer : BaseEnemy
     public GameObject MagicCircle;
     void Start()
     {
+        // Move road
+        if (WaypointManager.instance != null)
+        {
+            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
+        }
         /*// Bỏ vào awake thì bị lỗi nếu instantiate từ necromancer và boss mystery
         if (Waypoint_CurrentIndex == 0) // Đảm bảo việc gán từ bên ngoài
         {
@@ -33,6 +38,7 @@ public class Necromancer : BaseEnemy
                 GameObject newEnemy = Instantiate(Minion, transform.position, Quaternion.identity);
                 BaseEnemy enemy = newEnemy.GetComponent<BaseEnemy>();
                 enemy.Waypoint_CurrentIndex = this.Waypoint_CurrentIndex;
+                enemy.Waypoint_SelectedIndex = this.Waypoint_SelectedIndex;
                 enemy.Distance = this.Distance;
                 yield return new WaitForSeconds(0.5f);
             }

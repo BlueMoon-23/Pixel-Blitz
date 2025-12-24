@@ -29,6 +29,9 @@ public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler
         previous_RectTransform = m_RectTransform.anchoredPosition;
         // Range
         range_RectTransform = RangeUI.GetComponent<RectTransform>();
+    }
+    void Start()
+    {
         baseCharacter = CharacterPrefab.GetComponent<BaseCharacter>();
     }
     protected abstract void OnPointerDown_Specific(PointerEventData eventData);

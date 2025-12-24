@@ -11,9 +11,11 @@ public class BaseEnemy : MonoBehaviour
     [SerializeField] protected float Speed;
     [SerializeField] protected bool isHidden;
     [SerializeField] protected bool isArmored;
+    public GameObject Center; // đây là chỗ để các character nhắm bắn vào
     // Move
     public GameObject[] Waypoints;
-    public int Waypoint_CurrentIndex;
+    public int Waypoint_SelectedIndex; // Thằng gamemode sẽ truyền cái này cho enemy để nó biết nó ở waypoint nào
+    public int Waypoint_CurrentIndex; // thằng này sẽ chỉ enemy đi đâu
     // Move animation
     protected SPUM_Prefabs SPUM_Prefabs;
     public Dictionary<PlayerState, int> IndexPair = new();
@@ -41,9 +43,6 @@ public class BaseEnemy : MonoBehaviour
     protected bool isStunned = false;
     protected void Awake()
     {
-        // Move road
-        Waypoints = GameObject.FindGameObjectsWithTag("Waypoint");
-        Waypoints = Waypoints.OrderBy(go  => go.name).ToArray();
         Waypoint_CurrentIndex = 1;
         // Move animation
         SPUM_Prefabs = GetComponent<SPUM_Prefabs>();
@@ -73,6 +72,11 @@ public class BaseEnemy : MonoBehaviour
         if (Waypoint_CurrentIndex == 0) // Đảm bảo việc gán từ bên ngoài
         {
         }*/
+        // Move road
+        if (WaypointManager.instance != null)
+        {
+            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
+        }
     }
 
     // Update is called once per frame
@@ -103,6 +107,17 @@ public class BaseEnemy : MonoBehaviour
     {
         if (HP <= 0)
         {
+            if (VFXPooler.instance != null)
+            {
+                BaseVFX EarnCoin = VFXPooler.instance.GetVFX(0); // 0 la hieu ung Earn coin
+                EarnCoin.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
+                EarnCoin.transform.rotation = Quaternion.identity;
+                EarnCoinVFX earnCoinVFX = EarnCoin.GetComponent<EarnCoinVFX>();
+                if (earnCoinVFX != null)
+                {
+                    earnCoinVFX.SetEarnCoinText(this.MaxHP);
+                }
+            }
             if (EconomyManager.instance != null)
             {
                 EconomyManager.instance.AddCoin(this.MaxHP);
@@ -187,7 +202,7 @@ public class BaseEnemy : MonoBehaviour
     private IEnumerator BeFrozen(float FreezeTime)
     {
         isFrozen = true;
-        GameObject effect = Instantiate(FreezeEffect, transform.position, Quaternion.identity);
+        GameObject effect = Instantiate(FreezeEffect, Center.transform.position, Quaternion.identity);
         Destroy(effect, FreezeTime);
         yield return new WaitForSeconds(FreezeTime);
         isFrozen = false;

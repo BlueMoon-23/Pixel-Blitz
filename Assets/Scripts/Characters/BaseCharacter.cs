@@ -32,7 +32,7 @@ public abstract class BaseCharacter : MonoBehaviour
     // Attack animation
     protected SPUM_Prefabs SPUM_Prefabs;
     public Dictionary<PlayerState, int> IndexPair = new();
-    protected float Bow_Attack_Duration = 0.833f;
+    protected float Bow_Attack_Duration;
     protected float Staff_Attack_Duration = 0.417f;
     public GameObject Bullet_StartPosition;
     public GameObject BulletMuzzle;
@@ -84,6 +84,10 @@ public abstract class BaseCharacter : MonoBehaviour
     public float GetDamage()
     {
         return Damage;
+    }
+    public float GetCooldown()
+    {
+        return Cooldown;
     }
     public int GetLevel()
     {
@@ -243,29 +247,12 @@ public abstract class BaseCharacter : MonoBehaviour
         BaseEnemy first_enemy = FindFirstEnemy();
         if (first_enemy != null && !first_enemy.isDieOrNot())
         {
-            if (first_enemy.transform.position.x < transform.position.x)
-            {
-                transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-            }
-            else
-            {
-                transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-            }
-            // Play animation
-            SPUM_Prefabs.PlayAnimation(PlayerState.ATTACK, IndexPair[PlayerState.ATTACK]);
-            SPUM_Prefabs._anim.speed = 2 * Attack_Duration / Cooldown;
-            yield return new WaitForSeconds(Attack_Duration / 2 + 0.1f);
-            // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
-            float Angle_in_Radian = Mathf.Atan2(first_enemy.transform.position.y - transform.position.y, first_enemy.transform.position.x - transform.position.x);
-            Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
-            GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
-            BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
-            bullet.SetCharacter(this);
-            bullet.SetEnemy(first_enemy);
-            // Tạo hiệu ứng nổ đạn (muzzle)
-            GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
-            Destroy(muzzle, 0.25f);
-            yield return new WaitForSeconds(Attack_Duration - (Attack_Duration / 2 + 0.1f));
+            SelfRotate(first_enemy);
+            PlayAttackAmination(Attack_Duration);
+            yield return new WaitForSeconds(Attack_Duration / 2);
+            Quaternion Angle_in_Quaternion = Shoot(first_enemy);
+            MuzzleEffect(Angle_in_Quaternion);
+            yield return new WaitForSeconds(Attack_Duration / 2);
             SPUM_Prefabs._anim.speed = 1;
         }
     }
@@ -278,28 +265,54 @@ public abstract class BaseCharacter : MonoBehaviour
             BaseEnemy first_enemy = FindFirstEnemy();
             if (first_enemy != null && !first_enemy.isDieOrNot())
             {
-                // Xoay bản thân
-                if (first_enemy.transform.position.x < transform.position.x)
-                {
-                    transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
-                else
-                {
-                    transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
-                // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
-                float Angle_in_Radian = Mathf.Atan2(first_enemy.transform.position.y - transform.position.y, first_enemy.transform.position.x - transform.position.x);
-                Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
-                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
-                BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
-                bullet.SetCharacter(this);
-                bullet.SetEnemy(first_enemy);
-                // Tạo hiệu ứng nổ đạn (muzzle)
-                GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
-                Destroy(muzzle, 0.25f);
+                SelfRotate(first_enemy);
+                Quaternion Angle_in_Quaternion = Shoot(first_enemy);
+                MuzzleEffect(Angle_in_Quaternion);
             }
             Clock = 0f;
         }
+    }
+    protected void PlayAttackAmination(float Attack_Duration)
+    {
+        SPUM_Prefabs.PlayAnimation(PlayerState.ATTACK, IndexPair[PlayerState.ATTACK]);
+        if (Attack_Duration != Cooldown)
+        {
+            SPUM_Prefabs._anim.speed = 2 * Attack_Duration / Cooldown;
+        }
+        else
+        {
+            SPUM_Prefabs._anim.speed = 2 / Cooldown;
+        }
+    }
+    protected void SelfRotate(BaseEnemy first_enemy)
+    {
+        if (first_enemy != null && !first_enemy.isDieOrNot())
+        {
+            if (first_enemy.transform.position.x < transform.position.x)
+            {
+                transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
+            }
+            else
+            {
+                transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
+            }
+        }
+    }
+    protected Quaternion Shoot(BaseEnemy first_enemy)
+    {
+        // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
+        float Angle_in_Radian = Mathf.Atan2(first_enemy.Center.transform.position.y - transform.position.y, first_enemy.Center.transform.position.x - transform.position.x);
+        Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
+        GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
+        BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
+        bullet.SetCharacter(this);
+        bullet.SetEnemy(first_enemy);
+        return Angle_in_Quaternion; // trả về quaternion để truyền xuống cho muzzle
+    }
+    protected void MuzzleEffect(Quaternion Angle_in_Quaternion)
+    {
+        GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
+        Destroy(muzzle, 0.25f);
     }
     public IEnumerator GetStunned(float duration)
     {

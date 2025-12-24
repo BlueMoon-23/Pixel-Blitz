@@ -7,7 +7,10 @@ public class FreezerBullet : BaseBullets
     public GameObject FrostExplosion;
     void Start()
     {
-        
+        if (character.GetLevel() < 3)
+        {
+            transform.localScale *= 0.5f;
+        }
     }
 
     // Update is called once per frame

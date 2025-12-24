@@ -135,28 +135,9 @@ public class Freezer : GroundCharacter
             BaseEnemy first_enemy = FindFirstEnemy();
             if (first_enemy != null && !first_enemy.isDieOrNot())
             {
-                if (first_enemy.transform.position.x < transform.position.x)
-                {
-                    transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
-                else
-                {
-                    transform.localScale = new Vector3(-1f * Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y), Mathf.Abs(transform.localScale.z));
-                }
-                // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
-                float Angle_in_Radian = Mathf.Atan2(first_enemy.transform.position.y - transform.position.y, first_enemy.transform.position.x - transform.position.x);
-                Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
-                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
-                if (Level < 3)
-                {
-                    newBullet.transform.localScale *= 0.5f;
-                }
-                BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
-                bullet.SetCharacter(this);
-                bullet.SetEnemy(first_enemy);
-                // Tạo hiệu ứng nổ đạn (muzzle)
-                GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
-                Destroy(muzzle, 0.25f);
+                SelfRotate(first_enemy);
+                Quaternion Angle_in_Quaternion = Shoot(first_enemy);
+                MuzzleEffect(Angle_in_Quaternion);
             }
             yield return new WaitForSeconds(0.25f);
         }

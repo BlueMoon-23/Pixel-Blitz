@@ -1,9 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 public class CharacterControll : MonoBehaviour
 {
+    // Script này là cơ chế nhấn vào character và hiện lên character range và characterUI
     private BaseCharacter character;
     private CharacterUIControll characterUI;
     private DragAbility abilityIcon;

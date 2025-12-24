@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Timeline;
 using UnityEngine;
@@ -32,7 +32,7 @@ public class BaseBullets : MonoBehaviour
     {
         if (enemy != null)
         {
-            float Angle_in_Radian = Mathf.Atan2(enemy.transform.position.y - transform.position.y, enemy.transform.position.x - transform.position.x);
+            float Angle_in_Radian = Mathf.Atan2(enemy.Center.transform.position.y - transform.position.y, enemy.Center.transform.position.x - transform.position.x);
             Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
             transform.rotation = Angle_in_Quaternion;
             transform.position += transform.up * BulletSpeed * Time.deltaTime;

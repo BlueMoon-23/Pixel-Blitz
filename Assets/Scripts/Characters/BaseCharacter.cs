@@ -33,7 +33,7 @@ public abstract class BaseCharacter : MonoBehaviour
     protected SPUM_Prefabs SPUM_Prefabs;
     public Dictionary<PlayerState, int> IndexPair = new();
     protected float Bow_Attack_Duration;
-    protected float Staff_Attack_Duration = 0.417f;
+    protected float Staff_Attack_Duration;
     public GameObject Bullet_StartPosition;
     public GameObject BulletMuzzle;
     // Stunned Effect
@@ -234,13 +234,23 @@ public abstract class BaseCharacter : MonoBehaviour
     }
     public virtual void AttackWithCooldown(float Attack_Duration)
     {
+        // Logic cũ
         if (isStunned) { return; }
         Clock += Time.deltaTime;
         if (Clock >= Cooldown)
         {
-            StartCoroutine(AttackWithAnimation(Attack_Duration));
-            Clock = 0f;
+            if (range.enemies_in_range.Count != 0)
+            {
+                StartCoroutine(AttackWithAnimation(Attack_Duration));
+                Clock = 0f;
+            }
+            else
+            {
+                Clock = Cooldown;
+            }
         }
+        // Vấn đề: khi ko có quái, không tấn công, nhưng bản chất attack vẫn được triển khai và lại quay về cooldown => không đúng
+        // Mong muốn: quái khi chạm vào range thì sẽ tấn công, sau đó mới bắt đầu tính cooldown. nếu range hết quái thì clock tăng sau đó giữ nguyên ở cooldown, không kéo về 0f
     }
     public virtual IEnumerator AttackWithAnimation(float Attack_Duration)
     {
@@ -262,14 +272,21 @@ public abstract class BaseCharacter : MonoBehaviour
         Clock += Time.deltaTime;
         if (Clock >= Cooldown)
         {
-            BaseEnemy first_enemy = FindFirstEnemy();
-            if (first_enemy != null && !first_enemy.isDieOrNot())
+            if (range.enemies_in_range.Count != 0)
             {
-                SelfRotate(first_enemy);
-                Quaternion Angle_in_Quaternion = Shoot(first_enemy);
-                MuzzleEffect(Angle_in_Quaternion);
+                BaseEnemy first_enemy = FindFirstEnemy();
+                if (first_enemy != null && !first_enemy.isDieOrNot())
+                {
+                    SelfRotate(first_enemy);
+                    Quaternion Angle_in_Quaternion = Shoot(first_enemy);
+                    MuzzleEffect(Angle_in_Quaternion);
+                    Clock = 0f;
+                }
             }
-            Clock = 0f;
+            else
+            {
+                Clock = Cooldown;
+            }
         }
     }
     protected void PlayAttackAmination(float Attack_Duration)
@@ -301,12 +318,19 @@ public abstract class BaseCharacter : MonoBehaviour
     protected Quaternion Shoot(BaseEnemy first_enemy)
     {
         // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
-        float Angle_in_Radian = Mathf.Atan2(first_enemy.Center.transform.position.y - transform.position.y, first_enemy.Center.transform.position.x - transform.position.x);
-        Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
+        Quaternion Angle_in_Quaternion = Quaternion.identity;
+        if (first_enemy != null)
+        {
+            float Angle_in_Radian = Mathf.Atan2(first_enemy.Center.transform.position.y - transform.position.y, first_enemy.Center.transform.position.x - transform.position.x);
+            Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
+        }
         GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
         BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
         bullet.SetCharacter(this);
-        bullet.SetEnemy(first_enemy);
+        if (first_enemy != null)
+        {
+            bullet.SetEnemy(first_enemy);
+        }
         return Angle_in_Quaternion; // trả về quaternion để truyền xuống cho muzzle
     }
     protected void MuzzleEffect(Quaternion Angle_in_Quaternion)

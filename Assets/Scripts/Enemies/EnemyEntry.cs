@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Easy;
+using static Gamemodes;
 
 [Serializable]
 public class EnemyEntry

@@ -52,7 +52,13 @@ public class MapUI : MonoBehaviour
             }
         }
     }
-
+    public void ChooseFromMapIndex()
+    {
+        if (MapChoose.instance != null)
+        {
+            MapChoose.instance.CompareMapData(mapData);
+        }
+    }
     // Update is called once per frame
     void Update()
     {

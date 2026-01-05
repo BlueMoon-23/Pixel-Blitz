@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 public class CharacterControll : MonoBehaviour
 {
     // Script này là cơ chế nhấn vào character và hiện lên character range và characterUI
@@ -42,5 +43,15 @@ public class CharacterControll : MonoBehaviour
         {
             characterUI.AbilityButton.gameObject.SetActive(false);
         }
+        if (characterUI.CurrentCharacter.GetLevel() >= 4)
+        {
+            characterUI.UpgradeButton.interactable = false;
+        }
+        else
+        {
+            characterUI.UpgradeButton.interactable = true;
+        }
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(characterUI.UpgradeContent);
     }
 }

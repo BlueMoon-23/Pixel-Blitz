@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.TextCore.Text;
 using UnityEngine.Tilemaps;
 
 public class DragAbility : DragThing
 {
     public static DragAbility instance;
-    private BaseCharacter currentCharacter; // truyền con minigunner có ability vào đây để khóa số lượng 1 clone
+    [SerializeField] private BaseCharacter currentCharacter; // truyền con minigunner có ability vào đây để khóa số lượng 1 clone
     public enum AbilityDragType { None, GroundPlacement, WaypointPlacement }
     public AbilityDragType currentDragType = AbilityDragType.None;
     private GameObject[] Range_Prefab;
@@ -111,9 +112,29 @@ public class DragAbility : DragThing
     private void WaypointPlacementBeginDrag(PointerEventData eventData)
     {
         // cái này của summoner
+        canvasGroup.blocksRaycasts = false;
+        // Placing
+        WaypointUI.SetActive(true);
+        CancelPlacing.SetActive(true);
+        // Range
+        currentCharacter.Range_Prefab.GetComponent<Renderer>().enabled = true;
     }
     private void WaypointPlacementEndDrag(PointerEventData eventData)
     {
         // cái này của summoner
+        canvasGroup.blocksRaycasts = true;
+        WaypointUI.SetActive(false);
+        CancelPlacing.SetActive(false);
+        GameObject cancelPlacing = eventData.pointerCurrentRaycast.gameObject;
+        if (cancelPlacing.CompareTag("CancelPlacing"))
+        {
+            m_RectTransform.anchoredPosition = previous_RectTransform;
+            range_RectTransform.anchoredPosition = m_RectTransform.anchoredPosition - new Vector2(0f, 30f);
+            return;
+        }
+        //
+        currentCharacter.Ability(GetWaypointDropPosition(eventData.position));
+        //
+        m_RectTransform.anchoredPosition = previous_RectTransform;
     }
 }

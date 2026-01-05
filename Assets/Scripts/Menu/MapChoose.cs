@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -81,6 +80,11 @@ public class MapChoose : MonoBehaviour
         {
             CharacterLoadout.instance.Set_CharacterLoadout_Prefab();
         }
+        if (CharacterLoadout.instance.characterLoadout.Count == 0) 
+        {
+            StartCoroutine(ShowEquipAnnounce());
+            return;
+        }
         // Xác nhận currentMapData
         MapData ChosenMap = Maps[currentMapDataIndex];
         // Cài data xuống mode manager: currentGamemode, Star (gọi hàm play của modemanager cũng được
@@ -104,6 +108,17 @@ public class MapChoose : MonoBehaviour
                     SceneManager.LoadScene(SceneKey.Greenland);
                     break; ;
                 }
+        }
+    }
+    private IEnumerator ShowEquipAnnounce()
+    {
+        if (CharacterEquip.instance != null)
+        {
+            CharacterEquip.instance.LoadoutGroup.SetActive(false);
+            CharacterEquip.instance.EquipAnnounce.SetActive(true);
+            yield return new WaitForSeconds(1f);
+            CharacterEquip.instance.LoadoutGroup.SetActive(true);
+            CharacterEquip.instance.EquipAnnounce.SetActive(false);
         }
     }
     public void PreviousMap()
@@ -158,6 +173,18 @@ public class MapChoose : MonoBehaviour
         {
             NextMap();
         }
+    }
+    public void CompareMapData(MapData mapData)
+    {
+        for (int i = 0; i < Maps.Count; i++)
+        {
+            if (mapData.mapInformation.name == Maps[i].mapInformation.name && mapData.gamemode.name == Maps[i].gamemode.name)
+            {
+                currentMapDataIndex = i;
+                break;
+            }
+        }
+        ShowMapUI(currentMapDataIndex);
     }
     public void Exit()
     {

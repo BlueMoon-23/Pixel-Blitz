@@ -33,11 +33,11 @@ public class ModeManager : MonoBehaviour
             }
             if (currentGamemode.GetType() == typeof(Medium))
             {
-                MaxWave = 25;
+                MaxWave = 30;
             }
             if (currentGamemode.GetType() == typeof(Hard))
             {
-                MaxWave = 25;
+                MaxWave = 30;
             }
         }
         currentGamemode = this.gameObject.GetComponentInChildren<Gamemodes>();

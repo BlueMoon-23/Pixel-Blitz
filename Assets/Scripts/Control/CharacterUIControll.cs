@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -24,6 +24,7 @@ public class CharacterUIControll : MonoBehaviour
     //
     public TextMeshProUGUI characterName;
     public Image characterImage;
+    public RectTransform UpgradeContent;
     public TextMeshProUGUI upgradeName;
     public TextMeshProUGUI Info1;
     public TextMeshProUGUI Info2;
@@ -37,6 +38,8 @@ public class CharacterUIControll : MonoBehaviour
     public BaseCharacter CurrentCharacter;
     public CanvasGroup HiddenDetectionIcon;
     public CanvasGroup StrikethroughIcon;
+    //
+    public Button UpgradeButton;
     public Button AbilityButton;
     public Image AbilityCurrentIcon;
     public Sprite[] AbilityIcons;
@@ -47,6 +50,11 @@ public class CharacterUIControll : MonoBehaviour
         for (int i = 0; i < Range_Prefab.Length; i++)
         {
             Range_Prefab[i].GetComponent<Renderer>().enabled = false;
+        }
+        // Wizard tắt script dragability, nên phải bật lại ở nút close để character khác còn dùng
+        if (DragAbility.instance != null)
+        {
+            DragAbility.instance.enabled = true;
         }
     }
     public void Upgrade()
@@ -76,12 +84,29 @@ public class CharacterUIControll : MonoBehaviour
             EconomyManager.instance.Change_CurrentCoin();
         }
         if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Sell_Sound);
-        CharacterManager.instance.RemoveCharacter(CurrentCharacter);
+        // RemoveCharacter không chạy đúng với MinigunnerClone
+        if (CurrentCharacter.GetType() == typeof(MinigunnerClone))
+        {
+            CharacterManager.instance.RemovePosition(CurrentCharacter.transform.position);
+        }
+        else
+        {
+            CharacterManager.instance.RemoveCharacter(CurrentCharacter);
+        }
         Destroy(CurrentCharacter.gameObject);
         gameObject.SetActive(false);
     }
     public void UseAbility()
     {
-        //
+        // Minigunner và Summoner có cách gọi ability riêng rồi. Cái này chỉ dành cho wizard
+        Wizard wizard = CurrentCharacter.GetComponent<Wizard>();
+        if (wizard != null)
+        {
+            wizard.Ability(Vector3.zero); // Position không quan trọng đâu
+        }
+        else
+        {
+            Debug.Log("Wizard = null");
+        }
     }
 }

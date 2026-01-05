@@ -16,6 +16,9 @@ public class SoundManager : MonoBehaviour
     public AudioClip Victory_Sound; // pianoairy
     public AudioClip Defeat_Sound; // airystring
     public AudioClip StompGround_Sound;
+    public AudioClip SpiralStun_Sound; // shoot magic etfx
+    public AudioClip ChargerSound;
+    public AudioClip UndeadSummonSound; // EngineScifi_1_Start
     private void Awake()
     {
         if (Instance == null)

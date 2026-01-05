@@ -29,12 +29,9 @@ public class CharacterSaveManager : MonoBehaviour
         }
         else
         {
-            if (CharacterSaveManager.instance != null)
-            {
-                // Cấp sẵn Archer (0) và Freezer(1) 
-                CharacterSaveManager.instance.BuyCharacter(allCharacters[0]);
-                CharacterSaveManager.instance.BuyCharacter(allCharacters[1]);
-            }
+            // Cấp sẵn Archer (0) và Freezer(1) 
+            BuyCharacter(allCharacters[0]);
+            BuyCharacter(allCharacters[1]);
         }
     }
     public void BuyCharacter(CharacterData characterData)

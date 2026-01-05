@@ -95,7 +95,7 @@ public class Freezer : GroundCharacter
             case 3:
                 {
                     characterUI.upgradeName.text = "Glacial Glowing";
-                    characterUI.Info1.text = "Bullets now explode";
+                    characterUI.Info1.text = "Bullets now explode.";
                     characterUI.Info2.text = "Damage: 2 => 5";
                     characterUI.Info3.text = "";
                     break;
@@ -124,8 +124,15 @@ public class Freezer : GroundCharacter
         Clock += Time.deltaTime;
         if (Clock >= Cooldown)
         {
-            StartCoroutine(Burst());
-            Clock = 0f;
+            if (range.enemies_in_range.Count != 0)
+            {
+                StartCoroutine(Burst());
+                Clock = 0f;
+            }
+            else
+            {
+                Clock = Cooldown;
+            }
         }
     }
     private IEnumerator Burst()

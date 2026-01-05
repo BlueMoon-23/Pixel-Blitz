@@ -7,8 +7,8 @@ public class MinigunnerClone : Minigunner
 {
     void Start()
     {
-        Cooldown = 0.05f;
-        Damage = 8f;
+        Cooldown = 0.1f;
+        Damage = 20f;
         Range = 15f;
         Level = 3;
         Cost = 0f;

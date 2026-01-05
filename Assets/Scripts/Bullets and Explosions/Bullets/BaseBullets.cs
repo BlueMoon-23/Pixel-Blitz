@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Timeline;
 using UnityEngine;
 
 public class BaseBullets : MonoBehaviour
@@ -35,12 +34,13 @@ public class BaseBullets : MonoBehaviour
             float Angle_in_Radian = Mathf.Atan2(enemy.Center.transform.position.y - transform.position.y, enemy.Center.transform.position.x - transform.position.x);
             Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
             transform.rotation = Angle_in_Quaternion;
-            transform.position += transform.up * BulletSpeed * Time.deltaTime;
         }
         else
         {
-            Destroy(this.gameObject);
+            enemy = character.FindFirstEnemy();
+            Destroy(this.gameObject, 0.5f);
         }
+        transform.position += transform.up * BulletSpeed * Time.deltaTime;
     }
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {

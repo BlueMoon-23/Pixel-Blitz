@@ -6,71 +6,7 @@ using UnityEngine;
 
 public class Easy : Gamemodes
 {
-
     // Chứa logic sinh ra quái theo từng wave
-    public enum EnemyName { Normal, Quick, Enraged, NormalBoss, Hidden, Armored, NormalMystery, Necromancer, NecromancerMinion, SkeletonBoss, HiddenBoss, Speed, SpeedyBoss, BossMystery, EasyFinalBoss}
-    public List<EnemyEntry> enemyEntries = new List<EnemyEntry>();
-    private Dictionary<EnemyName, BaseEnemy> EnemyList = new Dictionary<EnemyName, BaseEnemy>(14);
-    // EnemySpawner
-    private GameObject EnemySpawner;
-    private void Awake()
-    {
-        for (int i = 0; i < enemyEntries.Count; i++)
-        {
-            if (EnemyList.ContainsKey(enemyEntries[i].Name))
-            {
-                Debug.Log("Co " + enemyEntries[i].Name + " roi");
-            }
-            else
-            {
-                EnemyList.Add(enemyEntries[i].Name, enemyEntries[i].Enemy_Prefab);
-            }
-        }
-    }
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    public BaseEnemy GetEnemyWithName(EnemyName name)
-    {
-        BaseEnemy enemyPrefab; // (1) Khai báo biến để chứa giá trị kết quả
-        // (2) Sử dụng TryGetValue: Tra cứu và gán giá trị chỉ trong 1 lần
-        if (EnemyList.TryGetValue(name, out enemyPrefab))
-        {
-            // Nếu tra cứu THÀNH CÔNG (Key tồn tại)
-            return enemyPrefab;
-        }
-        else
-        {
-            // Nếu tra cứu THẤT BẠI (Key không tồn tại)
-            Debug.LogError("Không tìm thấy EnemyName: " + name + ". Kiểm tra lại Inspector!");
-            return null; // Trả về null để tránh lỗi treo ứng dụng
-        }
-    }
-    private IEnumerator SpawnEnemyLayout(EnemyName name, int Quantity)
-    {
-        for (int i = 0; i < Quantity; i++)
-        {
-            yield return new WaitForSeconds(1f);
-            // Set lại EnemySpawner một cách tự động
-            if (WaypointManager.instance != null)
-            {
-                GameObject[] Waypoints = WaypointManager.instance.GetWaypoints(out int Waypoints_index);
-                EnemySpawner = Waypoints[0];
-                GameObject newEnemy = Instantiate(GetEnemyWithName(name).gameObject, EnemySpawner.transform.position, Quaternion.identity);
-                BaseEnemy baseEnemy = newEnemy.GetComponent<BaseEnemy>();
-                if (baseEnemy != null)
-                {
-                    baseEnemy.Waypoint_SelectedIndex = Waypoints_index;
-                }
-            }
-        }
-    }
     public override IEnumerator SpawnEnemyWave(int Wave) 
     {
         switch (Wave)
@@ -127,20 +63,20 @@ public class Easy : Gamemodes
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 2));
                     break;
                 }
-            case 10: // 10 hidden
+            case 10: // 15 hidden
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 15));
                     break;
                 }
-            case 11: // 10 hidden, 2 normal boss
+            case 11: // 10 hidden, 3 normal boss
                 {
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 3));
                     break;
                 }
-            case 12: // 4 armored
+            case 12: // 6 armored
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Armored, 4));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Armored, 6));
                     break;
                 }
             case 13: // 15 normal mystery
@@ -148,61 +84,62 @@ public class Easy : Gamemodes
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 15));
                     break;
                 }
-            case 14: // 7 normal mystery, 3 normal boss
+            case 14: // 10 normal mystery, 3 normal boss
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 7));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 10));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 3));
                     break;
                 }
-            case 15: // 10 hidden, 1 necromancer
+            case 15: // 20 hidden, 2 necromancer
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 1));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 20));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 2));
                     break;
                 }
-            case 16: // 20 enraged, 2 normal boss, 1 skeleton boss
+            case 16: // 20 enraged, 4 normal boss, 1 skeleton boss
                 {
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 20));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 4));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 1));
                     break;
                 }
-            case 17: // 3 normal boss, 1 necromancer, 5 enraged
+            case 17: // 3 normal boss, 3 necromancer, 5 normal mystery
                 {
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 3));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 3));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 5));
                     break;
                 }
-            case 18: // 10 hidden, 1 hidden boss, 10 hidden, 5 armored
+            case 18: // 15 hidden, 1 hidden boss, 15 hidden, 10 armored
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 15));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Armored, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 15));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Armored, 10));
                     break;
                 }
-            case 19: // 10 speed, 5 normal mystery, 2 skeleton boss
+            case 19: // 10 speed, 5 necromancer, 2 skeleton boss
                 {
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 5));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 2));
                     break;
                 }
-            case 20: // 5 hidden, 3 hidden boss, 15 hidden
+            case 20: // 5 hidden, 3 hidden boss, 10 hidden, 2 hidden boss, 5 hidden
                 {
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 5));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 3));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 15));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 5));
                     break;
                 }
-            case 21: // 3 normal boss, 1 skeleton boss, 5 speed, 5 normal boss, 1 hidden boss, 2 necromancer
+            case 21: // 6 normal boss, 3 skeleton boss, 10 speed, 3 hidden boss, 2 necromancer
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 3));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 1));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 6));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 3));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 3));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 2));
                     break;
                 }
@@ -213,20 +150,20 @@ public class Easy : Gamemodes
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 10));
                     break;
                 }
-            case 23: // 20 normal mystery, 10 boss mystery
+            case 23: // 20 normal mystery, 15 boss mystery
                 {
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 20));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 15));
                     break;
                 }
-            case 24: // 2 speedy boss, 4 boss mystery, 1 skeleton boss, 10 normal boss, 5 speed, 2 hidden boss,
+            case 24: // 3 speedy boss, 5 boss mystery, 2 skeleton boss, 10 normal boss, 5 speed, 4 hidden boss,
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SpeedyBoss, 2));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 4));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 1));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SpeedyBoss, 3));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 2));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 10));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 4));
                     break;
                 }
             case 25: // 1 normal, 2 quick, 3 enraged, 4 normal boss, 5 hidden, 6 armored, 7 normal mystery, 8 necromancer, 9 skeleton boss, 10 hidden boss, 11 speed, 12 speedy boss, 13 boss mystery
@@ -249,8 +186,6 @@ public class Easy : Gamemodes
                     {
                         GameManager.instance.BossHPGroup.SetActive(true);
                         GameManager.instance.BossName.text = "Scarlet Knight";
-                        GameManager.instance.BossHPText.text = "25000 / 25000";
-                        
                     }
                     break;
                 }

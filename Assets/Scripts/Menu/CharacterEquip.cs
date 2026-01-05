@@ -23,6 +23,9 @@ public class CharacterEquip : MonoBehaviour
     private int CurrentIndex = 0; // 0, 1, 2, 3
     public GameObject Equip_Button;
     public GameObject Unequip_Button;
+    // Thông báo người chơi bắt buộc phải equip ít nhất 1 character để vào game
+    public GameObject LoadoutGroup;
+    public GameObject EquipAnnounce;
     // Singleton để truyền dữ liệu vào game scene ở hàm awake => CharacterLoadout làm, nếu để ở đây thì khi load lại scene
     // thì các button sẽ mất link
     public static CharacterEquip instance;
@@ -65,12 +68,12 @@ public class CharacterEquip : MonoBehaviour
         CharacterInfo.SetActive(true);
         // Chỉnh thông tin
         chosenCharacter = character;
-        CharacterName.text = chosenCharacter.characterData.CharacterName;
-        CharacterImage.sprite = chosenCharacter.characterData.CharacterImage;
-        RangeStat.text = chosenCharacter.characterData.RangeStat.ToString();
-        DamageStat.text = chosenCharacter.characterData.DamageStat.ToString();
-        CooldownStat.text = chosenCharacter.characterData.CooldownStat.ToString();
-        CostStat.text = chosenCharacter.characterData.CostStat.ToString();
+        CharacterName.text = chosenCharacter.characterData.characterProfile.CharacterName;
+        CharacterImage.sprite = chosenCharacter.characterData.characterProfile.CharacterImage;
+        RangeStat.text = chosenCharacter.characterData.characterProfile.RangeStat.ToString();
+        DamageStat.text = chosenCharacter.characterData.characterProfile.DamageStat.ToString();
+        CooldownStat.text = chosenCharacter.characterData.characterProfile.CooldownStat.ToString();
+        CostStat.text = chosenCharacter.characterData.characterProfile.CostStat.ToString();
         // Kiểm tra đã được equip vào loadout chưa
         for (int i = 0; i < characterLoadout.Count; i++)
         {
@@ -99,8 +102,8 @@ public class CharacterEquip : MonoBehaviour
         // Chỉnh thông tin trên loadout
         CharacterLoadoutImages[CurrentIndex].gameObject.SetActive(true);
         CharacterLoadoutCosts[CurrentIndex].gameObject.SetActive(true);
-        CharacterLoadoutImages[CurrentIndex].sprite = chosenCharacter.characterData.CharacterImage;
-        CharacterLoadoutCosts[CurrentIndex].text = "$" + chosenCharacter.characterData.CostStat.ToString();
+        CharacterLoadoutImages[CurrentIndex].sprite = chosenCharacter.characterData.characterProfile.CharacterImage;
+        CharacterLoadoutCosts[CurrentIndex].text = "$" + chosenCharacter.characterData.characterProfile.CostStat.ToString();
         // Kéo chosenCharacter vào List<CharacterInfomation> CharacterLoadout
         characterLoadout.Add(chosenCharacter);
         CurrentIndex++;

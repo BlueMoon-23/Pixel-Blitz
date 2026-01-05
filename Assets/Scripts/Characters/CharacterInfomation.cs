@@ -20,7 +20,7 @@ public class CharacterInfomation : MonoBehaviour
         {
             for (int i = 0; i < AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters.Count; i++)
             {
-                if (this.characterData.CharacterName == AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters[i].CharacterName)
+                if (this.characterData.characterProfile.CharacterName == AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters[i].characterProfile.CharacterName)
                 {
                     hasOwned = true;
                     break;

@@ -64,5 +64,19 @@ public class AccountSaveManager : MonoBehaviour
                 }
             }
         }
+        // Load lại túi đồ của người chơi
+        if (CharacterSaveManager.instance != null)
+        {
+            for (int i = 0; i < CurrentAccount.userCharacterData.OwnedCharacters.Count; i++)
+            {
+                for (int j = 0; j < CharacterSaveManager.instance.allCharacters.Count; j++)
+                {
+                    if (CurrentAccount.userCharacterData.OwnedCharacters[i].characterID == CharacterSaveManager.instance.allCharacters[j].characterID)
+                    {
+                        CurrentAccount.userCharacterData.OwnedCharacters[i].characterProfile = CharacterSaveManager.instance.allCharacters[j].characterProfile;
+                    }
+                }
+            }
+        }
     }
 }

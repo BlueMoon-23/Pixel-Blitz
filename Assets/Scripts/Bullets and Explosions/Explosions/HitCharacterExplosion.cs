@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class HitCharacterExplosion : MonoBehaviour
 {
+    public bool CanHitCliffCharacter;
     public float StunDuration = 2f;
     void Start()
     {
@@ -18,6 +19,10 @@ public class HitCharacterExplosion : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         BaseCharacter character = collision.GetComponent<GroundCharacter>();
+        if (CanHitCliffCharacter && character == null)
+        {
+            character = collision.GetComponent<CliffCharacter>();
+        }
         if (character != null)
         {
             character.StartCoroutine(character.GetStunned(StunDuration));

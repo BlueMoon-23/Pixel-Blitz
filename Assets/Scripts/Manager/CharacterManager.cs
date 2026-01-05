@@ -1,9 +1,10 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
-using DG.Tweening;
 public class CharacterManager : MonoBehaviour
 {
     public static CharacterManager instance;
@@ -28,10 +29,10 @@ public class CharacterManager : MonoBehaviour
     public TextMeshProUGUI Announcement;
     public enum CharacterName { Archer, Freezer, Minigunner, MinigunnerClone, Ranger, Rocketeer, Summoner, Accelerator, Wizard};
     private Dictionary<CharacterName, int> Limit_for_1_Character = new Dictionary<CharacterName, int> { 
-        { CharacterName.Archer, 8 },
+        { CharacterName.Archer, 12 },
         { CharacterName.Freezer, 4 },
         { CharacterName.Minigunner, 4 },
-        { CharacterName.MinigunnerClone, 4 },
+        //{ CharacterName.MinigunnerClone, 4 },
         { CharacterName.Ranger, 5 },
         { CharacterName.Rocketeer, 5 },
         { CharacterName.Summoner, 3 },
@@ -42,7 +43,7 @@ public class CharacterManager : MonoBehaviour
         { CharacterName.Archer, 0 },
         { CharacterName.Freezer, 0 },
         { CharacterName.Minigunner, 0 },
-        { CharacterName.MinigunnerClone, 0 },
+        //{ CharacterName.MinigunnerClone, 0 },
         { CharacterName.Ranger, 0 },
         { CharacterName.Rocketeer, 0 },
         { CharacterName.Summoner, 0 },
@@ -63,6 +64,11 @@ public class CharacterManager : MonoBehaviour
     public int GetPopulation()
     {
         return characterList.Count;
+    }
+    public BaseCharacter GetCharacterByIndex(int index)
+    {
+        if (characterList[index] == null) return null;
+        return characterList[index];
     }
     public void AddCharacterWithPosition(BaseCharacter character, Vector3 position)
     {
@@ -201,7 +207,7 @@ public class CharacterManager : MonoBehaviour
                         }
                         break;
                     }
-                case "MinigunnerClone":
+                /*case "MinigunnerClone":
                     {
                         if (CharacterQuantity[CharacterName.MinigunnerClone] < Limit_for_1_Character[CharacterName.MinigunnerClone])
                         {
@@ -216,7 +222,7 @@ public class CharacterManager : MonoBehaviour
                             Show_Limit_for_1_Character_Text(CharacterName.MinigunnerClone, character);
                         }
                         break;
-                    }
+                    }*/
                 default:
                     {
                         break;
@@ -227,6 +233,14 @@ public class CharacterManager : MonoBehaviour
         {
             LimitPlacement_Announce();
         }
+    }
+    public void AddPosition(Vector3 position)
+    {
+        CharacterPositions.Add(position);
+    }
+    public void RemovePosition(Vector3 position)
+    {
+        CharacterPositions.Remove(position);
     }
     public bool hasCharacterinPosition(Vector3 position)
     {
@@ -259,11 +273,11 @@ public class CharacterManager : MonoBehaviour
                     CharacterQuantity[CharacterName.Minigunner]--;
                     break;
                 }
-            case "MinigunnerClone":
+            /*case "MinigunnerClone":
                 {
                     CharacterQuantity[CharacterName.MinigunnerClone]--;
                     break;
-                }
+                }*/
             case "Ranger":
                 {
                     CharacterQuantity[CharacterName.Ranger]--;
@@ -324,6 +338,27 @@ public class CharacterManager : MonoBehaviour
     private void Show_Limit_for_1_Character_Text(CharacterName name, BaseCharacter character)
     {
         Limit_for_1_Character_Text.text = "You can only place " + Limit_for_1_Character[name] + " " + character.GetType().Name + "s.";
+        //DOTween.KillAll();
+        Limit_for_1_Character_Text.gameObject.SetActive(true);
+        Vector3 original_position = Limit_for_1_Character_Text.transform.position;
+        Sequence sequence = DOTween.Sequence();
+        sequence.AppendCallback(() =>
+        {
+            Limit_for_1_Character_Text.DOFade(1f, 0.25f).From(0f);
+        }).Join(Limit_for_1_Character_Text.transform.DOMove(new Vector3(Limit_for_1_Character_Text.transform.position.x, Limit_for_1_Character_Text.transform.position.y - 25f, Limit_for_1_Character_Text.transform.position.z), 0.25f));
+        sequence.AppendInterval(1f).Append(Limit_for_1_Character_Text.transform.DOMove(new Vector3(Limit_for_1_Character_Text.transform.position.x, Limit_for_1_Character_Text.transform.position.y + 25f, Limit_for_1_Character_Text.transform.position.z), 0.25f)).AppendInterval(0.25f).JoinCallback(() =>
+        {
+            Limit_for_1_Character_Text.DOFade(0f, 0.25f).From(1f);
+        });
+        sequence.OnComplete(() =>
+        {
+            Limit_for_1_Character_Text.transform.position = original_position;
+            Limit_for_1_Character_Text.gameObject.SetActive(false);
+        });
+    }
+    public void AbilityOutOfRange_Announce()
+    {
+        Limit_for_1_Character_Text.text = "Grave must not out of summoner's range!";
         //DOTween.KillAll();
         Limit_for_1_Character_Text.gameObject.SetActive(true);
         Vector3 original_position = Limit_for_1_Character_Text.transform.position;

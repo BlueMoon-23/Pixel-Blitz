@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI Victory_TimePlayedText;
     public TextMeshProUGUI Victory_GemRewardText;
     public TextMeshProUGUI Victory_DiamondRewardText;
+    public TextMeshProUGUI Victory_GamemodeText;
     // Defeat UI
     private bool Defeated = false;
     public CanvasGroup TitleBar1;
@@ -44,6 +45,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI Defeat_TimePlayedText;
     public TextMeshProUGUI Defeat_GemRewardText;
     public TextMeshProUGUI Defeat_DiamondRewardText;
+    public TextMeshProUGUI Defeat_GamemodeText;
     // Boss HP
     public GameObject BossHPGroup;
     public TextMeshProUGUI BossName;
@@ -90,7 +92,7 @@ public class GameManager : MonoBehaviour
         ReadyUI.gameObject.SetActive(false);
         Coroutine coroutine = TimeManager.instance.StartCoroutine(TimeManager.instance.TimeCount());
         TimeManager.instance.SetCoroutine(coroutine);
-        for (int i = 1; i <= MaxWave; i++)
+        for (int i = 21; i <= MaxWave; i++)
         {
             if (!Defeated) // khong co if nay thi vong while bi break, wavetext bi lap lai nhieu lan
             {
@@ -100,7 +102,7 @@ public class GameManager : MonoBehaviour
                 WantToSkip = false; // khong co lenh nay la neu skip roi thi wanttoskip = true, break vong while
                 // Wave handle
                 WaveText.text = "Base Health";
-                if (EconomyManager.instance != null) EconomyManager.instance.EarnCoinEachWave(i);
+                if (EconomyManager.instance != null) EconomyManager.instance.EarnCoinEachWave(mode, i);
                 mode.StartCoroutine(mode.SpawnEnemyWave(i));
                 if (i < MaxWave) { StartCoroutine(Skip()); }
                 currentWaveText.text = i.ToString() + " / " + MaxWave.ToString();
@@ -240,7 +242,7 @@ public class GameManager : MonoBehaviour
         // Get reward
         int gemreward = RewardCalculator.CalculateGem(currentWave, ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
         CurrencySaveManager.instance.AddGem(gemreward);
-        int diamondreward = RewardCalculator.CalculateGem(currentWave, ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
+        int diamondreward = RewardCalculator.CalculateDiamond(currentWave, ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
         CurrencySaveManager.instance.AddDiamonds(diamondreward);
         if (SoundManager.Instance != null) { SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Victory_Sound); }
         // Show Score
@@ -255,6 +257,7 @@ public class GameManager : MonoBehaviour
         sequence.AppendInterval(2f).AppendCallback(() =>
         {
             VictoryInfo.gameObject.SetActive(true);
+            Victory_GamemodeText.text += ModeManager.instance.currentGamemode.GetType().Name;
             Victory_TimePlayedText.text = "Time Played: " + (TimeManager.instance.Get_TimePlayed() / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
             if (gemreward == 0)
             {
@@ -293,7 +296,7 @@ public class GameManager : MonoBehaviour
         // Get reward
         int gemreward = RewardCalculator.CalculateGem(currentWave, ModeManager.instance.Star, ModeManager.instance.currentGamemode, false);
         CurrencySaveManager.instance.AddGem(gemreward);
-        int diamondreward = RewardCalculator.CalculateGem(currentWave, ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
+        int diamondreward = RewardCalculator.CalculateDiamond(currentWave, ModeManager.instance.Star, ModeManager.instance.currentGamemode, false);
         CurrencySaveManager.instance.AddDiamonds(diamondreward);
         // UI
         if (SoundManager.Instance != null) { SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Defeat_Sound); }
@@ -308,23 +311,24 @@ public class GameManager : MonoBehaviour
         sequence.AppendInterval(2f).AppendCallback(() =>
         {
             DefeatInfo.gameObject.SetActive(true);
+            Defeat_GamemodeText.text += ModeManager.instance.currentGamemode.GetType().Name;
             Defeat_TimePlayedText.text = "Time Played: " + (TimeManager.instance.Get_TimePlayed() / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
             if (gemreward == 0)
             {
-                Victory_GemRewardText.gameObject.transform.parent.gameObject.SetActive(false);
+                Defeat_GemRewardText.gameObject.transform.parent.gameObject.SetActive(false);
             }
             else
             {
-                Victory_GemRewardText.text = gemreward.ToString();
+                Defeat_GemRewardText.text = gemreward.ToString();
             }
             // Thêm text diamond cho hard mode nữa
             if (diamondreward == 0)
             {
-                Victory_DiamondRewardText.gameObject.transform.parent.gameObject.SetActive(false);
+                Defeat_DiamondRewardText.gameObject.transform.parent.gameObject.SetActive(false);
             }
             else
             {
-                Victory_DiamondRewardText.text = diamondreward.ToString();
+                Defeat_DiamondRewardText.text = diamondreward.ToString();
             }
             DefeatInfo.DOFade(1f, 1f).From(0f);
         });

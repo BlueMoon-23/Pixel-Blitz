@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Necromancer : BaseEnemy
 {
-    public GameObject Minion;
+    public GameObject[] Minion;
     public GameObject MagicCircle;
     void Start()
     {
@@ -33,9 +33,10 @@ public class Necromancer : BaseEnemy
         {
             GameObject magiccircle = Instantiate(MagicCircle, transform.position, Quaternion.identity);
             Destroy(magiccircle, 1f);
+            int random_index = Random.Range(0, Minion.Length);
             for (int i = 0; i < 4; i++)
             {
-                GameObject newEnemy = Instantiate(Minion, transform.position, Quaternion.identity);
+                GameObject newEnemy = Instantiate(Minion[random_index], transform.position, Quaternion.identity);
                 BaseEnemy enemy = newEnemy.GetComponent<BaseEnemy>();
                 enemy.Waypoint_CurrentIndex = this.Waypoint_CurrentIndex;
                 enemy.Waypoint_SelectedIndex = this.Waypoint_SelectedIndex;

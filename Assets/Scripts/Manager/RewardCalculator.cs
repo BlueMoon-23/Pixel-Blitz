@@ -7,6 +7,9 @@ public class RewardCalculator : MonoBehaviour
 {
     public static int CalculateGem(int wave, float star, Gamemodes gamemodes, bool doVictory)
     {
+        // Easy: 2x^1.25 + 138
+        // Medium: 2*x^1.5 + 171
+        // Hard: 0.28*x^2 + 4.75x + 497
         double BaseGem = 0;
         int BonusGem = 0;
         if (gamemodes.GetType() == typeof(Easy))

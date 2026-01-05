@@ -41,31 +41,18 @@ public class RangerLaser : BaseBullets
         //RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, 50f);
         if (enemy != null)
         {
-            Collider2D hit = Physics2D.OverlapCircle(enemy.Center.transform.position, 0.5f); // Khi chạm tạo 1 vùng collider hình tròn bán kính 0.5f
-            if (hit != null)
+            if (character != null && !hasDealtDamage)
             {
-                BaseEnemy baseEnemy = hit.GetComponent<BaseEnemy>();
-                if (baseEnemy != null && baseEnemy == enemy)
+                enemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                hasDealtDamage = true;
+                // Stun for 1s when level 4
+                if (character.GetLevel() >= 4)
                 {
-                    if (character != null && !hasDealtDamage)
-                    {
-                        baseEnemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
-                        hasDealtDamage = true;
-                        // Stun for 1s when level 4
-                        if (character.GetLevel() >= 4)
-                        {
-                            baseEnemy.StartCoroutine(baseEnemy.GetStunned(1f));
-                        }
-                    }
-                    GameObject spawnedSFX = Instantiate(Explosion_SFX, baseEnemy.transform.position, Quaternion.identity);
-                    Destroy(spawnedSFX, 0.5f);
-                    Destroy(this.gameObject, 0.5f);
-
+                    enemy.StartCoroutine(enemy.GetStunned(1f));
                 }
-            }
-            else
-            {
-                Destroy(this.gameObject, 0.5f);
+                GameObject spawnedSFX = Instantiate(Explosion_SFX, enemy.transform.position, Quaternion.identity);
+                Destroy(spawnedSFX, 0.5f);
+                Destroy(this.gameObject, 0.25f);
             }
         }
     }

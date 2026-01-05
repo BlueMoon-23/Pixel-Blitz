@@ -13,7 +13,7 @@ public class Ranger : CliffCharacter
         Level = 0;
         hasHiddenDetection = false;
         canStrikethrough = true;
-        UpgradeCost = new float[] { 900, 4250, 10000, 22500 };
+        UpgradeCost = new float[] { 900, 4250, 14500, 26500 };
         SellCost = (int)(Cost / 3);
     }
 
@@ -41,20 +41,20 @@ public class Ranger : CliffCharacter
     public override void UpgradeToLevel2()
     {
         Range = 15f;
-        Damage = 65f;
+        Damage = 95f;
         Level = 2;
     }
     public override void UpgradeToLevel3()
     {
         Range = 25f;
         Cooldown = 3f;
-        Damage = 150f;
+        Damage = 225;
         Level = 3;
     }
     public override void UpgradeToLevel4()
     {
-        Cooldown = 7f;
-        Damage = 1500f;
+        Cooldown = 6f;
+        Damage = 3000;
         Level = 4;
         // Stun
     }
@@ -76,7 +76,7 @@ public class Ranger : CliffCharacter
                 {
                     characterUI.upgradeName.text = "Cherry Blossom";
                     characterUI.Info1.text = "Range: 12 => 15";
-                    characterUI.Info2.text = "Damage: 50 => 65";
+                    characterUI.Info2.text = "Damage: 50 => 95";
                     characterUI.Info3.text = "";
                     break;
                 }
@@ -84,7 +84,7 @@ public class Ranger : CliffCharacter
                 {
                     characterUI.upgradeName.text = "Quickdraw Specialist";
                     characterUI.Info1.text = "Range: 15 => 25";
-                    characterUI.Info2.text = "Damage: 65 => 150";
+                    characterUI.Info2.text = "Damage: 95 => 225";
                     characterUI.Info3.text = "Cooldown: 3.5s => 3s";
                     break;
                 }
@@ -92,8 +92,8 @@ public class Ranger : CliffCharacter
                 {
                     characterUI.upgradeName.text = "Wild Exceptional";
                     characterUI.Info1.text = "Stun enemies for 1s";
-                    characterUI.Info2.text = "Damage: 150 => 1500";
-                    characterUI.Info3.text = "Cooldown: 3s => 7s";
+                    characterUI.Info2.text = "Damage: 225 => 3000";
+                    characterUI.Info3.text = "Cooldown: 3s => 6s";
                     break;
                 }
             default:
@@ -113,25 +113,32 @@ public class Ranger : CliffCharacter
         Clock += Time.deltaTime;
         if (Clock >= Cooldown)
         {
-            BaseEnemy first_enemy = FindFirstEnemy();
-            if (first_enemy != null && !first_enemy.isDieOrNot())
+            if (range.enemies_in_range.Count != 0)
             {
-                SelfRotate(first_enemy);
-                // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
-                float Angle_in_Radian = Mathf.Atan2(first_enemy.Center.transform.position.y - transform.position.y, first_enemy.Center.transform.position.x - transform.position.x);
-                Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
-                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
-                Destroy(newBullet, 1f);
-                BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
-                bullet.SetCharacter(this);
-                bullet.SetEnemy(first_enemy);
-                // Gán headgun cho rangerlaser
-                RangerLaser rangerLaser = bullet.GetComponent<RangerLaser>();
-                rangerLaser.HeadGun = Bullet_StartPosition;
-                // Tạo hiệu ứng nổ đạn (muzzle)
-                MuzzleEffect(Angle_in_Quaternion);
+                BaseEnemy first_enemy = FindFirstEnemy();
+                if (first_enemy != null && !first_enemy.isDieOrNot())
+                {
+                    SelfRotate(first_enemy);
+                    // Bắn đạn: lưu ý là truyền góc là hướng bắn của mình luôn chứ không dùng transform.rotation hay quaternion.identity
+                    float Angle_in_Radian = Mathf.Atan2(first_enemy.Center.transform.position.y - transform.position.y, first_enemy.Center.transform.position.x - transform.position.x);
+                    Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
+                    GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
+                    Destroy(newBullet, 1f);
+                    BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
+                    bullet.SetCharacter(this);
+                    bullet.SetEnemy(first_enemy);
+                    // Gán headgun cho rangerlaser
+                    RangerLaser rangerLaser = bullet.GetComponent<RangerLaser>();
+                    rangerLaser.HeadGun = Bullet_StartPosition;
+                    // Tạo hiệu ứng nổ đạn (muzzle)
+                    MuzzleEffect(Angle_in_Quaternion);
+                    Clock = 0f;
+                }
             }
-            Clock = 0f;
+            else
+            {
+                Clock = Cooldown;
+            }
         }
     }
 }

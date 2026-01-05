@@ -97,8 +97,8 @@ public class ShopManager : MonoBehaviour
                     // Thêm character vào túi đồ
                     CharacterSaveManager.instance.BuyCharacter(CharacterSaveManager.instance.allCharacters[currentIndex]);
                     // Trừ tiền và cập nhật lên 2 thanh tiền trên đầu
-                    CurrencySaveManager.instance.RemoveGem(CharacterSaveManager.instance.allCharacters[currentIndex].GemRequire);
-                    CurrencySaveManager.instance.RemoveDiamonds(CharacterSaveManager.instance.allCharacters[currentIndex].DiamondRequire);
+                    CurrencySaveManager.instance.RemoveGem(CharacterSaveManager.instance.allCharacters[currentIndex].characterProfile.GemRequire);
+                    CurrencySaveManager.instance.RemoveDiamonds(CharacterSaveManager.instance.allCharacters[currentIndex].characterProfile.DiamondRequire);
                     UpdateCurrencyTexts();
                     // Thay đổi trạng thái nút
                     purchaseButton.SetActive(false);
@@ -114,19 +114,19 @@ public class ShopManager : MonoBehaviour
         {
             if (CharacterSaveManager.instance.allCharacters[allCharacter_index] != null)
             {
-                CharacterName.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].CharacterName;
-                CharacterImage.sprite = CharacterSaveManager.instance.allCharacters[allCharacter_index].CharacterImage;
-                RangeStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].RangeStat.ToString();
-                DamageStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].DamageStat.ToString();
-                CooldownStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].CooldownStat.ToString();
-                CostStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].CostStat.ToString();
-                Tier.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].Tier;
-                Description.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].Description;
-                Special.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].Special;
-                HiddenDetection.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].HiddenDetection;
-                Strikethrough.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].Strikethrough;
-                GemRequire.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].GemRequire.ToString();
-                DiamondRequire.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].DiamondRequire.ToString();
+                CharacterName.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CharacterName;
+                CharacterImage.sprite = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CharacterImage;
+                RangeStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.RangeStat.ToString();
+                DamageStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.DamageStat.ToString();
+                CooldownStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CooldownStat.ToString();
+                CostStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CostStat.ToString();
+                Tier.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.Tier;
+                Description.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.Description;
+                Special.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.Special;
+                HiddenDetection.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.HiddenDetection;
+                Strikethrough.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.Strikethrough;
+                GemRequire.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.GemRequire.ToString();
+                DiamondRequire.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.DiamondRequire.ToString();
             }
             // Kiểm tra xem đã có character hay chưa
             bool hasOwned = false;
@@ -134,7 +134,7 @@ public class ShopManager : MonoBehaviour
             {
                 for (int i = 0; i < AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters.Count; i++)
                 {
-                    if (CharacterSaveManager.instance.allCharacters[allCharacter_index].CharacterName == AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters[i].CharacterName)
+                    if (CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CharacterName == AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters[i].characterProfile.CharacterName)
                     {
                         hasOwned = true;
                         break;
@@ -149,7 +149,7 @@ public class ShopManager : MonoBehaviour
             {
                 int playergem = AccountSaveManager.CurrentAccount.CurrencyData.UserGems;
                 int playerdiamonds = AccountSaveManager.CurrentAccount.CurrencyData.UserDiamonds;
-                if (playergem < CharacterSaveManager.instance.allCharacters[allCharacter_index].GemRequire || playerdiamonds < CharacterSaveManager.instance.allCharacters[allCharacter_index].DiamondRequire)
+                if (playergem < CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.GemRequire || playerdiamonds < CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.DiamondRequire)
                 {
                     purchaseButton.SetActive(false);
                     cantpurchaseButton.SetActive(true);

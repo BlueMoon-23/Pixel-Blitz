@@ -13,10 +13,12 @@ public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler
     protected Vector2 previous_RectTransform;
     public Tilemap PlacingGround;
     public Tilemap PlacingCliff;
+    public Tilemap PlacingWaypoint;
     //
     public GameObject CharacterPrefab;
     public GameObject PlacingGroundUI;
     public GameObject PlacingCliffUI;
+    public GameObject WaypointUI;
     public GameObject CancelPlacing;
     // Range
     public GameObject RangeUI;
@@ -82,6 +84,22 @@ public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler
             {
                 return Vector3.zero;
             }
+        }
+    }
+    protected Vector3 GetWaypointDropPosition(Vector3 MousePosition)
+    {
+        Camera camera = Camera.main;
+        MousePosition.z = Mathf.Abs(camera.transform.position.z);
+        Vector3 WorldPosition = camera.ScreenToWorldPoint(MousePosition);
+        Vector3Int TilePosition = PlacingWaypoint.WorldToCell(WorldPosition);
+        // Kiểm tra có nằm ngoài phạm vi PlacingGround không
+        if (PlacingWaypoint.HasTile(TilePosition))
+        {
+            return PlacingWaypoint.GetCellCenterWorld(TilePosition);
+        }
+        else
+        {
+            return Vector3.zero;
         }
     }
     // Phương thức OnDrag_Specific là bình thường vì như nhau ở DragAbility và DragCharacter

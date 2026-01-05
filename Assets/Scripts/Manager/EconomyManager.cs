@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -84,9 +85,23 @@ public class EconomyManager : MonoBehaviour
             Announcement.gameObject.SetActive(false);
         });
     }
-    public void EarnCoinEachWave(int wave)
+    public void EarnCoinEachWave(Gamemodes mode, int wave)
     {
-        float Formula = 15 * wave * wave + 25 * wave + 150;
+        // Formula cho easy: (100 + 50 * wave)^1.05
+        // Formula cho medium: (100 + 50 * wave)^1.15
+        float Formula = 0;
+        if (mode.GetType() == typeof(Easy))
+        {
+            Formula = (int)Mathf.Pow(100 + 50 * wave, 1.05f);
+        }
+        else if (mode.GetType() == typeof(Medium))
+        {
+            Formula = (int)Mathf.Pow(100 + 65 * wave, 1.15f);
+        }
+        else if (mode.GetType() == typeof(Hard))
+        {
+            Formula = (int)Mathf.Pow(100 + 75 * wave, 1.25f);
+        }
         AddCoin(Formula);
         Change_CurrentCoin();
         WaveReward.text = "Wave Reward: $" + (Formula);

@@ -89,6 +89,7 @@ public class BaseEnemy : MonoBehaviour
     {
         return isHidden;
     }
+    public float GetHP() { return HP; }
     public virtual void TakeDamage(float Damage, bool canStrikethrough) // Boss còn phải cập nhật lên text nên để virtual
     {
         // Hidden: nếu không có hidden detection thì KHÔNG NHẮM VÀO
@@ -142,7 +143,10 @@ public class BaseEnemy : MonoBehaviour
                 {
                     // Không được so sánh tuyệt đối bởi vì time.deltatime gây ra 1 độ lệch (1/fps)
                     Vector3 Direction = (Waypoints[Waypoint_CurrentIndex].transform.position - transform.position).normalized;
-                    transform.position += Direction * Speed * Time.deltaTime;
+                    // Di chuyển bình thường: bị lỗi khi fps quá thấp, các con quái có tốc độ cao sẽ đi qua, thỏa mãn khoảng cách đạt được và bị kẹt quanh
+                    // Giải pháp: dùng hàm MoveTowards (không bao giờ đi quá đích). bản chất là nếu quá lố đích thì sẽ bị teleport về đích
+                    float step = Speed * Time.deltaTime;
+                    transform.position = Vector3.MoveTowards(transform.position, Waypoints[Waypoint_CurrentIndex].transform.position, step);
                     if (Direction.x >= 0)
                     {
                         EnemyRoot.transform.localScale = new Vector3(-1f * Mathf.Abs(EnemyRoot.transform.localScale.x), Mathf.Abs(EnemyRoot.transform.localScale.y), Mathf.Abs(EnemyRoot.transform.localScale.z));
@@ -208,5 +212,14 @@ public class BaseEnemy : MonoBehaviour
         isFrozen = false;
         FreezeCurrentStack = 0;
         yield break;
+    }
+    public void GetHealed(float amount)
+    {
+        HP += amount;
+        if (HP >= MaxHP) { HP = MaxHP; }
+    }
+    public void GetSpeedUp(float percent)
+    {
+        Speed *= percent;
     }
 }

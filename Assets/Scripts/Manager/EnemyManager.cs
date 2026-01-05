@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
@@ -38,5 +37,12 @@ public class EnemyManager : MonoBehaviour
             Destroy(EnemyList[i].gameObject);
         }
         EnemyList.Clear();
+    }
+    public void SpeedUpAllEnemies(float percent)
+    {
+        for (int i = 0;i < EnemyList.Count;i++)
+        {
+            EnemyList[i].GetSpeedUp(percent);
+        }
     }
 }

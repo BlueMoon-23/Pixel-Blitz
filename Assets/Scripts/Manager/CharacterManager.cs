@@ -1,12 +1,15 @@
 ﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
+using static CharacterManager;
 public class CharacterManager : MonoBehaviour
 {
+    // Quản lý danh sách character
     public static CharacterManager instance;
     private void Awake()
     {
@@ -16,50 +19,135 @@ public class CharacterManager : MonoBehaviour
         }
         else
         {
-            Destroy(this);
+            Destroy(this.gameObject);
         }
         characterList = new List<BaseCharacter> ();
         CharacterPositions = new List<Vector3>();
     }
-    private List<BaseCharacter> characterList;
+    private List<BaseCharacter> characterList; // danh sách các character đang active
     // Mảng lưu vị trí character để kiểm tra tránh trùng lặp
     private List<Vector3> CharacterPositions;
     private int Character_LimitPlacement = 20;
     public TextMeshProUGUI CurrentCharacter;
     public TextMeshProUGUI Announcement;
-    public enum CharacterName { Archer, Freezer, Minigunner, MinigunnerClone, Ranger, Rocketeer, Summoner, Accelerator, Wizard};
+    public enum CharacterName { Archer, Freezer, Musketeer, Minigunner, MinigunnerClone, Ranger, Rocketeer, Summoner, Pulser, Wizard};
     private Dictionary<CharacterName, int> Limit_for_1_Character = new Dictionary<CharacterName, int> { 
-        { CharacterName.Archer, 12 },
+        { CharacterName.Archer, 8 },
         { CharacterName.Freezer, 4 },
+        { CharacterName.Musketeer, 8 },
         { CharacterName.Minigunner, 4 },
         //{ CharacterName.MinigunnerClone, 4 },
         { CharacterName.Ranger, 5 },
         { CharacterName.Rocketeer, 5 },
         { CharacterName.Summoner, 3 },
-        { CharacterName.Accelerator, 4 },
+        { CharacterName.Pulser, 4 },
         { CharacterName.Wizard, 6 },
     };
     private Dictionary<CharacterName, int> CharacterQuantity = new Dictionary<CharacterName, int> {
         { CharacterName.Archer, 0 },
         { CharacterName.Freezer, 0 },
+        { CharacterName.Musketeer, 0 },
         { CharacterName.Minigunner, 0 },
         //{ CharacterName.MinigunnerClone, 0 },
         { CharacterName.Ranger, 0 },
         { CharacterName.Rocketeer, 0 },
         { CharacterName.Summoner, 0 },
-        { CharacterName.Accelerator, 0 },
+        { CharacterName.Pulser, 0 },
         { CharacterName.Wizard, 0 },
     };
     public TextMeshProUGUI Limit_for_1_Character_Text;
+    // Pooler
+    public Transform poolParent;
+    private Dictionary<CharacterName, Stack<BaseCharacter>> pools;
     void Start()
     {
-        
+        poolParent = this.transform;
+        pools = new Dictionary<CharacterName, Stack<BaseCharacter>>();
+        int index = 0;
+        if (CharacterLoadout.instance != null)
+        {
+            foreach (Transform child in CharacterLoadout.instance.transform)
+            {
+                BaseCharacter newCharacter = child.GetComponent<BaseCharacter>();
+                CharacterName characterName = GetCharacterEnumName(newCharacter);
+                for (int i = 0; i < Limit_for_1_Character[characterName]; i++)
+                {
+                    CreateCharacter(newCharacter);
+                }
+                index++;
+            }
+        }
     }
-
     // Update is called once per frame
     void Update()
     {
         
+    }
+    private CharacterName GetCharacterEnumName(BaseCharacter character)
+    {
+        CharacterName characterName = CharacterName.Archer;
+        if (Enum.TryParse(character.GetType().Name, out CharacterName result)) // Ép kiểu từ string xuống enum
+        {
+            characterName = result;
+        }
+        return characterName;
+    }
+    public BaseCharacter CreateCharacter(BaseCharacter baseCharacter)
+    {
+        BaseCharacter Character = Instantiate(baseCharacter, poolParent);
+        Character.gameObject.SetActive(false);
+        CharacterName characterName = GetCharacterEnumName(baseCharacter);
+        if (pools.TryGetValue(characterName, out Stack<BaseCharacter> pool))
+        {
+            pool.Push(Character);
+        }
+        else
+        {
+            pool = new Stack<BaseCharacter>();
+            pool.Push(Character);
+            pools[characterName] = pool;
+        }
+        return Character;
+    }
+    public BaseCharacter GetCharacter(BaseCharacter baseCharacter)
+    {
+        Stack<BaseCharacter> pool = null;
+        CharacterName characterName = GetCharacterEnumName(baseCharacter);
+        if (pools.ContainsKey(characterName))
+        {
+            pool = pools[characterName];
+        }
+        else
+        {
+            CreateCharacter(baseCharacter);
+            pool = pools[characterName];
+        }
+        if (pool.Count > 0)
+        {
+            BaseCharacter Character = pool.Pop();
+            Character.gameObject.SetActive(true);
+            return Character;
+        }
+        else
+        {
+            BaseCharacter Character = CreateCharacter(baseCharacter);
+            Character.gameObject.SetActive(true);
+            pool.Pop();
+            return Character;
+        }
+    }
+    public void ReturnCharacter(BaseCharacter baseCharacter)
+    {
+        baseCharacter.transform.SetParent(poolParent);
+        baseCharacter.gameObject.SetActive(false);
+        CharacterName characterName = GetCharacterEnumName(baseCharacter);
+        if (pools.TryGetValue(characterName, out Stack<BaseCharacter> pool))
+        {
+            if (!pool.Contains(baseCharacter))
+            {
+                pool.Push(baseCharacter);
+            }
+        }
     }
     public int GetPopulation()
     {
@@ -76,157 +164,19 @@ public class CharacterManager : MonoBehaviour
         {
             characterList.Add(character);
             CharacterPositions.Add(position);
+            CharacterName characterName = GetCharacterEnumName(character);
             Change_CurrentCharacter();
-            switch (character.GetType().Name)
+            if (CharacterQuantity[characterName] < Limit_for_1_Character[characterName])
             {
-                case "Archer":
-                    {
-                        if (CharacterQuantity[CharacterName.Archer] < Limit_for_1_Character[CharacterName.Archer])
-                        {
-                            CharacterQuantity[CharacterName.Archer]++;
-                        }
-                        else
-                        {
-                            characterList.Remove(character);
-                            CharacterPositions.Remove(position);
-                            Destroy(character.gameObject);
-                            Change_CurrentCharacter();
-                            Show_Limit_for_1_Character_Text(CharacterName.Archer, character);
-                        }
-                        break;
-                    }
-                case "Freezer":
-                    {
-                        if (CharacterQuantity[CharacterName.Freezer] < Limit_for_1_Character[CharacterName.Freezer])
-                        {
-                            CharacterQuantity[CharacterName.Freezer]++;
-                        }
-                        else
-                        {
-                            characterList.Remove(character);
-                            CharacterPositions.Remove(position);
-                            Destroy(character.gameObject);
-                            Change_CurrentCharacter();
-                            Show_Limit_for_1_Character_Text(CharacterName.Freezer, character);
-                        }
-                        break;
-                    }
-                case "Minigunner":
-                    {
-                        if (CharacterQuantity[CharacterName.Minigunner] < Limit_for_1_Character[CharacterName.Minigunner])
-                        {
-                            CharacterQuantity[CharacterName.Minigunner]++;
-                        }
-                        else
-                        {
-                            characterList.Remove(character);
-                            CharacterPositions.Remove(position);
-                            Destroy(character.gameObject);
-                            Change_CurrentCharacter();
-                            Show_Limit_for_1_Character_Text(CharacterName.Minigunner, character);
-                        }
-                        break;
-                    }
-                case "Ranger":
-                    {
-                        if (CharacterQuantity[CharacterName.Ranger] < Limit_for_1_Character[CharacterName.Ranger])
-                        {
-                            CharacterQuantity[CharacterName.Ranger]++;
-                        }
-                        else
-                        {
-                            characterList.Remove(character);
-                            CharacterPositions.Remove(position);
-                            Destroy(character.gameObject);
-                            Change_CurrentCharacter();
-                            Show_Limit_for_1_Character_Text(CharacterName.Ranger, character);
-                        }
-                        break;
-                    }
-                case "Rocketeer":
-                    {
-                        if (CharacterQuantity[CharacterName.Rocketeer] < Limit_for_1_Character[CharacterName.Rocketeer])
-                        {
-                            CharacterQuantity[CharacterName.Rocketeer]++;
-                        }
-                        else
-                        {
-                            characterList.Remove(character);
-                            CharacterPositions.Remove(position);
-                            Destroy(character.gameObject);
-                            Change_CurrentCharacter();
-                            Show_Limit_for_1_Character_Text(CharacterName.Rocketeer, character);
-                        }
-                        break;
-                    }
-                case "Summoner":
-                    {
-                        if (CharacterQuantity[CharacterName.Summoner] < Limit_for_1_Character[CharacterName.Summoner])
-                        {
-                            CharacterQuantity[CharacterName.Summoner]++;
-                        }
-                        else
-                        {
-                            characterList.Remove(character);
-                            CharacterPositions.Remove(position);
-                            Destroy(character.gameObject);
-                            Change_CurrentCharacter();
-                            Show_Limit_for_1_Character_Text(CharacterName.Summoner, character);
-                        }
-                        break;
-                    }
-                case "Accelerator":
-                    {
-                        if (CharacterQuantity[CharacterName.Accelerator] < Limit_for_1_Character[CharacterName.Accelerator])
-                        {
-                            CharacterQuantity[CharacterName.Accelerator]++;
-                        }
-                        else
-                        {
-                            characterList.Remove(character);
-                            CharacterPositions.Remove(position);
-                            Destroy(character.gameObject);
-                            Change_CurrentCharacter();
-                            Show_Limit_for_1_Character_Text(CharacterName.Accelerator, character);
-                        }
-                        break;
-                    }
-                case "Wizard":
-                    {
-                        if (CharacterQuantity[CharacterName.Wizard] < Limit_for_1_Character[CharacterName.Wizard])
-                        {
-                            CharacterQuantity[CharacterName.Wizard]++;
-                        }
-                        else
-                        {
-                            characterList.Remove(character);
-                            CharacterPositions.Remove(position);
-                            Destroy(character.gameObject);
-                            Change_CurrentCharacter();
-                            Show_Limit_for_1_Character_Text(CharacterName.Wizard, character);
-                        }
-                        break;
-                    }
-                /*case "MinigunnerClone":
-                    {
-                        if (CharacterQuantity[CharacterName.MinigunnerClone] < Limit_for_1_Character[CharacterName.MinigunnerClone])
-                        {
-                            CharacterQuantity[CharacterName.MinigunnerClone]++;
-                        }
-                        else
-                        {
-                            characterList.Remove(character);
-                            CharacterPositions.Remove(position);
-                            Destroy(character.gameObject);
-                            Change_CurrentCharacter();
-                            Show_Limit_for_1_Character_Text(CharacterName.MinigunnerClone, character);
-                        }
-                        break;
-                    }*/
-                default:
-                    {
-                        break;
-                    }
+                CharacterQuantity[characterName]++;
+            }
+            else
+            {
+                characterList.Remove(character);
+                CharacterPositions.Remove(position);
+                Destroy(character.gameObject);
+                Change_CurrentCharacter();
+                Show_Limit_for_1_Character_Text(characterName, character);
             }
         }
         else
@@ -256,59 +206,10 @@ public class CharacterManager : MonoBehaviour
         {
             if (characterList[i] == character) CharacterPositions.Remove(CharacterPositions[i]);
         }
-        switch (character.GetType().Name)
-        {
-            case "Archer":
-                {
-                    CharacterQuantity[CharacterName.Archer]--;
-                    break;
-                }
-            case "Freezer":
-                {
-                    CharacterQuantity[CharacterName.Freezer]--;
-                    break;
-                }
-            case "Minigunner":
-                {
-                    CharacterQuantity[CharacterName.Minigunner]--;
-                    break;
-                }
-            /*case "MinigunnerClone":
-                {
-                    CharacterQuantity[CharacterName.MinigunnerClone]--;
-                    break;
-                }*/
-            case "Ranger":
-                {
-                    CharacterQuantity[CharacterName.Ranger]--;
-                    break;
-                }
-            case "Rocketeer":
-                {
-                    CharacterQuantity[CharacterName.Rocketeer]--;
-                    break;
-                }
-            case "Summoner":
-                {
-                    CharacterQuantity[CharacterName.Summoner]--;
-                    break;
-                }
-            case "Accelerator":
-                {
-                    CharacterQuantity[CharacterName.Accelerator]--;
-                    break;
-                }
-            case "Wizard":
-                {
-                    CharacterQuantity[CharacterName.Wizard]--;
-                    break;
-                }
-            default:
-                {
-                    break;
-                }
-        }
+        CharacterName characterName = GetCharacterEnumName(character);
+        CharacterQuantity[characterName]--;
         characterList.Remove(character);
+        ReturnCharacter(character);
         Change_CurrentCharacter();
     }
     private void Change_CurrentCharacter()
@@ -379,10 +280,18 @@ public class CharacterManager : MonoBehaviour
     }
     public void DestroyAllCharacters()
     {
-        for (int i = 0; i < characterList.Count; i++)
+        foreach (var pool in pools.Values)
         {
-            Destroy(characterList[i].gameObject);
+            pool.Clear();
         }
+        for (int i = poolParent.childCount - 1; i >= 0; i--)
+        {
+            if (poolParent.GetChild(i).gameObject != null)
+            {
+                Destroy(poolParent.GetChild(i).gameObject);
+            }
+        }
+        pools.Clear();
         characterList.Clear();
         Change_CurrentCharacter();
         CharacterPositions.Clear();

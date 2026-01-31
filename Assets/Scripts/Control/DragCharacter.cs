@@ -19,6 +19,10 @@ public class DragCharacter : DragThing
         out offset
     );
         offset = m_RectTransform.anchoredPosition - offset;
+        if (CharacterUIControll.instance != null)
+        {
+            CharacterUIControll.instance.UI_Off();
+        }
     }
     protected override void OnBeginDrag_Specific(PointerEventData eventData) 
     {
@@ -63,10 +67,19 @@ public class DragCharacter : DragThing
                 {
                     if (GetDropPosition(eventData.position) != Vector3.zero && !(CharacterManager.instance.hasCharacterinPosition(GetDropPosition(eventData.position))))
                     {
-                        if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Place_Sound);
-                        GameObject newCharacter = Instantiate(CharacterPrefab, GetDropPosition(eventData.position), Quaternion.identity);
-                        newCharacter.SetActive(true);
-                        CharacterManager.instance.AddCharacterWithPosition(newCharacter.GetComponent<BaseCharacter>(), GetDropPosition(eventData.position));
+                        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Place_Sound);
+                        if (CharacterManager.instance != null)
+                        {
+                            //GameObject newCharacter = Instantiate(CharacterPrefab, GetDropPosition(eventData.position), Quaternion.identity);
+                            BaseCharacter newCharacter = CharacterManager.instance.GetCharacter(CharacterPrefab.GetComponent<BaseCharacter>());
+                            if (newCharacter != null)
+                            {
+                                newCharacter.transform.position = GetDropPosition(eventData.position);
+                                newCharacter.transform.rotation = Quaternion.identity;
+                                newCharacter.gameObject.SetActive(true);
+                                CharacterManager.instance.AddCharacterWithPosition(newCharacter, GetDropPosition(eventData.position));
+                            }
+                        }
                         EconomyManager.instance.Purchase(character.GetCost());
                         EconomyManager.instance.Change_CurrentCoin();
                     }

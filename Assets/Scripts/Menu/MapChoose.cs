@@ -95,17 +95,20 @@ public class MapChoose : MonoBehaviour
         {
             case "OmittedCastle":
                 {
-                    SceneManager.LoadScene(SceneKey.OmittedCastle);
+                    SceneKey.targetScene = SceneKey.OmittedCastle;
+                    SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
                     break;
                 }
             case "DeadShaft":
                 {
-                    SceneManager.LoadScene(SceneKey.DeadShaft);
+                    SceneKey.targetScene = SceneKey.DeadShaft;
+                    SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
                     break;
                 }
             default:
                 {
-                    SceneManager.LoadScene(SceneKey.Greenland);
+                    SceneKey.targetScene = SceneKey.Greenland;
+                    SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
                     break; ;
                 }
         }
@@ -185,6 +188,7 @@ public class MapChoose : MonoBehaviour
             }
         }
         ShowMapUI(currentMapDataIndex);
+        StopShowAvailableMaps();
     }
     public void Exit()
     {

@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StarSequence : MonoBehaviour
+public class StarSequence : BaseExplosion
 {
     // Start is called before the first frame update
     public GameObject[] StarExplosions; // lắp theo hệ đếm -2, -1, 0, 1 , 2
-    void Start()
+    void OnEnable()
     {
         StartCoroutine(ExplodeInSequence());
-        Destroy(gameObject, 3.0f);
+        if (ExplosionPooler.instance != null)
+        {
+            ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(this, 2.0f));
+        }
     }
 
     // Update is called once per frame

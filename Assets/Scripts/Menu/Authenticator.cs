@@ -55,7 +55,9 @@ public class Authenticator : MonoBehaviour
         AccountSaveManager.CurrentAccount = newUser;
         // Lưu vào playerprefs để lần sau khỏi phải đăng nhập lại
         PlayerPrefs.SetString(UserDataKey.USERNAME_KEY, username_Signup.text);
-        SceneManager.LoadScene(SceneKey.MainMenu);
+        // SceneManager.LoadScene(SceneKey.MainMenu);
+        SceneKey.targetScene = SceneKey.MainMenu;
+        SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     public void LogIn()
     {
@@ -66,7 +68,8 @@ public class Authenticator : MonoBehaviour
                 AccountSaveManager.CurrentAccount = AccountSaveManager.instance.UserAccounts.userDatas[i]; // không tạo checkuser rồi compare nhé
                 // Lưu vào playerprefs để lần sau khỏi phải đăng nhập lại
                 PlayerPrefs.SetString(UserDataKey.USERNAME_KEY, username_Login.text);
-                SceneManager.LoadScene(SceneKey.MainMenu);
+                SceneKey.targetScene = SceneKey.MainMenu;
+                SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
                 return;
             }
         }

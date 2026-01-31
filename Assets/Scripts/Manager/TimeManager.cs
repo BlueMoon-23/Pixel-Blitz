@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
+    // Time text
+    private Coroutine Coroutine;
+    [SerializeField] private int TimePlayed;
     public static TimeManager instance;
     private void Awake()
     {
@@ -17,8 +20,6 @@ public class TimeManager : MonoBehaviour
             Destroy(this);
         }
     }
-    [SerializeField] private int TimePlayed;
-    private Coroutine Coroutine;
     void Start()
     {
         

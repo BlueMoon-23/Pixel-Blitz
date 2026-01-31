@@ -29,9 +29,9 @@ public class CharacterSaveManager : MonoBehaviour
         }
         else
         {
-            // Cấp sẵn Archer (0) và Freezer(1) 
+            // Cấp sẵn Archer (0) và Musketeer(2) 
             BuyCharacter(allCharacters[0]);
-            BuyCharacter(allCharacters[1]);
+            BuyCharacter(allCharacters[2]);
         }
     }
     public void BuyCharacter(CharacterData characterData)

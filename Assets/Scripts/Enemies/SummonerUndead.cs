@@ -12,6 +12,7 @@ public class SummonerUndead : MonoBehaviour
     [SerializeField] protected float HP;
     [SerializeField] protected float MaxHP;
     [SerializeField] protected float Speed;
+    public int ID;
     // Move
     [SerializeField] private GameObject[] Waypoints;
     [SerializeField] private int Waypoint_CurrentIndex; // thằng này sẽ chỉ enemy đi đâu
@@ -23,8 +24,17 @@ public class SummonerUndead : MonoBehaviour
     protected float Original_x_HPScale;
     // Rotate
     public GameObject EnemyRoot;
-    protected void Awake()
+    // ResetStats
+    public bool StatsReseted = false; // mặc định phải là false, true là update sẽ chạy trước
+    protected void OnEnable()
     {
+        StartCoroutine(ResetStats());
+    }
+    private IEnumerator ResetStats()
+    {
+        StatsReseted = false;
+        yield return null;
+        // Awake
         // Move animation
         SPUM_Prefabs = GetComponent<SPUM_Prefabs>();
         if (SPUM_Prefabs == null)
@@ -42,9 +52,8 @@ public class SummonerUndead : MonoBehaviour
         }
         // HP Bar
         Original_x_HPScale = HP_RedBar.transform.localScale.x;
-    }
-    void Start()
-    {
+        yield return null;
+        // Start
         if (WaypointManager.instance != null)
         {
             Waypoints = WaypointManager.instance.GetWaypoints(out int Waypoints_index);
@@ -59,26 +68,35 @@ public class SummonerUndead : MonoBehaviour
                 break;
             }
         }
+        StatsReseted = true;
     }
     private bool x_Between_2_Waypoints(int index, float x_position)
     {
-        return (Waypoints[index].transform.position.x <= x_position && x_position <= Waypoints[index + 1].transform.position.x);
+        return ((Waypoints[index].transform.position.x <= x_position && x_position <= Waypoints[index + 1].transform.position.x) || (Waypoints[index].transform.position.x >= x_position && x_position >= Waypoints[index + 1].transform.position.x));
     }
     private bool y_Between_2_Waypoints(int index, float y_position)
     {
-        return (Waypoints[index].transform.position.y <= y_position && y_position <= Waypoints[index + 1].transform.position.y);
+        return ((Waypoints[index].transform.position.y <= y_position && y_position <= Waypoints[index + 1].transform.position.y) || (Waypoints[index].transform.position.y >= y_position && y_position >= Waypoints[index + 1].transform.position.y));
     }
     // Update is called once per frame
     void Update()
     {
-        Move();
-        Die();
+        if (StatsReseted)
+        {
+            Move();
+            Die();
+        }
     }
     private void Die()
     {
         if (HP <= 0)
         {
-            Destroy(this.gameObject);
+            if (SummonerUndeadPooler.instance != null)
+            {
+                SummonerUndeadPooler.instance.ReturnUndead(this);
+            }
+            //Reset lại hp
+            HP = MaxHP;
         }
     }
     private void Move()
@@ -108,7 +126,12 @@ public class SummonerUndead : MonoBehaviour
         }
         else
         {
-            Destroy(this.gameObject);
+            if (SummonerUndeadPooler.instance != null)
+            {
+                SummonerUndeadPooler.instance.ReturnUndead(this);
+            }
+            //Reset lại hp
+            HP = MaxHP;
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -122,7 +145,10 @@ public class SummonerUndead : MonoBehaviour
             float damage = this.HP; // 50
             float enemyHP = baseEnemy.GetHP(); // 800
             baseEnemy.TakeDamage(damage, true); // mình gây 50 damage lên enemy
-            this.HP -= enemyHP; // mình mất 800 máu, thành -750 máu
+            if (enemyHP > 0) // tránh tình huống 1 con tông vào con kia, con kia âm máu, chưa kịp chết thì con thứ 2 đã tông vào nó, lấy máu âm cộng lại
+            {
+                this.HP -= enemyHP; // mình mất 800 máu, thành -750 máu
+            }
             if (this.HP <= 0)
             {
                 Die();

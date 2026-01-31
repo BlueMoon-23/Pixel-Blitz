@@ -35,7 +35,9 @@ public class StartScene : MonoBehaviour
         // Người chơi mới: register cái đã rồi chơi
         if (PlayerPrefs.HasKey(UserDataKey.ACCOUNT_KEY))
         {
-            SceneManager.LoadScene(SceneKey.MainMenu);
+            // SceneManager.LoadScene(SceneKey.MainMenu);
+            SceneKey.targetScene = SceneKey.MainMenu;
+            SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
         }
         else
         {

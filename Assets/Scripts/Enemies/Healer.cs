@@ -6,28 +6,30 @@ using UnityEngine;
 public class Healer : BaseEnemy
 {
     public GameObject MagicCircle;
-    void Start()
+    protected override IEnumerator ResetStats()
     {
-        // Move road
-        if (WaypointManager.instance != null)
-        {
-            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
-        }
+        StartCoroutine(base.ResetStats());
+        yield return null;
         isFinalBoss = false;
         StartCoroutine(HealEnemiesInCircle());
-    }
-    void Update()
-    {
-        Move();
-        Die();
     }
     private IEnumerator HealEnemiesInCircle()
     {
         do
         {
-            GameObject newMagicCircle = Instantiate(MagicCircle, transform.position, Quaternion.identity);
-            Destroy(newMagicCircle, 1f);
-            yield return new WaitForSeconds(1f);
+            /*GameObject newMagicCircle = Instantiate(MagicCircle, transform.position, Quaternion.identity);
+            Destroy(newMagicCircle, 1f);*/
+            if (ExplosionPooler.instance != null)
+            {
+                BaseExplosion newMagicCircle = ExplosionPooler.instance.GetExplosion(MagicCircle.GetComponent<BaseExplosion>().ExplosionID);
+                if (newMagicCircle != null)
+                {
+                    newMagicCircle.transform.position = this.transform.position;
+                    newMagicCircle.transform.rotation = Quaternion.identity;
+                    ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(newMagicCircle, 1f));
+                }
+            }
+            yield return new WaitForSeconds(2f);
         }
         while (true);
     }

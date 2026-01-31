@@ -9,7 +9,7 @@ public class PulserLaser : BaseBullets
     public GameObject HeadGun;
     private float TickClock = 0.1f;
     private float Tick = 0.1f;
-    private void Awake()
+    private void OnEnable()
     {
         lineRenderer = GetComponent<LineRenderer>();
     }
@@ -58,6 +58,7 @@ public class PulserLaser : BaseBullets
                     pulser.StackPulse(character.GetDamage() < enemy.GetHP() ? character.GetDamage() : enemy.GetHP());
                 }
                 enemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                enemy.ModifySpeed(0.8f);
             }
         }
     }

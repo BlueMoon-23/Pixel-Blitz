@@ -5,17 +5,18 @@ using UnityEngine;
 public class Rocketeer : CliffCharacter
 {
     private float ExplosionRadius;
-    void Start()
+    protected override void OnEnable()
     {
+        base.OnEnable();
         Range = 10f;
         Damage = 12f;
         Cooldown = 3f;
-        Cost = 1000;
+        Cost = 1100;
         ExplosionRadius = 1;
         Level = 0;
         hasHiddenDetection = false;
         canStrikethrough = true;
-        UpgradeCost = new float[] { 1500, 3300, 9500, 19500 };
+        UpgradeCost = new float[] { 2300, 4100, 9700, 30400 };
         SellCost = (int)(Cost / 3);
         _hasAbility = false;
     }
@@ -23,8 +24,11 @@ public class Rocketeer : CliffCharacter
     // Update is called once per frame
     void Update()
     {
-        if (!isStunned) { AttackWithoutAnimation(); }
-        // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
+        if (StatsReseted)
+        {
+            if (!isStunned) { AttackWithoutAnimation(); }
+            // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
+        }
     }
     public override float GetRange()
     {
@@ -33,7 +37,7 @@ public class Rocketeer : CliffCharacter
     }
     public override float GetCost()
     {
-        if (Cost != 1000) { return 1000; }
+        if (Cost != 1100) { return 1100; }
         else return Cost;
     }
     public float GetExplosionRadius() { return ExplosionRadius; }
@@ -58,56 +62,60 @@ public class Rocketeer : CliffCharacter
     }
     public override void UpgradeToLevel4()
     {
-        Damage = 450f;
+        Damage = 350f;
         Level = 4;
+        base.UpgradeToLevel4();
     }
     public override void SetUpgradeInformation()
     {
-        characterUI.characterName.text = "Rocketeer";
-        characterUI.characterImage.sprite = characterUI.characterImages[4]; // Copy paste nhớ chỉnh ở đây dùm con
-        switch (Level)
+        if (characterUI != null)
         {
-            case 0:
-                {
-                    characterUI.upgradeName.text = "Blast Off";
-                    characterUI.Info1.text = "Damage: 12 => 25";
-                    characterUI.Info2.text = "Explosion Radius: 1 => 1.5";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            case 1:
-                {
-                    characterUI.upgradeName.text = "Long-Frontal Fire";
-                    characterUI.Info1.text = "Range: 10 => 12";
-                    characterUI.Info2.text = "Damage: 25 => 45";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            case 2:
-                {
-                    characterUI.upgradeName.text = "Seismic Crash";
-                    characterUI.Info1.text = "Range: 12 => 15";
-                    characterUI.Info2.text = "Damage: 45 => 105";
-                    characterUI.Info3.text = "Explosion Radius: 1.5 => 2.5";
-                    break;
-                }
-            case 3:
-                {
-                    characterUI.upgradeName.text = "Heart on Fire Fragments";
-                    characterUI.Info1.text = "Damage: 105 => 450";
-                    characterUI.Info2.text = "Rockets now launch 4 bombs on its impact, each deals 100 damage";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            default:
-                {
-                    characterUI.upgradeName.text = "";
-                    characterUI.Info1.text = "";
-                    characterUI.Info2.text = "";
-                    characterUI.Info3.text = "";
-                    break;
-                }
+            characterUI.characterName.text = "Rocketeer";
+            characterUI.characterImage.sprite = characterUI.characterImages[4]; // Copy paste nhớ chỉnh ở đây dùm con
+            switch (Level)
+            {
+                case 0:
+                    {
+                        characterUI.upgradeName.text = "Blast Off";
+                        characterUI.Info1.text = "Damage: 12 => 25";
+                        characterUI.Info2.text = "Explosion Radius: 1 => 1.5";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                case 1:
+                    {
+                        characterUI.upgradeName.text = "Long-Frontal Fire";
+                        characterUI.Info1.text = "Range: 10 => 12";
+                        characterUI.Info2.text = "Damage: 25 => 45";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                case 2:
+                    {
+                        characterUI.upgradeName.text = "Penetrating Warhead";
+                        characterUI.Info1.text = "Range: 12 => 15";
+                        characterUI.Info2.text = "Damage: 45 => 105";
+                        characterUI.Info3.text = "Explosion Radius: 1.5 => 2.5";
+                        break;
+                    }
+                case 3:
+                    {
+                        characterUI.upgradeName.text = "Heart on Fire Fragments";
+                        characterUI.Info1.text = "Damage: 105 => 350";
+                        characterUI.Info2.text = "Rockets now launch 4 bombs on its impact, each deals 50 damage";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                default:
+                    {
+                        characterUI.upgradeName.text = "";
+                        characterUI.Info1.text = "";
+                        characterUI.Info2.text = "";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+            }
+            base.SetUpgradeInformation();
         }
-        base.SetUpgradeInformation();
     }
 }

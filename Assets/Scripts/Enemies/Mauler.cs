@@ -5,30 +5,20 @@ using UnityEngine;
 public class Mauler : BaseEnemy
 {
     public GameObject MaulerAim; 
-    void Start()
+    protected override IEnumerator ResetStats()
     {
-        // Move road
-        if (WaypointManager.instance != null)
-        {
-            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
-        }
+        yield return StartCoroutine(base.ResetStats());
+        yield return null;
         isFinalBoss = false;
         StartCoroutine(SmashGround());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        Move();
-        Die();
     }
     private IEnumerator SmashGround()
     {
         do
         {
-            SPUM_Prefabs.PlayAnimation(PlayerState.ATTACK, IndexPair[PlayerState.ATTACK]);
+            SPUM_Prefabs.PlayAnimation(PlayerState.ATTACK, 0);
             yield return new WaitForSeconds(0.5f);
-            if (SoundManager.Instance != null) { SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.StompGround_Sound); }
+            if (SoundManager.Instance != null) { SoundManager.Instance.SoundEffectSource.PlayOneShot(SoundManager.Instance.StompGround_Sound); }
             CreateBlastChain();
             yield return new WaitForSeconds(9.5f);
         }
@@ -47,7 +37,7 @@ public class Mauler : BaseEnemy
             // Instantiate MaulerAim rồi setting mauleraim là xong
             GameObject newMaulerAim = Instantiate(MaulerAim, transform.position, Quaternion.identity);
             MaulerAim maulerAim = newMaulerAim.GetComponent<MaulerAim>();
-            Destroy(maulerAim.gameObject, 5f);
+            Destroy(maulerAim.gameObject, 2.5f);
             if (maulerAim != null)
             {
                 maulerAim.SetAimedCharacter(CharacterManager.instance.GetCharacterByIndex(character_index_position));

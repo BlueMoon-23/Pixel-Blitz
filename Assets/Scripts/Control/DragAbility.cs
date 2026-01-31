@@ -87,6 +87,7 @@ public class DragAbility : DragThing
         // Set range = 15 sẵn luôn
         RangeUI.transform.localScale = new Vector3(RangeUI.transform.localScale.x * 15, RangeUI.transform.localScale.y * 15, RangeUI.transform.localScale.z * 15);
         range_RectTransform.anchoredPosition = m_RectTransform.anchoredPosition - new Vector2(0f, 30f);
+
     }
     private void GroundPlacementEndDrag(PointerEventData eventData)
     {
@@ -107,6 +108,11 @@ public class DragAbility : DragThing
         //
         m_RectTransform.anchoredPosition = previous_RectTransform;
         range_RectTransform.anchoredPosition = m_RectTransform.anchoredPosition - new Vector2(0f, 30f);
+        // Tắt characterUIControll, mang lại cảm giác thông thoáng hơn
+        if (CharacterUIControll.instance != null)
+        {
+            CharacterUIControll.instance.UI_Off();
+        }
     }
 
     private void WaypointPlacementBeginDrag(PointerEventData eventData)
@@ -118,6 +124,7 @@ public class DragAbility : DragThing
         CancelPlacing.SetActive(true);
         // Range
         currentCharacter.Range_Prefab.GetComponent<Renderer>().enabled = true;
+
     }
     private void WaypointPlacementEndDrag(PointerEventData eventData)
     {

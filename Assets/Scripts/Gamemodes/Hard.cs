@@ -9,236 +9,226 @@ public class Hard : Gamemodes
     {
         switch (Wave)
         {
-            case 1: // 4 normal
+            case 1:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Normal, 4));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Normal, 6, 1f));
                     break;
                 }
-            case 2: // 4 normal 4 quick
+            case 2:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Normal, 4));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Quick, 4));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Normal, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Quick, 5, 1f));
                     break;
                 }
-            case 3: // 10 Enraged
+            case 3:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Normal, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Quick, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 4, 1f));
                     break;
                 }
-            case 4: // 10 Enraged, 1 Normal Boss
+            case 4:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 1));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 10, 1f));
                     break;
                 }
-            case 5: // 15 Enraged, 8 Quick, 8 Normal
+            case 5:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 15));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Quick, 8));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Normal, 8));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 1, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 5, 1f));
                     break;
                 }
-            case 6: // 10 Quick, 2 Normal Boss, 10 Normal
+            case 6:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Quick, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Normal, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 10, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Quick, 7, 0.5f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Normal, 7, 0.75f));
                     break;
                 }
-            case 7: // 15 Hiddden
+            case 7:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 15));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 8, 1f));
                     break;
                 }
-            case 8: // 15 Enraged, 5 Armored
+            case 8:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Enraged, 15));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Armored, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Armored, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 2, 1f));
                     break;
                 }
-            case 9: // 10 Hidden, 3 Normal Boss
+            case 9:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 3));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 6, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Armored, 5, 0.75f));
                     break;
                 }
-            case 10: // 10 Normal Mystery
+            case 10:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 10, 1f));
                     break;
                 }
-            case 11: // 10 Hidden, 2 Necromancer
+            case 11:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10, 0.5f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 2, 1f));
                     break;
                 }
-            case 12: // 15 Normal Mystery, 3 Normal Boss, 1 Skeleton Boss
+            case 12:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 15));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 3));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 1));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Armored, 5, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalBoss, 3, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 1, 1f));
                     break;
                 }
-            case 13: // 10 Hidden, 2 Hidden Boss, 10 Hidden
+            case 13:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 2));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 10, 0.75f));
                     break;
                 }
-            case 14: // 10 Speed, 3 Necromancer, 2 Skeleton Boss
+            case 14:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 3));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 2, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 1, 1f));
                     break;
                 }
-            case 15: // 10 Speed, 3 Necromancer, 2 Skeleton Boss
+            case 15:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 3));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonBoss, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalKnight, 5, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonKnight, 5, 0.75f));
                     break;
                 }
-            case 16: // 15 Normal Mystery, 7 Boss Mystery
+            case 16:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalMystery, 15));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 7));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Hidden, 10, 0.5f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 3, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 5, 0.75f));
                     break;
                 }
-            case 17: // 15 Speed, 5 Hidden Boss, 2 Speedy Boss
+            case 17:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 15));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SpeedyBoss, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 5, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SpeedyBoss, 2, 1f));
                     break;
                 }
-            case 18: // 10 Armored, 5 Normal Knight, 5 Skeleton Knight
+            case 18:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Armored, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalKnight, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonKnight, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 8, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalKnight, 6, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonKnight, 6, 1f));
                     break;
                 }
-            case 19: // 10 Normal Knight, 10 Skeleton Knight
+            case 19:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalKnight, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonKnight, 10));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalKnight, 5 , 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonKnight, 5, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 1, 1f));
                     break;
                 }
-            case 20: // 15 Boss Mystery, 3 King, 5 Hidden Boss
+            case 20:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 15));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 3));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 15, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 2, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 5, 1f));
                     break;
                 }
-            case 21: // 15 Speed, 10 Speedy Boss, 1 Horse Rider
+            case 21:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 15));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SpeedyBoss, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 3, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 5, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 5, 1f));
                     break;
                 }
-            case 22: // 5 Heavy Knight, 10 Speedy Boss, 5 King
+            case 22:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SpeedyBoss, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 3, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SpeedyBoss, 3, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 5, 1f));
                     break;
                 }
-            case 23: // 10 Heavy Knight, 10 Boss Mystery, 10 Heavy Knight, 5 King
+            case 23:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 4, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Ghost, 4, 0.75f));
                     break;
                 }
-            case 24: // 1 Horse Rider, 10 Normal Knight, 10 Skeleton Knight, 10 King, 15 Hidden Boss
+            case 24:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.NormalKnight, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SkeletonKnight, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 15));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 1, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 5, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 5, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 2, 1f));
                     break;
                 }
-            case 25: // 1 Mauler, 5 Hidden Boss, 5 Soul, 5 Necromancer, 8 Soul, 5 King, 1 Healer
+            case 25:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HiddenBoss, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Necromancer, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 8));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 1));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 1, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1, 1.25f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 5, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Speed, 4, 1f));
                     break;
                 }
-            case 26: // 10 Soul, 5 Ghoul, 1 Horse Rider, 1 Healer, 8 Heavy Knight, 1 Mauler, 1 Healer
+            case 26:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Ghost, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 8));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 1));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 4, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 6, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Ghost, 6, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 1, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 2, 1f));
                     break;
                 }
-            case 27: // 5 Soul, 5 Ghoul, 5 King, 1 Horse Rider, 1 Charger, 10 King, 1 Healer, 3 Mauler
+            case 27:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Ghost, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 3));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Ghost, 5, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 1, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 1, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 1, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 3, 1f));
                     break;
                 }
-            case 28: // 5 Heavy Knight, 3 Mauler, 4 Healer, 5 King, 2 Mauler, 4 Healer, 2 Horse Rider
+            case 28:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 3));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 4));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 2));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 4));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 5, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 3, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 5, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 2, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 3, 1f));
                     break;
                 }
-            case 29: // 2 Healer, 3 Mauler, 2 Charger, 2 Healer, 2 Horse Rider, 2 Healer, 2 Charger
+            case 29:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 2));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 3));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 2));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 2));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 2));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 2));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 2));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 2, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 2, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 2, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 2, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 2, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 2, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 2, 1f));
                     break;
                 }
-            case 30: // 10 Heavy Knight, 10 Ghoul, 10 Soul, 5 King, 5 Mauler, 1 Charger, Final Boss, 10 Boss Mystery, 5 King, 1 Horse Rider, 5 Healer
+            case 30:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Ghost, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HardFinalBoss, 1));
-                    if (GameManager.instance != null)
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 5, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Ghost, 5, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 5, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 3, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 1, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HardFinalBoss, 1, 1.25f));
+                    if (BossManager.instance != null)
                     {
-                        GameManager.instance.BossHPGroup.SetActive(true);
-                        GameManager.instance.BossName.text = "Secret Glamour Angel";
+                        BossManager.instance.BossHPGroup.SetActive(true);
+                        BossManager.instance.BossName.text = "Secret Glamour Angel";
                     }
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 10));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 5));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 5));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 10, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1, 1.25f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 4, 1f));
                     break;
                 }
             default:

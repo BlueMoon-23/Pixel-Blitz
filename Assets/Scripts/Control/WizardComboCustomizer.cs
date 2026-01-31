@@ -34,6 +34,10 @@ public class WizardComboCustomizer : MonoBehaviour
         canvasGroup.alpha = 0;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
+        if (CharacterUIControll.instance != null)
+        {
+            CharacterUIControll.instance.UI_Off();
+        }
     }
     public void SetCurrentWizard(Wizard wizard)
     {
@@ -41,10 +45,13 @@ public class WizardComboCustomizer : MonoBehaviour
     }
     public void Confirm()
     {
+        float totalDamage = 0f;
         for (int i = 0; i < SkillBoxes.Length; i++)
         {
             currentWizard.SkillOrderID[i] = SkillBoxes[i].GetCurrentSkillID();
+            totalDamage += SkillBoxes[i].GetDamageByID();
         }
+        currentWizard.SetVirtualDamage(totalDamage);
         CloseUI();
     }
     public void ShowCurrentWizardSkillOrder()

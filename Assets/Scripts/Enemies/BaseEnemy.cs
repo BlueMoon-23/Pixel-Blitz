@@ -2,16 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class BaseEnemy : MonoBehaviour
 {
-    [SerializeField] protected float HP;
-    [SerializeField] protected float MaxHP;
-    [SerializeField] protected float Speed;
+    // Stats gốc nằm ở EnemyStats, bao gồm những thứ sẽ bị reset, còn găm từ prefab xuống thì ở đây là đr
+    protected EnemyStats enemyStats;
+    protected float HP;
+    protected float Speed;
+    protected EnemyModifiers enemyModifiers;
     [SerializeField] protected bool isHidden;
     [SerializeField] protected bool isArmored;
     public GameObject Center; // đây là chỗ để các character nhắm bắn vào
+    [SerializeField] protected float incomingDamage = 0; // damage ảo, dùng để check xem nếu mục tiêu sắp chết rồi thì nhắm vào con khác
+    protected float lastrecordedDamage = 0f;
     // Move
     public GameObject[] Waypoints;
     public int Waypoint_SelectedIndex; // Thằng gamemode sẽ truyền cái này cho enemy để nó biết nó ở waypoint nào
@@ -26,70 +32,122 @@ public class BaseEnemy : MonoBehaviour
         get { return _Distance; }
         set { if (value >= 0) _Distance = value; }
     }
+    public bool isSummoned = false; // phòng trường hợp summon lấy từ pooling, pooling get xong distance bị reset = 0 thì k đáng
     // HP Bar;
-    [SerializeField] protected GameObject HP_RedBar;
-    protected float Original_x_HPScale;
+    public GameObject HP_RedBar;
     // Rotate
     public GameObject EnemyRoot;
     // FreezeEffect
     public GameObject FreezeEffect; // MagicChargeBlue
     protected int FreezeStack = 3;
-    [SerializeField] protected int FreezeCurrentStack = 0;
+    protected int FreezeCurrentStack = 0;
     protected bool isFrozen = false;
     // Boss
     protected bool isFinalBoss = false;
     // Stun effect
     public GameObject StunEffect;
     protected bool isStunned = false;
-    protected void Awake()
+    // Kiểm tra đã reset hay chưa
+    public bool StatsReseted = false; // PHẢI MẶC ĐỊNH LÀ FALSE, TRUE LÀ UPDATE SẼ CHẠY TRƯỚC LÀ SẼ BÁO NULL
+    protected void OnEnable()
     {
-        Waypoint_CurrentIndex = 1;
-        // Move animation
-        SPUM_Prefabs = GetComponent<SPUM_Prefabs>();
-        if (SPUM_Prefabs == null)
+        StartCoroutine(ResetStats());
+    }
+    protected virtual IEnumerator ResetStats()
+    {
+        // Awake
+        StatsReseted = false; // khóa update/move cho đến khi xong stats
+        yield return null;
+        enemyStats = GetComponent<EnemyStats>();
+        enemyModifiers = GetComponent<EnemyModifiers>();
+        if (enemyStats != null)
         {
-            SPUM_Prefabs = transform.GetChild(0).GetComponent<SPUM_Prefabs>();
-            if (!SPUM_Prefabs.allListsHaveItemsExist())
+            if (!isSummoned) Waypoint_CurrentIndex = 1; // xem lại tình huống ở necromancer và mystery enemies
+            // Move animation
+            SPUM_Prefabs = GetComponent<SPUM_Prefabs>();
+            if (SPUM_Prefabs == null)
             {
-                SPUM_Prefabs.PopulateAnimationLists();
+                SPUM_Prefabs = transform.GetChild(0).GetComponent<SPUM_Prefabs>();
+                if (!SPUM_Prefabs.allListsHaveItemsExist())
+                {
+                    SPUM_Prefabs.PopulateAnimationLists();
+                }
+            }
+            SPUM_Prefabs.OverrideControllerInit();
+            foreach (PlayerState state in Enum.GetValues(typeof(PlayerState)))
+            {
+                IndexPair[state] = 0;
+            }
+            // HP Bar
+            enemyStats.Original_x_HPScale = 3.5f;
+            // Start
+            yield return null;
+            // Move road
+            if (WaypointManager.instance != null)
+            {
+                Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
+            }
+            // Reset Stats thiệt nè
+            HP = enemyStats.MaxHP;
+            Speed = enemyStats.OldSpeed;
+            isHidden = enemyStats.isHidden;
+            isArmored = enemyStats.isArmored;
+            incomingDamage = 0f;
+            lastrecordedDamage = Time.time;
+            FreezeCurrentStack = 0;
+            if (!isSummoned) Distance = 0f;
+            isFrozen = false;
+            isStunned = false;
+            StatsReseted = true;
+            // Reset lại effect nữa
+            StunEffect.SetActive(false);
+            FreezeEffect.SetActive(false);
+            // Reset modifiers
+            if (enemyModifiers != null)
+            {
+                enemyModifiers.ResetModifiers();
             }
         }
-        SPUM_Prefabs.OverrideControllerInit();
-        foreach (PlayerState state in Enum.GetValues(typeof(PlayerState)))
+        yield return null;
+        if (enemyStats != null) // sau thêm modifiers thì thêm ở đây
         {
-            IndexPair[state] = 0;
-        }
-        // HP Bar
-        Original_x_HPScale = HP_RedBar.transform.localScale.x;
-        // Distance
-        _Distance = 0f;
-        // EnemyManager
-        if (EnemyManager.instance != null) { EnemyManager.instance.AddEnemy(this); }
-    }
-    void Start()
-    {
-        /*// Bỏ vào awake thì bị lỗi nếu instantiate từ necromancer và boss mystery
-        if (Waypoint_CurrentIndex == 0) // Đảm bảo việc gán từ bên ngoài
-        {
-        }*/
-        // Move road
-        if (WaypointManager.instance != null)
-        {
-            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
+            HP_RedBar.transform.localScale = new Vector3(enemyStats.Original_x_HPScale * HP / enemyStats.MaxHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
         }
     }
-
     // Update is called once per frame
-    void Update()
+    protected void Update()
     {
-        Move();
-        Die();
+        if (StatsReseted)
+        {
+            Move();
+            Die();
+            ResetIncomingDamage();
+        }
     }
     public bool isHiddenOrNot()
     {
         return isHidden;
     }
     public float GetHP() { return HP; }
+    public void TakeIncomingDamage(float Damage, bool canStrikethrough)
+    {
+        if ((isArmored && !canStrikethrough))
+        {
+            //
+        }
+        else
+        {
+            incomingDamage += Damage;
+            lastrecordedDamage = Time.time;
+        }
+    }
+    protected void ResetIncomingDamage()
+    {
+        if (incomingDamage > 0 && Time.time - lastrecordedDamage > 1f)
+        {
+            incomingDamage = 0;
+        }
+    }
     public virtual void TakeDamage(float Damage, bool canStrikethrough) // Boss còn phải cập nhật lên text nên để virtual
     {
         // Hidden: nếu không có hidden detection thì KHÔNG NHẮM VÀO
@@ -100,11 +158,17 @@ public class BaseEnemy : MonoBehaviour
         }
         else
         {
-            HP -= Damage;
-            HP_RedBar.transform.localScale = new Vector3(Original_x_HPScale * HP / MaxHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
+            if (HP - Damage <= 0) { HP = 0; }
+            else { HP -= Damage; }
+            if (incomingDamage - Damage <= 0) { incomingDamage = 0; }
+            else { incomingDamage -= Damage; }
+            if (enemyStats != null)
+            {
+                HP_RedBar.transform.localScale = new Vector3(enemyStats.Original_x_HPScale * HP / enemyStats.MaxHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
+            }
         }
     }
-    public virtual void Die()
+    protected virtual void Die()
     {
         if (HP <= 0)
         {
@@ -116,27 +180,41 @@ public class BaseEnemy : MonoBehaviour
                 EarnCoinVFX earnCoinVFX = EarnCoin.GetComponent<EarnCoinVFX>();
                 if (earnCoinVFX != null)
                 {
-                    earnCoinVFX.SetEarnCoinText(this.MaxHP);
+                    earnCoinVFX.SetEarnCoinText(this.enemyStats.MaxHP);
                 }
             }
             if (EconomyManager.instance != null)
             {
-                EconomyManager.instance.AddCoin(this.MaxHP);
+                EconomyManager.instance.AddCoin(this.enemyStats.MaxHP);
                 EconomyManager.instance.Change_CurrentCoin();
             }
-            Destroy(this.gameObject);
+            //Destroy(this.gameObject);
+            if (enemyStats != null)
+            {
+                HP_RedBar.transform.localScale = new Vector3(enemyStats.Original_x_HPScale, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
+            }
+            if (EnemyManager.instance != null)
+            {
+                EnemyManager.instance.ReturnEnemy(this);
+            }
+            //Reset lại hp redbar, do x của nó = 0 nên khi dùng lại thì bị gán ngu
         }
     }
     public bool isDieOrNot()
     {
-        return (HP <= 0);
+        return (HP - incomingDamage <= 0f);
     }
-    public void Move()
+    protected void Move()
     {
+        // bỏ cái này lên chỗ reset stats vẫn còn bị lỗi thanh máu mất trắng, nên bỏ vào đây cho chắc
+        //HP_RedBar.transform.localScale = new Vector3(enemyStats.Original_x_HPScale * HP / enemyStats.MaxHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
         if (!isFrozen && !isStunned)
         {
-            SPUM_Prefabs.PlayAnimation(PlayerState.MOVE, IndexPair[PlayerState.MOVE]);
-            SPUM_Prefabs._anim.speed = 25 * Speed / 38 + 7 / 38;
+            if (SPUM_Prefabs != null)
+            {
+                SPUM_Prefabs.PlayAnimation(PlayerState.MOVE, 0);
+                SPUM_Prefabs._anim.speed = 25 * Speed / 38 + 7 / 38;
+            }
             if (Waypoint_CurrentIndex != Waypoints.Length)
             {
                 if (Vector3.Distance(transform.position, Waypoints[Waypoint_CurrentIndex].transform.position) >= 0.05f)
@@ -163,8 +241,11 @@ public class BaseEnemy : MonoBehaviour
             }
             else // == nghia la da cham nha chinh
             {
-                GameManager.instance.BaseGetHit(HP);
-                Destroy(this.gameObject);
+                BaseHealth.instance.BaseGetHit(HP);
+                if (EnemyManager.instance != null)
+                {
+                    EnemyManager.instance.ReturnEnemy(this);
+                }
                 // Remove enemy from enemy manager
             }
             // Distance
@@ -172,13 +253,12 @@ public class BaseEnemy : MonoBehaviour
         }
         else
         {
-            SPUM_Prefabs.PlayAnimation(PlayerState.IDLE, IndexPair[PlayerState.IDLE]);
-            SPUM_Prefabs._anim.speed = 0f;
+            if (SPUM_Prefabs != null)
+            {
+                SPUM_Prefabs.PlayAnimation(PlayerState.IDLE, 0);
+                SPUM_Prefabs._anim.speed = 0f;
+            }
         }
-    }
-    private void OnDestroy()
-    {
-        if (EnemyManager.instance != null) { EnemyManager.instance.RemoveEnemy(this); }
     }
     public void GetFreeze(float FreezeTime, int FreezeCount)
     {
@@ -206,20 +286,47 @@ public class BaseEnemy : MonoBehaviour
     private IEnumerator BeFrozen(float FreezeTime)
     {
         isFrozen = true;
-        GameObject effect = Instantiate(FreezeEffect, Center.transform.position, Quaternion.identity);
-        Destroy(effect, FreezeTime);
+        FreezeEffect.SetActive(true);
         yield return new WaitForSeconds(FreezeTime);
         isFrozen = false;
         FreezeCurrentStack = 0;
+        FreezeEffect.SetActive(false);
         yield break;
     }
     public void GetHealed(float amount)
     {
-        HP += amount;
-        if (HP >= MaxHP) { HP = MaxHP; }
+        if (enemyStats != null)
+        {
+            HP += amount;
+            incomingDamage -= amount;
+            if (HP >= enemyStats.MaxHP) { HP = enemyStats.MaxHP; }
+        }
     }
-    public void GetSpeedUp(float percent)
+    public void ModifySpeed(float percent)
     {
-        Speed *= percent;
+        if (!isFinalBoss)
+        {
+            // mong muốn: speed = oldspeed * min của mảng slowmodifier * mã cua mảng boostmodifier
+            float slow_factor = 1f;
+            float boost_factor = 1f;
+            if (enemyModifiers != null)
+            {
+                if (percent >= 1)
+                {
+                    enemyModifiers.AddSpeedUpModifier(percent);
+                }
+                else
+                {
+                    enemyModifiers.AddSlowModifier(percent);
+                }
+                slow_factor = enemyModifiers.GetMinSlowPercent();
+                boost_factor = enemyModifiers.GetMaxBoostPercent();
+            }
+            Speed = enemyStats.OldSpeed * slow_factor * boost_factor;
+        }
+        else
+        {
+            Speed = enemyStats.OldSpeed;
+        }
     }
 }

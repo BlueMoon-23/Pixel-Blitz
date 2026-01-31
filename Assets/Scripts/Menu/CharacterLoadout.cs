@@ -24,6 +24,13 @@ public class CharacterLoadout : MonoBehaviour
         if (CharacterEquip.instance != null)
         {
             characterLoadout = CharacterEquip.instance.characterLoadout;
+            string Loadout_Key = "";
+            for (int i = 0; i < characterLoadout.Count; i++)
+            {
+                Loadout_Key += characterLoadout[i].characterData.characterID;
+                Loadout_Key += ",";
+            }
+            PlayerPrefs.SetString(UserDataKey.LOADOUTKEY, Loadout_Key);
         }
     }
     public void Set_CharacterLoadout_Prefab()

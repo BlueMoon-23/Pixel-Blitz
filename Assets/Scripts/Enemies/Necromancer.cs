@@ -6,26 +6,11 @@ public class Necromancer : BaseEnemy
 {
     public GameObject[] Minion;
     public GameObject MagicCircle;
-    void Start()
+    protected override IEnumerator ResetStats()
     {
-        // Move road
-        if (WaypointManager.instance != null)
-        {
-            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
-        }
-        /*// Bỏ vào awake thì bị lỗi nếu instantiate từ necromancer và boss mystery
-        if (Waypoint_CurrentIndex == 0) // Đảm bảo việc gán từ bên ngoài
-        {
-            Waypoint_CurrentIndex = 1;
-        }*/
+        StartCoroutine(base.ResetStats());
+        yield return null;
         StartCoroutine(SpawnMinions());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        Move();
-        Die();
     }
     IEnumerator SpawnMinions()
     {
@@ -36,14 +21,27 @@ public class Necromancer : BaseEnemy
             int random_index = Random.Range(0, Minion.Length);
             for (int i = 0; i < 4; i++)
             {
-                GameObject newEnemy = Instantiate(Minion[random_index], transform.position, Quaternion.identity);
+                /*GameObject newEnemy = Instantiate(Minion[random_index], transform.position, Quaternion.identity);
                 BaseEnemy enemy = newEnemy.GetComponent<BaseEnemy>();
                 enemy.Waypoint_CurrentIndex = this.Waypoint_CurrentIndex;
                 enemy.Waypoint_SelectedIndex = this.Waypoint_SelectedIndex;
-                enemy.Distance = this.Distance;
+                enemy.Distance = this.Distance;*/
+                if (EnemyManager.instance != null)
+                {
+                    BaseEnemy baseEnemy = EnemyManager.instance.GetEnemy(Minion[random_index].GetComponent<BaseEnemy>());
+                    if (baseEnemy != null)
+                    {
+                        baseEnemy.isSummoned = true;
+                        baseEnemy.transform.position = this.transform.position;
+                        baseEnemy.transform.rotation = Quaternion.identity;
+                        baseEnemy.Waypoint_CurrentIndex = this.Waypoint_CurrentIndex;
+                        baseEnemy.Waypoint_SelectedIndex = this.Waypoint_SelectedIndex;
+                        baseEnemy.Distance = this.Distance;
+                    }
+                }
                 yield return new WaitForSeconds(0.5f);
             }
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(10f);
         }
     }
 }

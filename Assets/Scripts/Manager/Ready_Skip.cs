@@ -1,0 +1,105 @@
+using DG.Tweening;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Ready_Skip : MonoBehaviour
+{
+    // Skip UI
+    private bool _WantToSkip = false;
+    public bool WantToSkip
+    {
+        get { return _WantToSkip; }
+        set { _WantToSkip = value; }
+    }
+    public CanvasGroup SkipUI;
+    // GetReady UI
+    private bool _isReady = false;
+    public bool isReady
+    {
+        get { return _isReady; }
+        set { _isReady = value; }
+    }
+    public CanvasGroup ReadyUI;
+    public GameObject WaypointArrows;
+    public static Ready_Skip instance;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+    public IEnumerator GetReady()
+    {
+        //DOTween.KillAll();
+        Sequence sequence = DOTween.Sequence();
+        sequence.AppendCallback(() =>
+        {
+            ReadyUI.gameObject.SetActive(true);
+            ReadyUI.DOFade(1f, 0.5f).From(0f);
+        });
+        do
+        {
+            Sequence sequence1 = DOTween.Sequence();
+            sequence1.AppendCallback(() =>
+            {
+                WaypointArrows.gameObject.SetActive(true);
+            });
+            sequence1.AppendInterval(1f).AppendCallback(() =>
+            {
+                WaypointArrows.gameObject.SetActive(false);
+            });
+            yield return new WaitForSeconds(2f);
+        }
+        while (!isReady);
+        yield break;
+    }
+    public IEnumerator Skip()
+    {
+        yield return new WaitForSeconds(14f);
+        // Show Skip annouonce
+        //DOTween.KillAll();
+        if (GameSetting.instance != null)
+        {
+            if (GameSetting.instance._autoSkip) { DoSkip(); }
+            else
+            {
+                Sequence sequence = DOTween.Sequence();
+                sequence.AppendCallback(() =>
+                {
+                    SkipUI.gameObject.SetActive(true);
+                    SkipUI.DOFade(1f, 0.5f).From(0f);
+                });
+                yield return new WaitForSeconds(43f);
+                sequence.AppendCallback(() =>
+                {
+                    SkipUI.DOFade(0f, 0.5f).From(1f);
+                });
+                sequence.AppendInterval(0.5f).AppendCallback(() => {
+                    SkipUI.gameObject.SetActive(false);
+                });
+            }
+        }
+    }
+    public void DoSkip()
+    {
+        WantToSkip = true;
+        SkipUI.gameObject.SetActive(false);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Skip_Sound);
+    }
+    public void DontSkip()
+    {
+        WantToSkip = false;
+        SkipUI.gameObject.SetActive(false);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Skip_Sound);
+    }
+    public void Ready()
+    {
+        isReady = true;
+    }
+}

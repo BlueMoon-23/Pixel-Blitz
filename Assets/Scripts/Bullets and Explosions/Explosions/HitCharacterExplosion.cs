@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HitCharacterExplosion : MonoBehaviour
+public class HitCharacterExplosion : BaseExplosion
 {
     public bool CanHitCliffCharacter;
+    public bool CanHitSummonerUndead;
     public float StunDuration = 2f;
     void Start()
     {
@@ -26,6 +27,14 @@ public class HitCharacterExplosion : MonoBehaviour
         if (character != null)
         {
             character.StartCoroutine(character.GetStunned(StunDuration));
+        }
+        if (CanHitSummonerUndead)
+        {
+            SummonerUndead summonerUndead = collision.GetComponent<SummonerUndead>();
+            if (summonerUndead != null && SummonerUndeadPooler.instance != null)
+            {
+                SummonerUndeadPooler.instance.ReturnUndead(summonerUndead);
+            }
         }
     }
 }

@@ -50,7 +50,59 @@ public class CharacterEquip : MonoBehaviour
     }
     void Start()
     {
-        
+        if (PlayerPrefs.HasKey(UserDataKey.LOADOUTKEY)) 
+        {
+            string loadoutKey = PlayerPrefs.GetString(UserDataKey.LOADOUTKEY);
+            // string có dạng: archer,freezer,minigunner,ranger, 
+            // tách chuỗi ra từng cái 1
+            int oldLoadoutLength = 0;
+            List<int> commaIndex = new List<int>();
+            for (int i = 0; i < loadoutKey.Length; i++)
+            {
+                if (loadoutKey[i] == ',')
+                {
+                    oldLoadoutLength++;
+                    commaIndex.Add(i);
+                }
+            }
+            CurrentIndex = oldLoadoutLength;
+            List<string> characterKeys = new List<string>(oldLoadoutLength);
+            for (int i = 0; i < oldLoadoutLength; i++)
+            {
+                int j = 0;
+                if (i > 0)
+                {
+                    j = commaIndex[i - 1] + 1;
+                }
+                string res = "";
+                for (; j < loadoutKey.Length; j++)
+                {
+                    if (loadoutKey[j] != ',') { res += loadoutKey[j]; }
+                    else // nghĩa là đã chạm dấu phẩy, break vòng này
+                    {
+                        characterKeys.Add(res);
+                        break;
+                    }
+                }
+            }
+            CharacterInfomation[] characterSource = FindObjectsOfType<CharacterInfomation>();
+            for (int i = 0; i < characterKeys.Count; i++)
+            {
+                for (int j = 0; j < characterSource.Length; j++)
+                {
+                    if (characterKeys[i] == characterSource[j].characterData.characterID)
+                    {
+                        // Chỉnh thông tin trên loadout
+                        CharacterLoadoutImages[i].gameObject.SetActive(true);
+                        CharacterLoadoutCosts[i].gameObject.SetActive(true);
+                        CharacterLoadoutImages[i].sprite = characterSource[j].characterData.characterProfile.CharacterImage;
+                        CharacterLoadoutCosts[i].text = "$" + characterSource[j].characterData.characterProfile.CostStat.ToString();
+                        characterLoadout.Add(characterSource[j]);
+                        break;
+                    }
+                }
+            }
+        }
     }
     // Update is called once per frame
     void Update()

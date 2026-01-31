@@ -34,7 +34,7 @@ public class EconomyManager : MonoBehaviour
     public CanvasGroup WaveClearBonusAnnounecement;
     void Start()
     {
-        _PlayerCoin = 600f;
+        _PlayerCoin = 300f;
         Change_CurrentCoin();
     }
 
@@ -54,7 +54,7 @@ public class EconomyManager : MonoBehaviour
     public void AddCoin(float Bonus)
     {
         _PlayerCoin += Bonus;
-        if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.EarnCoin_Sound);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.EarnCoin_Sound);
     }
     public void Announce_CantPlace(float Cost)
     {
@@ -87,27 +87,25 @@ public class EconomyManager : MonoBehaviour
     }
     public void EarnCoinEachWave(Gamemodes mode, int wave)
     {
-        // Formula cho easy: (100 + 50 * wave)^1.05
-        // Formula cho medium: (100 + 50 * wave)^1.15
         float Formula = 0;
         if (mode.GetType() == typeof(Easy))
         {
-            Formula = (int)Mathf.Pow(100 + 50 * wave, 1.05f);
+            Formula = (int)Mathf.Pow(125 + 55 * wave, 1.2f);
         }
         else if (mode.GetType() == typeof(Medium))
         {
-            Formula = (int)Mathf.Pow(100 + 65 * wave, 1.15f);
+            Formula = (int)Mathf.Pow(125 + 55 * wave, 1.2f);
         }
         else if (mode.GetType() == typeof(Hard))
         {
-            Formula = (int)Mathf.Pow(100 + 75 * wave, 1.25f);
+            Formula = (int)Mathf.Pow(125 + 55 * wave, 1.2f);
         }
         AddCoin(Formula);
         Change_CurrentCoin();
         WaveReward.text = "Wave Reward: $" + (Formula);
         ShowAnnounce(WaveRewardAnnounecement);
         // Wave clear bonus
-        if (EnemyManager.instance != null && EnemyManager.instance.GetEnemyListCount() == 0)
+        if (EnemyManager.instance != null && EnemyManager.instance.isEmptyEnemies())
         {
             AddCoin((int)((Formula / 3)));
             Change_CurrentCoin();

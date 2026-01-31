@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class MainMenu : MonoBehaviour
     public TextMeshProUGUI Gems_Text;
     public TextMeshProUGUI Diamonds_Text;
     public GameObject Setting_Popup;
+    public Slider musicSlider;
+    public Slider UISlider;
     private void Awake()
     {
         if (instance == null)
@@ -35,6 +38,21 @@ public class MainMenu : MonoBehaviour
             Diamonds_Text.text = AccountSaveManager.CurrentAccount.CurrencyData.UserDiamonds.ToString();
         }
         Setting_Popup.SetActive(false);
+        if (SoundManager.Instance != null)
+        {
+            musicSlider.onValueChanged.AddListener(SoundManager.Instance.SetMusicVolume);
+            UISlider.onValueChanged.AddListener(SoundManager.Instance.SetUISoundsVolume);
+        }
+        if (PlayerPrefs.HasKey("MusicVolume") && PlayerPrefs.HasKey("UISoundsVolume"))
+        {
+            musicSlider.value = PlayerPrefs.GetFloat("MusicVolume");
+            UISlider.value = PlayerPrefs.GetFloat("UISoundsVolume");
+        }
+        else
+        {
+            musicSlider.value = 1f;
+            UISlider.value = 1f;
+        }
     }
 
     // Update is called once per frame
@@ -44,11 +62,15 @@ public class MainMenu : MonoBehaviour
     }
     public void Shop()
     {
-        SceneManager.LoadScene(SceneKey.ShopScene);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
+        SceneKey.targetScene = SceneKey.ShopScene;
+        SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     public void Play()
     {
-        SceneManager.LoadScene(SceneKey.MapChoose);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
+        SceneKey.targetScene = SceneKey.MapChoose;
+        SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     public void Setting()
     {
@@ -60,7 +82,8 @@ public class MainMenu : MonoBehaviour
     }
     public void LogOut()
     {
-        SceneManager.LoadScene(SceneKey.UserRegister);
+        SceneKey.targetScene = SceneKey.UserRegister;
+        SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     public void QuitGame()
     {

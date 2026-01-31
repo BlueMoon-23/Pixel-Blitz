@@ -9,6 +9,8 @@ public class Gamemodes : MonoBehaviour
     protected Dictionary<EnemyName, BaseEnemy> EnemyList = new Dictionary<EnemyName, BaseEnemy>();
     // EnemySpawner
     protected GameObject EnemySpawner;
+    // Thêm interval làm cho doSkip vô tình làm lố
+    protected bool finished_spawningEnemies = false;
     protected void Awake()
     {
         for (int i = 0; i < enemyEntries.Count; i++)
@@ -39,27 +41,47 @@ public class Gamemodes : MonoBehaviour
             return null; // Trả về null để tránh lỗi treo ứng dụng
         }
     }
-    protected IEnumerator SpawnEnemyLayout(EnemyName name, int Quantity)
+    protected IEnumerator SpawnEnemyLayout(EnemyName name, int Quantity, float interval)
     {
+        finished_spawningEnemies = false;
         for (int i = 0; i < Quantity; i++)
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(interval);
             // Set lại EnemySpawner một cách tự động
+            if (Win_Lose.instance.Defeated)
+            {
+                StopAllCoroutines();
+                yield break;
+            }
             if (WaypointManager.instance != null)
             {
                 GameObject[] Waypoints = WaypointManager.instance.GetWaypoints(out int Waypoints_index);
                 EnemySpawner = Waypoints[0];
-                GameObject newEnemy = Instantiate(GetEnemyWithName(name).gameObject, EnemySpawner.transform.position, Quaternion.identity);
+                /*GameObject newEnemy = Instantiate(GetEnemyWithName(name).gameObject, EnemySpawner.transform.position, Quaternion.identity);
                 BaseEnemy baseEnemy = newEnemy.GetComponent<BaseEnemy>();
                 if (baseEnemy != null)
                 {
                     baseEnemy.Waypoint_SelectedIndex = Waypoints_index;
+                }*/
+                if (EnemyManager.instance != null)
+                {
+                    BaseEnemy baseEnemy = EnemyManager.instance.GetEnemy(GetEnemyWithName(name));
+                    if (baseEnemy != null)
+                    {
+                        baseEnemy.isSummoned = false;
+                        baseEnemy.transform.position = EnemySpawner.transform.position;
+                        baseEnemy.transform.rotation = Quaternion.identity;
+                        baseEnemy.Waypoint_SelectedIndex = Waypoints_index;
+                    }
                 }
             }
         }
+        yield return new WaitForSeconds(interval);
+        finished_spawningEnemies = true;
     }
     public virtual IEnumerator SpawnEnemyWave(int Wave)
     {
         yield break;
     }
+    public bool isFinished_spawning() { return finished_spawningEnemies; }
 }

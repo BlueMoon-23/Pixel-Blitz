@@ -8,9 +8,13 @@ public class SummonerBullet : BaseBullets
     private GameObject TargetWaypoint;
     private Vector3 TargetDirection;
     // Start is called before the first frame update
-    void Start()
+    void OnEnable()
     {
-        
+        isBounced = false;
+        if (BulletPooler.instance != null)
+        {
+            BulletPooler.instance.StartCoroutine(BulletPooler.instance.ReturnBulletWithDelay(this, 1.25f));
+        }
     }
 
     // Update is called once per frame
@@ -35,11 +39,24 @@ public class SummonerBullet : BaseBullets
                     }
                     baseEnemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
                 }
-                GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
-                Destroy(spawnedSFX, 0.5f);
+                //GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
+                //Destroy(spawnedSFX, 0.5f);
+                if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
+                {
+                    BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                    if (explosionSFX != null)
+                    {
+                        explosionSFX.transform.position = this.transform.position;
+                        explosionSFX.transform.rotation = Quaternion.identity;
+                        ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+                    }
+                }
                 if (character.GetLevel() < 3)
                 {
-                    Destroy(this.gameObject);
+                    if (BulletPooler.instance != null)
+                    {
+                        BulletPooler.instance.ReturnBullet(this);
+                    }
                 }
                 else // Đạn nảy
                 {
@@ -64,10 +81,19 @@ public class SummonerBullet : BaseBullets
                     }
                     baseEnemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
                 }
-                GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
-                Destroy(spawnedSFX, 0.5f);
+                //GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
+                //Destroy(spawnedSFX, 0.5f);
+                if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
+                {
+                    BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                    if (explosionSFX != null)
+                    {
+                        explosionSFX.transform.position = this.transform.position;
+                        explosionSFX.transform.rotation = Quaternion.identity;
+                        ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+                    }
+                }
             }
-            Destroy(this.gameObject, 5.0f);
         }
     }
     private void BouncedMove()

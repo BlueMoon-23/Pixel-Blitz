@@ -28,7 +28,24 @@ public class CharacterControll : MonoBehaviour
     }
     private void OnMouseDown()
     {
-        if (characterUI.gameObject.activeInHierarchy) { return; };
+        //if (characterUI.gameObject.activeInHierarchy) { return; };
+        // Tạo data giả lập
+        PointerEventData data = new PointerEventData(EventSystem.current);
+        data.position = Input.mousePosition;
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(data, results);
+        foreach (var r in results)
+        {
+            if (r.gameObject.GetComponentInParent<Button>() != null)
+            {
+                return;
+            }
+        }
+        GameObject[] Range_Prefab = GameObject.FindGameObjectsWithTag("Range");
+        for (int i = 0; i < Range_Prefab.Length; i++)
+        {
+            Range_Prefab[i].GetComponent<Renderer>().enabled = false;
+        }
         character.Range_Prefab.GetComponent<Renderer>().enabled = true;
         characterUI.gameObject.SetActive(true);
         characterUI.CurrentCharacter = character;
@@ -43,7 +60,7 @@ public class CharacterControll : MonoBehaviour
         {
             characterUI.AbilityButton.gameObject.SetActive(false);
         }
-        if (characterUI.CurrentCharacter.GetLevel() >= 4)
+        if (characterUI.CurrentCharacter.GetLevel() >= 4 || characterUI.CurrentCharacter.GetType() == typeof(MinigunnerClone))
         {
             characterUI.UpgradeButton.interactable = false;
         }

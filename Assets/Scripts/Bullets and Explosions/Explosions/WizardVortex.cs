@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
-public class WizardVortex : MonoBehaviour
+public class WizardVortex : BaseExplosion
 {
     private float damageInterval = 0.1f;
-    private float damageValue = 50f;
+    private float damageValue = 20f;
     private float Clock = 0f;
     private float VortexDuration = 3.0f;
     private float DurationClock = 0f;
@@ -15,9 +15,10 @@ public class WizardVortex : MonoBehaviour
     * Khi enemy rời khỏi vortex, vortex sẽ xóa nó vào danh sách gây damage
     */
     private List<BaseEnemy> EnemiesInVortex = new List<BaseEnemy>();
-    void Start()
+    void OnEnable()
     {
-        
+        Clock = 0f;
+        DurationClock = 0f;
     }
 
     // Update is called once per frame
@@ -35,7 +36,10 @@ public class WizardVortex : MonoBehaviour
         DurationClock += Time.deltaTime;
         if (DurationClock >= VortexDuration)
         {
-            Destroy(this.gameObject);
+            if (ExplosionPooler.instance != null)
+            {
+                ExplosionPooler.instance.ReturnExplosion(this);
+            }
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)

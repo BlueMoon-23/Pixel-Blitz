@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ModeManager : MonoBehaviour
@@ -11,6 +12,8 @@ public class ModeManager : MonoBehaviour
     public Gamemodes currentGamemode; // Khi người chơi nhấn nút play, phải truyền cái currentGamemode vô
     public int MaxWave;
     public float Star;
+    // Current Enemy Prefabs
+    public List<BaseEnemy> enemy_Prefabs = new List<BaseEnemy>();
     private void Awake()
     {
         if (instance == null)
@@ -29,11 +32,11 @@ public class ModeManager : MonoBehaviour
         {
             if (currentGamemode.GetType() == typeof(Easy))
             {
-                MaxWave = 25;
+                MaxWave = 20;
             }
             if (currentGamemode.GetType() == typeof(Medium))
             {
-                MaxWave = 30;
+                MaxWave = 25;
             }
             if (currentGamemode.GetType() == typeof(Hard))
             {
@@ -45,6 +48,15 @@ public class ModeManager : MonoBehaviour
         // Lý do: coroutine gọi từ modemanager.instance.currentGamemode, nhưng currentGamemode lại trỏ về cái script trong prefab
         // Nên coroutine không công nhận nó (prefab = inactive)
         // Giải pháp: phải tạo ra cục gamemode object thật rồi găm lên currentGamemode
+
+        // Enemy pooler: mode manager phải làm danh sách prefab enemy để enemy pooler làm việc
+        if (currentGamemode != null)
+        {
+            for (int i = 0; i < currentGamemode.enemyEntries.Count; i++)
+            {
+                enemy_Prefabs.Add(currentGamemode.enemyEntries[i].Enemy_Prefab);
+            }
+        }
     }
     public void Play(MapData mapData)
     {
@@ -74,6 +86,13 @@ public class ModeManager : MonoBehaviour
             {
                 Destroy(child.gameObject);
             }
+        }
+    }
+    public void ClearEnemyPrefab()
+    {
+        if (enemy_Prefabs.Count > 0)
+        {
+            enemy_Prefabs.Clear();
         }
     }
 }

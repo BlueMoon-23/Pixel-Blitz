@@ -14,16 +14,17 @@ public class Freezer : GroundCharacter
     {
         get { return _FreezeCount; }
     }
-    void Start()
+    protected override void OnEnable()
     {
-        Range = 5f;
+        base.OnEnable();
+        Range = 4f;
         Damage = 1f;
         Cooldown = 3f;
-        Cost = 650f;
+        Cost = 450f;
         Level = 0;
         hasHiddenDetection = false;
         canStrikethrough = false;
-        UpgradeCost = new float[] { 600, 800, 1750, 5000 };
+        UpgradeCost = new float[] { 650, 700, 750, 3100 };
         SellCost = (int)(Cost / 3);
         _FreezeTime = 0.5f;
         _FreezeCount = 3;
@@ -33,17 +34,20 @@ public class Freezer : GroundCharacter
     // Update is called once per frame
     void Update()
     {
-        if (!isStunned) { AttackWithoutAnimation(); }
-        // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
+        if (StatsReseted)
+        {
+            if (!isStunned) { AttackWithoutAnimation(); }
+            // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
+        }
     }
     public override float GetRange()
     {
-        if (Range <= 5f) { return 5f; } // <= la chua duoc khoi tao
+        if (Range <= 4f) { return 4f; } // <= la chua duoc khoi tao
         else return Range;
     }
     public override float GetCost()
     {
-        if (Cost != 650f) { return 650f; }
+        if (Cost != 300f) { return 300f; }
         else return Cost;
     }
     public override void UpgradeToLevel1()
@@ -54,7 +58,7 @@ public class Freezer : GroundCharacter
     }
     public override void UpgradeToLevel2()
     {
-        Range = 7f;
+        Range = 6f;
         _FreezeTime = 1f;
         Level = 2;
     }
@@ -68,56 +72,59 @@ public class Freezer : GroundCharacter
     {
         Damage = 5f;
         Level = 4;
-        // Explode
+        base.UpgradeToLevel4();
     }
     public override void SetUpgradeInformation()
     {
-        characterUI.characterName.text = "Freezer";
-        characterUI.characterImage.sprite = characterUI.characterImages[1];
-        switch (Level)
+        if (characterUI != null)
         {
-            case 1:
-                {
-                    characterUI.upgradeName.text = "Frost shot";
-                    characterUI.Info1.text = "Range: 5 => 7";
-                    characterUI.Info2.text = "Freeze time: 0.5s => 1s";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            case 2:
-                {
-                    characterUI.upgradeName.text = "Piercing Shards";
-                    characterUI.Info1.text = "Freeze hit count: 3 => 2";
-                    characterUI.Info2.text = "+ Strikethrough";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            case 3:
-                {
-                    characterUI.upgradeName.text = "Glacial Glowing";
-                    characterUI.Info1.text = "Bullets now explode.";
-                    characterUI.Info2.text = "Damage: 2 => 5";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            case 4:
-                {
-                    characterUI.upgradeName.text = "";
-                    characterUI.Info1.text = "";
-                    characterUI.Info2.text = "";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            default:
-                {
-                    characterUI.upgradeName.text = "Flash Freeze";
-                    characterUI.Info1.text = "Cooldown: 3 => 2";
-                    characterUI.Info2.text = "Damage: 1 => 2";
-                    characterUI.Info3.text = "";
-                    break;
-                }
+            characterUI.characterName.text = "Freezer";
+            characterUI.characterImage.sprite = characterUI.characterImages[1];
+            switch (Level)
+            {
+                case 1:
+                    {
+                        characterUI.upgradeName.text = "Frost shot";
+                        characterUI.Info1.text = "Range: 4 => 6";
+                        characterUI.Info2.text = "Freeze time: 0.5s => 1s";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                case 2:
+                    {
+                        characterUI.upgradeName.text = "Piercing Shards";
+                        characterUI.Info1.text = "Freeze hit count: 3 => 2";
+                        characterUI.Info2.text = "+ Strikethrough";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                case 3:
+                    {
+                        characterUI.upgradeName.text = "Glacial Glowing";
+                        characterUI.Info1.text = "Bullets now explode.";
+                        characterUI.Info2.text = "Damage: 2 => 5";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                case 4:
+                    {
+                        characterUI.upgradeName.text = "";
+                        characterUI.Info1.text = "";
+                        characterUI.Info2.text = "";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                default:
+                    {
+                        characterUI.upgradeName.text = "Flash Freeze";
+                        characterUI.Info1.text = "Cooldown: 3 => 2";
+                        characterUI.Info2.text = "Damage: 1 => 2";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+            }
+            base.SetUpgradeInformation();
         }
-        base.SetUpgradeInformation();
     }
     public override void AttackWithoutAnimation()
     {
@@ -140,7 +147,7 @@ public class Freezer : GroundCharacter
         for (int i = 1; i <= 3; i++)
         {
             BaseEnemy first_enemy = FindFirstEnemy();
-            if (first_enemy != null && !first_enemy.isDieOrNot())
+            if (first_enemy != null)
             {
                 SelfRotate(first_enemy);
                 Quaternion Angle_in_Quaternion = Shoot(first_enemy);

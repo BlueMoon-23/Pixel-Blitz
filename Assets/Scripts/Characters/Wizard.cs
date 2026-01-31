@@ -11,6 +11,7 @@ public class Wizard : GroundCharacter
     public GameObject BaseFireball_Muzzle;
     // Star Sequence
     public GameObject StarSequence_Prefab;
+    public GameObject LowGraphic_StarSequence_Prefab;
     public GameObject StarSequence_Muzzle;
     // Astral Vortex
     public GameObject Vortex_Prefab;
@@ -19,28 +20,39 @@ public class Wizard : GroundCharacter
     public GameObject SharpFireball_Prefab;
     public GameObject SharpFireball_Muzzle;
     // Combo Serialization
-    public int[] SkillOrderID = { 1, 2, 3 }; // 3 giá trị chỉ nhận trong khoảng 1, 2, 3
-    void Start()
+    public int[] SkillOrderID = { 1, 1, 1 }; // 3 giá trị chỉ nhận trong khoảng 1, 2, 3
+    // Damage thực phải bằng 0 để đảm bảo chiêu thức được tung. Này sẽ là damage ảo để hiện lên cho người chơi
+    private float virtualDamage;
+    protected override void OnEnable()
     {
+        base.OnEnable();
         Range = 7f;
         Damage = 6f;
+        virtualDamage = 6f;
         Cooldown = 4f;
-        Cost = 600;
+        Cost = 500;
         Level = 0;
         hasHiddenDetection = true;
         canStrikethrough = true;
-        UpgradeCost = new float[] { 3650, 12500, 24000, 50000 };
+        UpgradeCost = new float[] { 3200, 15000, 16000, 50000 };
         SellCost = (int)(Cost / 3);
         _hasAbility = false;
         Staff_Attack_Duration = 0.417f;
+        for (int i = 0; i < SkillOrderID.Length; i++)
+        {
+            SkillOrderID[i] = 1;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        float min_duration = Staff_Attack_Duration < Cooldown ? Staff_Attack_Duration : Cooldown;
-        if (!isStunned) { AttackWithCooldown(min_duration); }
-        // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
+        if (StatsReseted)
+        {
+            float min_duration = Staff_Attack_Duration < Cooldown ? Staff_Attack_Duration : Cooldown;
+            if (!isStunned) { AttackWithCooldown(min_duration); }
+            // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
+        }
     }
     public override float GetRange()
     {
@@ -49,83 +61,98 @@ public class Wizard : GroundCharacter
     }
     public override float GetCost()
     {
-        if (Cost != 600) { return 600; }
+        if (Cost != 500) { return 500; }
         else return Cost;
+    }
+    public void SetVirtualDamage(float damage)
+    {
+        virtualDamage = damage;
+    }
+    public float GetVirtualDamage()
+    {
+        return virtualDamage;
     }
     public override void UpgradeToLevel1()
     {
-        Damage = 50f;
+        Damage = 0f;
+        virtualDamage = 15f;
         Level = 1;
     }
     public override void UpgradeToLevel2()
     {
+        virtualDamage = 600f;
         Range = 9f;
         Level = 2;
     }
     public override void UpgradeToLevel3()
     {
-        Damage = 500f;
+        virtualDamage = 600f;
         Level = 3;
     }
     public override void UpgradeToLevel4()
     {
+        virtualDamage = 45f; // đại diện cho 3 star sequence mặc định
         Range = 11f;
         _hasAbility = true;
         Level = 4;
+        base.UpgradeToLevel4();
     }
     public override void SetUpgradeInformation()
     {
-        characterUI.characterName.text = "Wizard";
-        characterUI.characterImage.sprite = characterUI.characterImages[7]; // Copy paste nhớ chỉnh ở đây dùm con
-        switch (Level)
+        if (characterUI != null)
         {
-            case 0:
-                {
-                    characterUI.upgradeName.text = "Star Sequence";
-                    characterUI.Info1.text = "Damage: 6 => 25";
-                    characterUI.Info2.text = "Current Ability: cast a line of 5 stars under enemy's feet which deals 50 damage and stun for 1s.";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            case 1:
-                {
-                    characterUI.upgradeName.text = "Astral Vortex";
-                    characterUI.Info1.text = "Range: 7 => 9";
-                    characterUI.Info2.text = "Current Ability: create a vortex at enemy that exists in 3 seconds, each 0.1s deals 50 damage.";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            case 2:
-                {
-                    characterUI.upgradeName.text = "Fiery Wrath";
-                    characterUI.Info1.text = "Damage: 50 => 500, only apply for fireballs";
-                    characterUI.Info2.text = "Current Ability: cast 3 fireballs in burst. Each fireball explodes and deals 500 damage to all enemies hit.";
-                    characterUI.Info3.text = "Its explosion extends the duration of Astral Vortex by 0.5s";
-                    break;
-                }
-            case 3:
-                {
-                    characterUI.upgradeName.text = "Combo Serialization";
-                    characterUI.Info1.text = "Range: 9 => 11";
-                    characterUI.Info2.text = "Current Ability: use 3 abilities chosen by the player in burst!";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            default:
-                {
-                    characterUI.upgradeName.text = "";
-                    characterUI.Info1.text = "";
-                    characterUI.Info2.text = "";
-                    characterUI.Info3.text = "";
-                    break;
-                }
+            characterUI.characterName.text = "Wizard";
+            characterUI.characterImage.sprite = characterUI.characterImages[7]; // Copy paste nhớ chỉnh ở đây dùm con
+            switch (Level)
+            {
+                case 0:
+                    {
+                        characterUI.upgradeName.text = "Star Sequence";
+                        characterUI.Info1.text = "Current Ability: cast a line of 5 stars under enemy's feet which deals 15 damage and stun for 1s.";
+                        characterUI.Info2.text = "";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                case 1:
+                    {
+                        characterUI.upgradeName.text = "Astral Vortex";
+                        characterUI.Info1.text = "Range: 7 => 9";
+                        characterUI.Info2.text = "Current Ability: create a vortex at enemy that exists in 3 seconds, each 0.1s deals 20 damage.";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                case 2:
+                    {
+                        characterUI.upgradeName.text = "Fiery Wrath";
+                        characterUI.Info1.text = "Current Ability: cast 3 fireballs in burst. Each fireball explodes and deals 200 damage to all enemies hit.";
+                        characterUI.Info2.text = "Its explosion extends the duration of Astral Vortex by 0.5s";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                case 3:
+                    {
+                        characterUI.upgradeName.text = "Combo Serialization";
+                        characterUI.Info1.text = "Range: 9 => 11";
+                        characterUI.Info2.text = "Current Ability: use 3 abilities chosen by the player in burst!";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                default:
+                    {
+                        characterUI.upgradeName.text = "";
+                        characterUI.Info1.text = "";
+                        characterUI.Info2.text = "";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+            }
+            base.SetUpgradeInformation();
         }
-        base.SetUpgradeInformation();
     }
     public override IEnumerator AttackWithAnimation(float Attack_Duration)
     {
         BaseEnemy first_enemy = FindFirstEnemy();
-        if (first_enemy != null && !first_enemy.isDieOrNot())
+        if (first_enemy != null)
         {
             Vector3 SpawnPosition = first_enemy.transform.position; // Spawn dưới chân nên không cần center
             SelfRotate(first_enemy);
@@ -179,7 +206,21 @@ public class Wizard : GroundCharacter
             float Angle_in_Radian = Mathf.Atan2(SpawnPosition.y - transform.position.y, SpawnPosition.x - transform.position.x);
             Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
         }
-        Instantiate(StarSequence_Prefab, SpawnPosition, Angle_in_Quaternion);
+        //Instantiate(StarSequence_Prefab, SpawnPosition, Angle_in_Quaternion);
+        GameObject chosenExplosion_SFX = StarSequence_Prefab;
+        if (GameSetting.instance != null && !GameSetting.instance._showExplosion)
+        {
+            chosenExplosion_SFX = LowGraphic_StarSequence_Prefab;
+        }
+        if (ExplosionPooler.instance != null)
+        {
+            BaseExplosion stars = ExplosionPooler.instance.GetExplosion(chosenExplosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            if (stars != null)
+            {
+                stars.transform.position = SpawnPosition;
+                stars.transform.rotation = Angle_in_Quaternion;
+            }
+        }
         GameObject muzzle = Instantiate(StarSequence_Muzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
         Destroy(muzzle, 0.25f);
     }
@@ -191,20 +232,33 @@ public class Wizard : GroundCharacter
             float Angle_in_Radian = Mathf.Atan2(SpawnPosition.y - transform.position.y, SpawnPosition.x - transform.position.x);
             Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
         }
-        Instantiate(Vortex_Prefab, SpawnPosition, Quaternion.identity);
+        //Instantiate(Vortex_Prefab, SpawnPosition, Quaternion.identity);
+        if (ExplosionPooler.instance != null)
+        {
+            BaseExplosion vortex = ExplosionPooler.instance.GetExplosion(Vortex_Prefab.GetComponent<BaseExplosion>().ExplosionID);
+            if (vortex != null)
+            {
+                vortex.transform.position = SpawnPosition;
+                vortex.transform.rotation = Quaternion.identity;
+            }
+            else
+            {
+                Debug.Log("vortex = null");
+            }
+        }
         GameObject muzzle = Instantiate(Vortex_Muzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
         Destroy(muzzle, 0.25f);
     }
     private IEnumerator CastBurstFireball()
     {
+        bullet_Prefab = SharpFireball_Prefab;
+        BulletMuzzle = SharpFireball_Muzzle;
         for (int i = 1; i <= 3; i++)
         {
             BaseEnemy first_enemy = FindFirstEnemy();
-            if (first_enemy != null && !first_enemy.isDieOrNot())
+            if (first_enemy != null)
             {
                 SelfRotate(first_enemy);
-                bullet_Prefab = SharpFireball_Prefab;
-                BulletMuzzle = SharpFireball_Muzzle;
                 Quaternion Angle_in_Quaternion = Shoot(first_enemy);
                 MuzzleEffect(Angle_in_Quaternion);
             }
@@ -217,13 +271,13 @@ public class Wizard : GroundCharacter
         for (int i = 0; i < 3; i++)
         {
             BaseEnemy first_enemy = FindFirstEnemy();
-            if (first_enemy != null && !first_enemy.isDieOrNot())
+            if (first_enemy != null)
             {
                 SelfRotate(first_enemy);
                 //ChooseRandomAbility(first_enemy);
                 DoAbilityByID(first_enemy, SkillOrderID[i]);
             }
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.35f);
         }
         yield break;
     }
@@ -247,6 +301,7 @@ public class Wizard : GroundCharacter
                     StartCoroutine(CastBurstFireball()); // mỗi lần burst cần tính toán lại first_enemy
                     break;
                 }
+
         }
     }
     public override void SetAbilityIcon()

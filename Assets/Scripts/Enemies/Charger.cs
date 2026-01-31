@@ -5,24 +5,16 @@ using UnityEngine;
 public class Charger : BaseEnemy
 {
     public GameObject LightningEffect;
-    void Start()
+    protected override IEnumerator ResetStats()
     {
-        // Move road
-        if (WaypointManager.instance != null)
-        {
-            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
-        }
+        StartCoroutine(base.ResetStats());
+        yield return null;
         isFinalBoss = false;
         SpeedUpAllEnemies();
     }
-    void Update()
-    {
-        Move();
-        Die();
-    }
     private void SpeedUpAllEnemies()
     {
-        if (SoundManager.Instance != null) { SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.ChargerSound); }
+        if (SoundManager.Instance != null) { SoundManager.Instance.SoundEffectSource.PlayOneShot(SoundManager.Instance.ChargerSound); }
         GameObject newLightningEffect = Instantiate(LightningEffect, transform.position, Quaternion.identity);
         Destroy(newLightningEffect, 1.0f );
         if (EnemyManager.instance != null)

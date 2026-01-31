@@ -4,29 +4,35 @@ using UnityEngine;
 
 public class RocketeerBullet : BaseBullets
 {
-    public GameObject RocketExplosion;
     public float ExplosionRadius;
-    private bool isCluster = false;
+    public bool isCluster = false;
     private Vector3 ClusterDirection;
     //
     private float x_direction = 0f;
     private float y_direction = 0f;
-    void Start()
+    void OnEnable()
     {
-        Rocketeer rocketeer = character.GetComponent<Rocketeer>();
-        if (rocketeer != null)
+        StartCoroutine(SetupAtStart());
+    }
+    private IEnumerator SetupAtStart()
+    {
+        yield return null;
+        if (character != null)
         {
-            if (isCluster)
+            Rocketeer rocketeer = character.GetComponent<Rocketeer>();
+            if (rocketeer != null)
             {
-                ExplosionRadius = 1.5f;
-            }
-            else
-            {
-                ExplosionRadius = rocketeer.GetExplosionRadius();
+                if (isCluster)
+                {
+                    ExplosionRadius = 1.5f;
+                }
+                else
+                {
+                    ExplosionRadius = rocketeer.GetExplosionRadius();
+                }
             }
         }
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -58,14 +64,25 @@ public class RocketeerBullet : BaseBullets
                         float x = i < 2 ? -1 : 1;
                         float y = i % 2 == 0 ? -1 : 1;
                         Vector3 newDirection = new Vector3(x, y, 0).normalized;
-                        GameObject ClusterRocket = Instantiate(this.gameObject, this.transform.position, Quaternion.identity);
-                        // Cài lại thông số cho đạn
-                        RocketeerBullet ClusterRocketBullet = ClusterRocket.GetComponent<RocketeerBullet>();
-                        ClusterRocketBullet.BulletSpeed = 3.125f;
-                        ClusterRocketBullet.SetCharacter(character);
-                        ClusterRocketBullet.isCluster = true;
-                        ClusterRocketBullet.ClusterDirection = newDirection;
-                        Destroy(ClusterRocket, 1f);
+                        if (BulletPooler.instance != null)
+                        {
+                            BaseBullets ClusterRocket = BulletPooler.instance.GetBullet(this.BulletID);
+                            if (ClusterRocket != null)
+                            {
+                                ClusterRocket.transform.position = this.transform.position;
+                                ClusterRocket.transform.rotation = Quaternion.identity;
+                                // Cài lại thông số cho đạn
+                                RocketeerBullet ClusterRocketBullet = ClusterRocket.GetComponent<RocketeerBullet>();
+                                ClusterRocketBullet.BulletSpeed = 3.125f;
+                                ClusterRocketBullet.SetCharacter(character);
+                                ClusterRocketBullet.isCluster = true;
+                                ClusterRocketBullet.ClusterDirection = newDirection;
+                                if (BulletPooler.instance != null)
+                                {
+                                    BulletPooler.instance.StartCoroutine(BulletPooler.instance.DestroyCluster(ClusterRocketBullet, 1.0f));
+                                }
+                            }
+                        }
                     }
                 }
                 // Sinh đạn trước khi nổ (bị destroy)
@@ -113,24 +130,61 @@ public class RocketeerBullet : BaseBullets
         this.transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
         this.transform.position += transform.up * BulletSpeed * Time.deltaTime;
     }
-    private void OnDestroy()
+    public void Explode()
     {
-        if (isCluster)
+        // Tạo 1 vòng tròn collider, rồi gây damage lên toàn bộ enemy trong vòng này
+        Collider2D[] enemyInRadius = Physics2D.OverlapCircleAll(transform.position, ExplosionRadius);
+        foreach (Collider2D enemy in enemyInRadius)
         {
-            Explode();
+            BaseEnemy enemyGetDamaged = enemy.GetComponent<BaseEnemy>();
+            if (enemyGetDamaged != null)
+            {
+                if (character != null)
+                {
+                    if (!isCluster)
+                    {
+                        enemyGetDamaged.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                    }
+                    else
+                    {
+                        enemyGetDamaged.TakeDamage(50, character.canStrikethroughOrNot());
+                    }
+                }
+            }
         }
-    }
-    private void Explode()
-    {
-        GameObject explosion = Instantiate(RocketExplosion, this.transform.position, Quaternion.identity);
-        explosion.transform.localScale = new Vector3(ExplosionRadius, ExplosionRadius, ExplosionRadius);
-        Destroy(explosion, 0.1f ); // Không có lệnh này là explosion sẽ chờ mục tiêu bước vào ở cluster sau khi nổ bị thừa
-        RocketExplosion baseBullets = explosion.GetComponent<RocketExplosion>();
-        baseBullets.SetCharacter(character);
-        if (character.GetLevel() >= 4 && isCluster) { baseBullets.ClusterDamage = 100; }
-        GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
-        spawnedSFX.transform.localScale = new Vector3(ExplosionRadius, ExplosionRadius, ExplosionRadius);
-        Destroy(spawnedSFX, 0.5f);
-        Destroy(this.gameObject); // thêm 0.5f vô để lệnh for đằng dưới thực hiện cho hết => không cần, đổi thứ tự thực thi là xong
+        //GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
+        //spawnedSFX.transform.localScale = new Vector3(ExplosionRadius, ExplosionRadius, ExplosionRadius);
+        //Destroy(spawnedSFX, 0.5f);
+        if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
+        {
+            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            if (explosionSFX != null)
+            {
+                explosionSFX.transform.position = this.transform.position;
+                explosionSFX.transform.rotation = Quaternion.identity;
+                explosionSFX.transform.localScale = new Vector3(ExplosionRadius, ExplosionRadius, ExplosionRadius);
+                ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+            }
+        }
+        else if (ExplosionPooler.instance != null && GameSetting.instance != null && !GameSetting.instance._showExplosion)
+        {
+            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            if (explosionSFX != null)
+            {
+                explosionSFX.transform.position = this.transform.position;
+                explosionSFX.transform.rotation = Quaternion.identity;
+                explosionSFX.transform.localScale = new Vector3(2 * ExplosionRadius, 2 * ExplosionRadius, 2 * ExplosionRadius);
+                ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+            }
+        }
+        // khôi phục cài đặt gốc
+        BulletSpeed = 30f;
+        isCluster = false;
+        x_direction = 0f;
+        y_direction = 0f;
+        if (BulletPooler.instance != null)
+        {
+            BulletPooler.instance.ReturnBullet(this);
+        }
     }
 }

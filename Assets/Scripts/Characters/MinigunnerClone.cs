@@ -8,8 +8,8 @@ public class MinigunnerClone : Minigunner
     void Start()
     {
         Cooldown = 0.1f;
-        Damage = 20f;
-        Range = 15f;
+        Damage = 10f;
+        Range = 12f;
         Level = 3;
         Cost = 0f;
         hasHiddenDetection = true;
@@ -20,7 +20,7 @@ public class MinigunnerClone : Minigunner
     }
     public override float GetRange()
     {
-        if (Range <= 15f) { return 15f; } // <= la chua duoc khoi tao
+        if (Range <= 12f) { return 12f; } // <= la chua duoc khoi tao
         else return Range;
     }
     public override float GetCost()
@@ -30,32 +30,35 @@ public class MinigunnerClone : Minigunner
     }
     public override void SetUpgradeInformation()
     {
-        characterUI.characterName.text = "Minigunner";
-        characterUI.characterImage.sprite = characterUI.characterImages[2];
-        characterUI.upgradeName.text = "";
-        characterUI.Info1.text = "";
-        characterUI.Info2.text = "";
-        characterUI.Info3.text = "";
-        characterUI.upgradeCost.text = "Can't Upgrade";
-        characterUI.sellCost.text = "Sell ($0)";
-        characterUI.RangeStats.text = Range.ToString();
-        characterUI.DamageStats.text = Damage.ToString();
-        characterUI.CooldownStats.text = Cooldown.ToString();
-        if (hasHiddenDetection)
+        if (characterUI != null)
         {
-            characterUI.HiddenDetectionIcon.alpha = 1f;
-        }
-        else
-        {
-            characterUI.HiddenDetectionIcon.alpha = 0f;
-        }
-        if (canStrikethrough)
-        {
-            characterUI.StrikethroughIcon.alpha = 1f;
-        }
-        else
-        {
-            characterUI.StrikethroughIcon.alpha = 0f;
+            characterUI.characterName.text = "Minigunner";
+            characterUI.characterImage.sprite = characterUI.characterImages[2];
+            characterUI.upgradeName.text = "";
+            characterUI.Info1.text = "";
+            characterUI.Info2.text = "";
+            characterUI.Info3.text = "";
+            characterUI.upgradeCost.text = "Can't Upgrade";
+            characterUI.sellCost.text = "Sell ($0)";
+            characterUI.RangeStats.text = Range.ToString();
+            characterUI.DamageStats.text = Damage.ToString();
+            characterUI.CooldownStats.text = Cooldown.ToString();
+            if (hasHiddenDetection)
+            {
+                characterUI.HiddenDetectionIcon.alpha = 1f;
+            }
+            else
+            {
+                characterUI.HiddenDetectionIcon.alpha = 0f;
+            }
+            if (canStrikethrough)
+            {
+                characterUI.StrikethroughIcon.alpha = 1f;
+            }
+            else
+            {
+                characterUI.StrikethroughIcon.alpha = 0f;
+            }
         }
     }
     // Update is called once per frame

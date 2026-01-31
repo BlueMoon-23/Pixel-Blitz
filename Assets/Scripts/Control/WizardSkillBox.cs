@@ -7,7 +7,7 @@ public class WizardSkillBox : MonoBehaviour
 {
     // Script này dùng để gắn lên các cục skill Box, dùng để định danh tốt hơn
     public int Order; // 1, 2, 3, gắn ở bên ngoài nên là public
-    private int CurrentSkillID = 1;
+    [SerializeField] private int CurrentSkillID = 1;
     private string[] SkillName = { "Star Sequence", "Astral Vortex", "Fiery Wrath"};
     private Color32[] NameColor = { new Color32(255, 165, 0, 255), new Color32(255, 0, 234, 255), new Color32(255, 83, 0, 255) };
     public TextMeshProUGUI SkillText;
@@ -23,8 +23,19 @@ public class WizardSkillBox : MonoBehaviour
     }
     public void ShowNameByID(int ID)
     {
+        CurrentSkillID = ID;
         SkillText.text = SkillName[ID - 1];
         SkillText.color = NameColor[ID - 1];
+    }
+    public float GetDamageByID()
+    {
+        switch (CurrentSkillID)
+        {
+            case 1: { return 15f; }
+            case 2: { return 600f; }
+            case 3: { return 600f; }
+            default: { return 0f; }
+        }
     }
     public void MoveUp()
     {

@@ -29,6 +29,9 @@ public abstract class BaseCharacter : MonoBehaviour
     protected Vector3 CircleScale;
     protected RangeScript range;
     public GameObject bullet_Prefab;
+    // Max level Change
+    public GameObject OriginalUnitRoot;
+    public GameObject MaxLevelUnitRoot;
     // Attack animation
     protected SPUM_Prefabs SPUM_Prefabs;
     public Dictionary<PlayerState, int> IndexPair = new();
@@ -39,15 +42,26 @@ public abstract class BaseCharacter : MonoBehaviour
     // Stunned Effect
     public GameObject StunnedEffect;
     protected bool isStunned = false;
-    private void Awake()
+    protected float stunEndTime;
+    // Kiểm tra đã reset hay chưa
+    public bool StatsReseted = false; // PHẢI MẶC ĐỊNH LÀ FALSE, TRUE LÀ UPDATE SẼ CHẠY TRƯỚC LÀ SẼ BÁO NULL
+    protected virtual void OnEnable()
     {
-        CircleScale = new Vector3(Range_Prefab.transform.localScale.x, Range_Prefab.transform.localScale.y, Range_Prefab.transform.localScale.z);
+        // Chỉnh lại một số stats
+        StatsReseted = false; // khóa update/move cho đến khi xong stats
+        isStunned = false;
+        stunEndTime = Time.time;
+        StartCoroutine(ResetStats());
+    }
+    protected IEnumerator ResetStats()
+    {
+        yield return null;
+        CircleScale = new Vector3(0.25f, 0.25f, 0.25f);
         SetRangeCircle();
         characterUI = FindObjectOfType<CharacterUIControll>(true);
-        UpgradeCost = new float[] { 0, 0, 0, 0};
         range = Range_Prefab.GetComponent<RangeScript>();
         Clock = Cooldown - 0.1f;
-        // Animation
+        // Animation. Cấm xóa đoạn này
         SPUM_Prefabs = GetComponent<SPUM_Prefabs>();
         if (SPUM_Prefabs == null)
         {
@@ -62,6 +76,9 @@ public abstract class BaseCharacter : MonoBehaviour
         {
             IndexPair[state] = 0;
         }
+        // TẮT CÁI HIỆU ỨNG MAXLEVEL ROOT. AI ĐÓ ÉP NÓ PHẢI BẬT TAO KHÔNG TÌM RA ĐƯỢC
+        StartCoroutine(ResetShadow());
+        StatsReseted = true;
     }
     // Abstract methods
     public abstract float GetCost();
@@ -113,33 +130,44 @@ public abstract class BaseCharacter : MonoBehaviour
     }
     public virtual void SetUpgradeInformation()
     {
-        if (Level < 4)
+        if (characterUI != null)
         {
-            characterUI.upgradeCost.text = "Upgrade ($" + UpgradeCost[Level] + ")";
-        }
-        else
-        {
-            characterUI.upgradeCost.text = "Max Level";
-        }
-        characterUI.sellCost.text = "Sell ($" + SellCost + ")";
-        characterUI.RangeStats.text = Range.ToString();
-        characterUI.DamageStats.text = Damage.ToString();
-        characterUI.CooldownStats.text = Cooldown.ToString();
-        if (hasHiddenDetection)
-        {
-            characterUI.HiddenDetectionIcon.alpha = 1f;
-        }
-        else
-        {
-            characterUI.HiddenDetectionIcon.alpha = 0f;
-        }
-        if (canStrikethrough)
-        {
-            characterUI.StrikethroughIcon.alpha = 1f;
-        }
-        else
-        {
-            characterUI.StrikethroughIcon.alpha = 0f;
+            if (Level < 4)
+            {
+                characterUI.upgradeCost.text = "Upgrade (-$" + UpgradeCost[Level] + ")";
+            }
+            else
+            {
+                characterUI.upgradeCost.text = "Max Level";
+            }
+            characterUI.sellCost.text = "Sell (+$" + SellCost + ")";
+            characterUI.RangeStats.text = Range.ToString();
+            Wizard wizard = this as Wizard;
+            if (wizard != null)
+            {
+                characterUI.DamageStats.text = wizard.GetVirtualDamage().ToString();
+            }
+            else
+            {
+                characterUI.DamageStats.text = Damage.ToString(); // damage bị lỗi từ bên wizard, nên sửa thêm
+            }
+            characterUI.CooldownStats.text = Cooldown.ToString();
+            if (hasHiddenDetection)
+            {
+                characterUI.HiddenDetectionIcon.alpha = 1f;
+            }
+            else
+            {
+                characterUI.HiddenDetectionIcon.alpha = 0f;
+            }
+            if (canStrikethrough)
+            {
+                characterUI.StrikethroughIcon.alpha = 1f;
+            }
+            else
+            {
+                characterUI.StrikethroughIcon.alpha = 0f;
+            }
         }
     }
     public void Upgrade()
@@ -184,27 +212,34 @@ public abstract class BaseCharacter : MonoBehaviour
         float max_distance = 0f;
         for (int i = 0; i < range.enemies_in_range.Count; i++)
         {
-            max_distance = Mathf.Max(max_distance, range.enemies_in_range[i].Distance);
+            if (!range.enemies_in_range[i].isDieOrNot())
+            {
+                max_distance = Mathf.Max(max_distance, range.enemies_in_range[i].Distance);
+            }
         }
         for (int i = 0; i < range.enemies_in_range.Count; i++)
         {
-            if (max_distance == range.enemies_in_range[i].Distance)
+            if (max_distance == range.enemies_in_range[i].Distance && !range.enemies_in_range[i].isDieOrNot())
             {
+                range.enemies_in_range[i].TakeIncomingDamage(Damage, canStrikethrough);
                 return range.enemies_in_range[i];
             }
         }
         return null;
     }
-    public BaseEnemy[] FindThreeFirstEnemies()
+    public List<BaseEnemy> FindThreeFirstEnemies()
     {
         // 2 1
         List<float> Enemy_Distances = new List<float>();
         for (int i = 0; i < range.enemies_in_range.Count; i++)
         {
-            Enemy_Distances.Add(range.enemies_in_range[i].Distance);
+            if (!range.enemies_in_range[i].isDieOrNot())
+            {
+                Enemy_Distances.Add(range.enemies_in_range[i].Distance);
+            }
         }
         Enemy_Distances.Sort((a, b) => b.CompareTo(a));
-        BaseEnemy[] Enemies_Result = new BaseEnemy[3];
+        List<BaseEnemy> Enemies_Result = new List<BaseEnemy>();
         int Safe_Enemy_Distance_Index = 0;
         switch (Enemy_Distances.Count)
         {
@@ -224,9 +259,10 @@ public abstract class BaseCharacter : MonoBehaviour
         {
             for (int j = 0; j < range.enemies_in_range.Count; j++)
             {
-                if (range.enemies_in_range[j].Distance == Enemy_Distances[i])
+                if (range.enemies_in_range[j].Distance == Enemy_Distances[i] && !range.enemies_in_range[j].isDieOrNot())
                 {
-                    Enemies_Result[i] = range.enemies_in_range[j];
+                    Enemies_Result.Add(range.enemies_in_range[j]);
+                    range.enemies_in_range[j].TakeIncomingDamage(Damage, canStrikethrough);
                 }
             }
         }
@@ -255,7 +291,7 @@ public abstract class BaseCharacter : MonoBehaviour
     public virtual IEnumerator AttackWithAnimation(float Attack_Duration)
     {
         BaseEnemy first_enemy = FindFirstEnemy();
-        if (first_enemy != null && !first_enemy.isDieOrNot())
+        if (first_enemy != null)
         {
             SelfRotate(first_enemy);
             PlayAttackAmination(Attack_Duration);
@@ -275,7 +311,7 @@ public abstract class BaseCharacter : MonoBehaviour
             if (range.enemies_in_range.Count != 0)
             {
                 BaseEnemy first_enemy = FindFirstEnemy();
-                if (first_enemy != null && !first_enemy.isDieOrNot())
+                if (first_enemy != null)
                 {
                     SelfRotate(first_enemy);
                     Quaternion Angle_in_Quaternion = Shoot(first_enemy);
@@ -303,7 +339,7 @@ public abstract class BaseCharacter : MonoBehaviour
     }
     protected void SelfRotate(BaseEnemy first_enemy)
     {
-        if (first_enemy != null && !first_enemy.isDieOrNot())
+        if (first_enemy != null)
         {
             if (first_enemy.transform.position.x < transform.position.x)
             {
@@ -324,26 +360,81 @@ public abstract class BaseCharacter : MonoBehaviour
             float Angle_in_Radian = Mathf.Atan2(first_enemy.Center.transform.position.y - transform.position.y, first_enemy.Center.transform.position.x - transform.position.x);
             Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
         }
+        /*
         GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
         BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
-        bullet.SetCharacter(this);
-        if (first_enemy != null)
+        */
+        if (BulletPooler.instance != null)
         {
-            bullet.SetEnemy(first_enemy);
+            BaseBullets bullet = BulletPooler.instance.GetBullet(bullet_Prefab.GetComponent<BaseBullets>().BulletID);
+            if (bullet != null)
+            {
+                bullet.transform.position = Bullet_StartPosition.transform.position;
+                bullet.transform.rotation = Angle_in_Quaternion;
+                bullet.SetCharacter(this);
+                if (first_enemy != null)
+                {
+                    bullet.SetEnemy(first_enemy);
+                }
+            }
         }
         return Angle_in_Quaternion; // trả về quaternion để truyền xuống cho muzzle
     }
     protected void MuzzleEffect(Quaternion Angle_in_Quaternion)
     {
-        GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
-        Destroy(muzzle, 0.25f);
+        //GameObject muzzle = Instantiate(BulletMuzzle, Bullet_StartPosition.transform.position, Angle_in_Quaternion);
+        //Destroy(muzzle, 0.25f);
+        if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showMuzzle)
+        {
+            BaseExplosion muzzle = ExplosionPooler.instance.GetExplosion(BulletMuzzle.GetComponent<BaseExplosion>().ExplosionID);
+            if (muzzle != null)
+            {
+                muzzle.transform.position = Bullet_StartPosition.transform.position;
+                muzzle.transform.rotation = Angle_in_Quaternion;
+                ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(muzzle, 0.25f));
+            }
+        }
     }
-    public IEnumerator GetStunned(float duration)
+    public IEnumerator GetStunned(float duration) // LOGIC CŨ LÀ STOP COROUTINE THÌ LÒI RA LỖI CỦA UNITY, NÊN ĐỔI CHỨ K CÓ SAI NGHEN
     {
         isStunned = true;
+        stunEndTime = Time.time + duration;
         GameObject newEffect = Instantiate(StunnedEffect, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
         Destroy(newEffect, duration);
-        yield return new WaitForSeconds(duration);
+        // vòng lặp kiểm tra thời gian stun ngay trong chính hàm này
+        while (Time.time < stunEndTime) { yield return null; }
         isStunned = false;
+    }
+    protected IEnumerator ResetShadow()
+    {
+        yield return new WaitForSeconds(0.01f);
+        if (MaxLevelUnitRoot != null)
+        {
+            MaxLevelUnitRoot.SetActive(false);
+        }
+        if (OriginalUnitRoot != null)
+        {
+            OriginalUnitRoot.SetActive(true);
+            Animator maxlevelanimator = OriginalUnitRoot.GetComponent<Animator>();
+            if (maxlevelanimator != null)
+            {
+                SPUM_Prefabs._anim = maxlevelanimator;
+            }
+            // Animation
+            SPUM_Prefabs = GetComponent<SPUM_Prefabs>();
+            if (SPUM_Prefabs == null)
+            {
+                SPUM_Prefabs = transform.GetChild(0).GetComponent<SPUM_Prefabs>();
+                if (!SPUM_Prefabs.allListsHaveItemsExist())
+                {
+                    SPUM_Prefabs.PopulateAnimationLists();
+                }
+            }
+            SPUM_Prefabs.OverrideControllerInit();
+            foreach (PlayerState state in Enum.GetValues(typeof(PlayerState)))
+            {
+                IndexPair[state] = 0;
+            }
+        }
     }
 }

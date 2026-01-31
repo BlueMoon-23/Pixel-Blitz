@@ -12,4 +12,6 @@ public class SceneKey
     public static string UserRegister = "UserRegister";
     public static string MapChoose = "MapChoose";
     public static string ShopScene = "ShopScene";
+    public static string LoadingScene = "LoadingScene";
+    public static string targetScene;
 }

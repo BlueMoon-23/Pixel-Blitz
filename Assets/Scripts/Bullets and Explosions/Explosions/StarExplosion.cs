@@ -21,7 +21,7 @@ public class StarExplosion : MonoBehaviour
         BaseEnemy baseEnemy = collision.gameObject.GetComponent<BaseEnemy>();
         if (baseEnemy != null)
         {
-            baseEnemy.TakeDamage(50f, true);
+            baseEnemy.TakeDamage(15f, true);
             baseEnemy.StartCoroutine(baseEnemy.GetStunned(1f));
         }
     }

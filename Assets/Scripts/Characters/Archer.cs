@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class Archer : GroundCharacter
 {
-    void Start()
+    protected override void OnEnable()
     {
-        Range = 6f;
-        Damage = 3f;
+        base.OnEnable();
+        Range = 5f;
+        Damage = 2f;
         Cooldown = 1.5f;
-        Cost = 600f;
+        Cost = 300f;
         Level = 0;
         hasHiddenDetection = false;
         canStrikethrough = false;
-        UpgradeCost = new float[] { 250, 750, 2500, 9000 };
+        UpgradeCost = new float[] { 150, 240, 2050, 6300 };
         SellCost = (int)(Cost / 3);
         _hasAbility = false;
         Bow_Attack_Duration = 0.833f;
@@ -22,29 +23,33 @@ public class Archer : GroundCharacter
     // Update is called once per frame
     void Update()
     {
-        float min_duration = Bow_Attack_Duration < Cooldown ? Bow_Attack_Duration : Cooldown;
-        if (!isStunned) { AttackWithCooldown(min_duration); }
-        // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
+        if (StatsReseted)
+        {
+            float min_duration = Bow_Attack_Duration < Cooldown ? Bow_Attack_Duration : Cooldown;
+            if (!isStunned) { AttackWithCooldown(min_duration); }
+            // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
+        }
     }
     public override float GetRange() 
     {
-        if (Range <= 6f) {  return 6f; } // <= la chua duoc khoi tao
+        if (Range <= 5f) {  return 5f; } // <= la chua duoc khoi tao
         else return Range; 
     }
     public override float GetCost()
     {
-        if (Cost != 600f) { return 600f; }
+        if (Cost != 300f) { return 300f; }
         else return Cost;
     }
     public override void UpgradeToLevel1()
     {
-        Range = 7f;
+        Range = 6f;
         Cooldown = 1f;
         Level = 1;
     }
     public override void UpgradeToLevel2()
     {
-        Range = 10f;
+        Range = 7f;
+        Damage = 3f;
         hasHiddenDetection = true;
         Level = 2;
     }
@@ -59,72 +64,85 @@ public class Archer : GroundCharacter
         Cooldown = 0.25f;
         Damage = 10f;
         Level = 4;
-        // ShootIn3
+        base.UpgradeToLevel4();
     }
     public override void SetUpgradeInformation()
     {
-        characterUI.characterName.text = "Archer";
-        characterUI.characterImage.sprite = characterUI.characterImages[0];
-        switch (Level)
+        if (characterUI != null)
         {
-            case 1:
-                {
-                    characterUI.upgradeName.text = "Eagle Eye";
-                    characterUI.Info1.text = "Range: 7 => 10";
-                    characterUI.Info2.text = "+ Hidden Detection";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            case 2:
-                {
-                    characterUI.upgradeName.text = "Quick Shot";
-                    characterUI.Info1.text = "Cooldown: 1s => 0.5s";
-                    characterUI.Info2.text = "Damage: 3 => 6";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            case 3:
-                {
-                    characterUI.upgradeName.text = "Arrow Barrage";
-                    characterUI.Info1.text = "Shoot three arrows";
-                    characterUI.Info2.text = "Cooldown: 0.5s => 0.25s";
-                    characterUI.Info3.text = "Damage: 6 => 10";
-                    break;
-                }
-            case 4:
-                {
-                    characterUI.upgradeName.text = "";
-                    characterUI.Info1.text = "";
-                    characterUI.Info2.text = "";
-                    characterUI.Info3.text = "";
-                    break;
-                }
-            default:
-                {
-                    characterUI.upgradeName.text = "Better Gloves";
-                    characterUI.Info1.text = "Range: 6 => 7";
-                    characterUI.Info2.text = "Cooldown: 1.5s => 1s";
-                    characterUI.Info3.text = "";
-                    break;
-                }
+            characterUI.characterName.text = "Archer";
+            characterUI.characterImage.sprite = characterUI.characterImages[0];
+            switch (Level)
+            {
+                case 1:
+                    {
+                        characterUI.upgradeName.text = "Eagle Eye";
+                        characterUI.Info1.text = "Range: 6 => 7";
+                        characterUI.Info2.text = "Damage: 2 => 3";
+                        characterUI.Info3.text = "+ Hidden Detection";
+                        break;
+                    }
+                case 2:
+                    {
+                        characterUI.upgradeName.text = "Quick Shot";
+                        characterUI.Info1.text = "Cooldown: 1s => 0.5s";
+                        characterUI.Info2.text = "Damage: 2 => 6";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                case 3:
+                    {
+                        characterUI.upgradeName.text = "Arrow Barrage";
+                        characterUI.Info1.text = "Shoot three arrows instead of one.";
+                        characterUI.Info2.text = "Cooldown: 0.5s => 0.25s";
+                        characterUI.Info3.text = "Damage: 6 => 10";
+                        break;
+                    }
+                case 4:
+                    {
+                        characterUI.upgradeName.text = "";
+                        characterUI.Info1.text = "";
+                        characterUI.Info2.text = "";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+                default:
+                    {
+                        characterUI.upgradeName.text = "Better Gloves";
+                        characterUI.Info1.text = "Range: 5 => 6";
+                        characterUI.Info2.text = "Cooldown: 1.5s => 1s";
+                        characterUI.Info3.text = "";
+                        break;
+                    }
+            }
+            base.SetUpgradeInformation();
         }
-        base.SetUpgradeInformation();
     }
     public override IEnumerator AttackWithAnimation(float Attack_Duration)
     {
         if (Level < 4)
         {
             BaseEnemy first_enemy = FindFirstEnemy();
-            if (first_enemy != null && !first_enemy.isDieOrNot())
+            if (first_enemy != null)
             {
                 SelfRotate(first_enemy);
                 PlayAttackAmination(Attack_Duration);
                 yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
                 // Bắn đạn: đạn archer cong cong cho đẹp
-                GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Quaternion.identity);
-                BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
-                bullet.SetCharacter(this);
-                bullet.SetEnemy(first_enemy);
+                if (BulletPooler.instance != null)
+                {
+                    BaseBullets bullet = BulletPooler.instance.GetBullet(bullet_Prefab.GetComponent<BaseBullets>().BulletID);
+                    if (bullet != null)
+                    {
+                        bullet.transform.position = Bullet_StartPosition.transform.position;
+                        bullet.transform.rotation = Quaternion.identity;
+                        bullet.SetCharacter(this);
+                        if (first_enemy != null)
+                        {
+                            bullet.SetEnemy(first_enemy);
+                        }
+                    }
+                }
                 // Tạo hiệu ứng nổ đạn (muzzle)
                 MuzzleEffect(Quaternion.identity);
                 yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
@@ -133,25 +151,30 @@ public class Archer : GroundCharacter
         }
         else
         {
-            BaseEnemy[] first_3_enemies = FindThreeFirstEnemies();
-            if (first_3_enemies[0] != null && !first_3_enemies[0].isDieOrNot())
+            List<BaseEnemy> first_3_enemies = FindThreeFirstEnemies();
+            if (first_3_enemies.Count == 0) yield break;
+            if (first_3_enemies[0] != null) { SelfRotate(first_3_enemies[0]); }
+            // Play animation
+            PlayAttackAmination(Attack_Duration);
+            yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
+            for (int i = 0; i < first_3_enemies.Count; i++)
             {
-                SelfRotate(first_3_enemies[0]);
-                // Play animation
-                PlayAttackAmination(Attack_Duration);
-                yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
-                for (int i = 0; i < first_3_enemies.Length; i++)
+                if (BulletPooler.instance != null)
                 {
-                    GameObject newBullet = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Quaternion.identity);
-                    BaseBullets bullet = newBullet.GetComponent<BaseBullets>();
-                    bullet.SetCharacter(this);
-                    bullet.SetEnemy(first_3_enemies[i]);
+                    BaseBullets bullet = BulletPooler.instance.GetBullet(bullet_Prefab.GetComponent<BaseBullets>().BulletID);
+                    if (bullet != null)
+                    {
+                        bullet.transform.position = Bullet_StartPosition.transform.position;
+                        bullet.transform.rotation = Quaternion.identity;
+                        bullet.SetCharacter(this);
+                        if (first_3_enemies[i] != null) { bullet.SetEnemy(first_3_enemies[i]); }
+                    }
                 }
-                // Tạo hiệu ứng nổ đạn (muzzle)
-                MuzzleEffect(Quaternion.identity);
-                yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
-                SPUM_Prefabs._anim.speed = 1;
             }
+            // Tạo hiệu ứng nổ đạn (muzzle)
+            MuzzleEffect(Quaternion.identity);
+            yield return new WaitForSeconds(Bow_Attack_Duration / SPUM_Prefabs._anim.speed * 0.5f);
+            SPUM_Prefabs._anim.speed = 1;
         }
     }
 }

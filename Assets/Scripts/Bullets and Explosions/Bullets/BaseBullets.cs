@@ -7,8 +7,10 @@ public class BaseBullets : MonoBehaviour
     [SerializeField] protected BaseCharacter character;
     [SerializeField] protected BaseEnemy enemy;
     [SerializeField] protected float BulletSpeed = 10f;
+    public int BulletID;
     // Serialize field giup unity biet duoc rang object nay can duoc luu tru
     public GameObject Explosion_SFX;
+    public GameObject LowGraphic_Explosion_SFX;
     void Start()
     {
         
@@ -29,7 +31,7 @@ public class BaseBullets : MonoBehaviour
     }
     protected void Move()
     {
-        if (enemy != null)
+        if (enemy != null && enemy.gameObject.activeInHierarchy)
         {
             float Angle_in_Radian = Mathf.Atan2(enemy.Center.transform.position.y - transform.position.y, enemy.Center.transform.position.x - transform.position.x);
             Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
@@ -37,8 +39,10 @@ public class BaseBullets : MonoBehaviour
         }
         else
         {
-            enemy = character.FindFirstEnemy();
-            Destroy(this.gameObject, 0.5f);
+            if (BulletPooler.instance != null)
+            {
+                BulletPooler.instance.ReturnBullet(this);
+            }
         }
         transform.position += transform.up * BulletSpeed * Time.deltaTime;
     }
@@ -51,9 +55,22 @@ public class BaseBullets : MonoBehaviour
             {
                 baseEnemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
             }
-            GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
-            Destroy(spawnedSFX, 0.5f);
-            Destroy(this.gameObject);
+            //GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
+            //Destroy(spawnedSFX, 0.5f);
+            if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
+            {
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                if (explosionSFX != null)
+                {
+                    explosionSFX.transform.position = this.transform.position;
+                    explosionSFX.transform.rotation = Quaternion.identity;
+                    ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+                }
+            }
+            if (BulletPooler.instance != null)
+            {
+                BulletPooler.instance.ReturnBullet(this);
+            }
         }
     }
 }

@@ -43,6 +43,13 @@ public class CharacterUIControll : MonoBehaviour
     public Button AbilityButton;
     public Image AbilityCurrentIcon;
     public Sprite[] AbilityIcons;
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E) && UpgradeButton.isActiveAndEnabled) 
+        {
+            Upgrade();
+        }
+    }
     public void UI_Off()
     {
         gameObject.SetActive(false);
@@ -64,7 +71,7 @@ public class CharacterUIControll : MonoBehaviour
             if (CurrentCharacter.GetUpgradeCost(CurrentCharacter.GetLevel()) <= EconomyManager.instance.PlayerCoin) 
             {
                 CurrentCharacter.Upgrade();
-                if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Upgrade_Sound);
+                if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Upgrade_Sound);
                 EconomyManager.instance.Purchase(CurrentCharacter.GetUpgradeCost(CurrentCharacter.GetLevel() - 1));
                 EconomyManager.instance.Change_CurrentCoin();
             }
@@ -83,17 +90,18 @@ public class CharacterUIControll : MonoBehaviour
             EconomyManager.instance.AddCoin(CurrentCharacter.GetSellCost()); 
             EconomyManager.instance.Change_CurrentCoin();
         }
-        if (SoundManager.Instance != null) SoundManager.Instance.audioSource.PlayOneShot(SoundManager.Instance.Sell_Sound);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Sell_Sound);
         // RemoveCharacter không chạy đúng với MinigunnerClone
         if (CurrentCharacter.GetType() == typeof(MinigunnerClone))
         {
             CharacterManager.instance.RemovePosition(CurrentCharacter.transform.position);
+            Destroy(CurrentCharacter.gameObject);
         }
         else
         {
-            CharacterManager.instance.RemoveCharacter(CurrentCharacter);
+            CharacterManager.instance.RemoveCharacter(CurrentCharacter); // trong remove có sẵn returncharacter rồi
         }
-        Destroy(CurrentCharacter.gameObject);
+        //Destroy(CurrentCharacter.gameObject);
         gameObject.SetActive(false);
     }
     public void UseAbility()

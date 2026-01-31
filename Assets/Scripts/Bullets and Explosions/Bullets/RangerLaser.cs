@@ -8,13 +8,13 @@ public class RangerLaser : BaseBullets
     private LineRenderer lineRenderer;
     public GameObject HeadGun;
     private bool hasDealtDamage = false;
-    private void Awake()
+    private void OnEnable()
     {
+        hasDealtDamage = false;
         lineRenderer = GetComponent<LineRenderer>();
     }
     void Start()
     {
-        StartCoroutine(DestroyAfter1Second());
     }
 
     // Update is called once per frame
@@ -52,14 +52,11 @@ public class RangerLaser : BaseBullets
                 }
                 GameObject spawnedSFX = Instantiate(Explosion_SFX, enemy.transform.position, Quaternion.identity);
                 Destroy(spawnedSFX, 0.5f);
-                Destroy(this.gameObject, 0.25f);
+                if (BulletPooler.instance != null)
+                {
+                    BulletPooler.instance.StartCoroutine(BulletPooler.instance.ReturnBulletWithDelay(this, 0.25f));
+                }
             }
         }
-    }
-    private IEnumerator DestroyAfter1Second()
-    {
-        yield return new WaitForSeconds(1f);
-        Destroy(this.gameObject);
-        yield break;
     }
 }

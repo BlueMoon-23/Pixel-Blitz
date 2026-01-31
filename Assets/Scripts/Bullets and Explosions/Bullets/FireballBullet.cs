@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FireballBullet : BaseBullets
 {
-    // Start is called before the first frame update
+    public float RealDamage;
     void Start()
     {
         
@@ -27,7 +27,7 @@ public class FireballBullet : BaseBullets
                 BaseEnemy enemyGetDamaged = enemy.GetComponent<BaseEnemy>();
                 if (enemyGetDamaged != null)
                 {
-                    enemyGetDamaged.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                    enemyGetDamaged.TakeDamage(RealDamage, character.canStrikethroughOrNot());
                 }
             }
             // Tăng thời gian tồn tại của Vortex lên 0.5s
@@ -39,12 +39,43 @@ public class FireballBullet : BaseBullets
                 {
                     wizardVortex.ExtendDuration(0.5f);
                 }
-                // Sinh hiệu ứng
-                GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
-                spawnedSFX.transform.localScale = new Vector3(2f, 2f, 2f);
-                Destroy(spawnedSFX, 0.5f);
-                Destroy(this.gameObject);
+            }
+            // Sinh hiệu ứng
+            //GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
+            //spawnedSFX.transform.localScale = new Vector3(2f, 2f, 2f);
+            //Destroy(spawnedSFX, 0.5f);
+            if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
+            {
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                if (explosionSFX != null)
+                {
+                    explosionSFX.transform.position = this.transform.position;
+                    explosionSFX.transform.rotation = Quaternion.identity;
+                    explosionSFX.transform.localScale = new Vector3(2f, 2f, 2f);
+                    ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+                }
+            }
+            else if (ExplosionPooler.instance != null && GameSetting.instance != null && !GameSetting.instance._showExplosion)
+            {
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                if (explosionSFX != null)
+                {
+                    explosionSFX.transform.position = this.transform.position;
+                    explosionSFX.transform.rotation = Quaternion.identity;
+                    explosionSFX.transform.localScale = new Vector3(4f, 4f, 4f);
+                    ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+                }
+            }
+            if (BulletPooler.instance != null)
+            {
+                BulletPooler.instance.ReturnBullet(this);
             }
         }
     }
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 2.0f); // cùng radius với OverlapCircleAll
+    }
+
 }

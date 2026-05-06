@@ -21,24 +21,7 @@ public class MapUI : MonoBehaviour
         mapImage.sprite = mapData.mapInformation.MapImage;
         mapStarRate.text = mapData.mapInformation.StarRate.ToString();
         mapDifficulty.text = mapData.gamemode.name;
-        switch (mapData.gamemode.name)
-        {
-            case "Medium":
-                {
-                    mapDifficulty.color = new Color32(255, 187, 73, 255);
-                    break;
-                }
-            case "Hard":
-                {
-                    mapDifficulty.color = new Color32(255, 100, 76, 255);
-                    break;
-                }
-            default:
-                {
-                    mapDifficulty.color = new Color32(165, 255, 107, 255);
-                    break;
-                }
-        }
+        mapDifficulty.color = mapData.gamemode.getColor();
         if (AccountSaveManager.CurrentAccount != null)
         {
             if (AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters.Count >= mapData.CharacterRequirement())

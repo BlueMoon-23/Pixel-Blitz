@@ -39,6 +39,7 @@ public class Authenticator : MonoBehaviour
         }
         newUser.Username = username_Signup.text;
         newUser.Password = password_Signup.text;
+        newUser.hasPlayedTutorial = false;
         // Kiểm tra trùng lặp
         for (int i = 0; i < AccountSaveManager.instance.UserAccounts.userDatas.Count; i++)
         {

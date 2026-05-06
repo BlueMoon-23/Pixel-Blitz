@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Gamemodes : MonoBehaviour
+public abstract class Gamemodes : MonoBehaviour
 {
     public enum EnemyName { Normal, Quick, Enraged, NormalBoss, Hidden, Armored, NormalMystery, Necromancer, NecromancerMinion, SkeletonBoss, HiddenBoss, Speed, SpeedyBoss, BossMystery, EasyFinalBoss, NormalKnight, SkeletonKnight, King, HeavyKnight, HorseRider, MediumFinalBoss, Soul, Ghost, Healer, Charger, Mauler, HardFinalBoss }
     public List<EnemyEntry> enemyEntries = new List<EnemyEntry>();
@@ -84,4 +84,9 @@ public class Gamemodes : MonoBehaviour
         yield break;
     }
     public bool isFinished_spawning() { return finished_spawningEnemies; }
+    public abstract void setGemReward(int wave, ref double BaseGem, ref int BonusGem, bool doVictory);
+    public abstract void setCoinFormula(int wave, ref float Formula);
+    public abstract int getMaxWave();
+    public abstract Color getColor();
+    public abstract int getDifficulty();
 }

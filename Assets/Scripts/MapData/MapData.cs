@@ -10,21 +10,7 @@ public class MapData
     public Gamemodes gamemode;
     public float Difficulty()
     {
-        int Gamemode_difficulty = 0;
-        if (gamemode.GetType() == typeof(Easy))
-        {
-            Gamemode_difficulty = 1;
-        }
-        else if (gamemode.GetType() == typeof(Medium))
-        {
-            Gamemode_difficulty = 2;
-        }
-        else if (gamemode.GetType() == typeof(Hard))
-        {
-            Gamemode_difficulty = 3;
-        }
-        //
-        return mapInformation.StarRate + Gamemode_difficulty;
+        return mapInformation.StarRate + gamemode.getDifficulty();
     }
     public int CharacterRequirement()
     {

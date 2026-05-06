@@ -12,8 +12,12 @@ public class MainMenu : MonoBehaviour
     public TextMeshProUGUI Gems_Text;
     public TextMeshProUGUI Diamonds_Text;
     public GameObject Setting_Popup;
+    public GameObject Giftcode_Popup;
+    public GameObject Tutorial_Popup;
     public Slider musicSlider;
     public Slider UISlider;
+    // Tutorial
+    public MapData tutorialMap;
     private void Awake()
     {
         if (instance == null)
@@ -31,13 +35,17 @@ public class MainMenu : MonoBehaviour
     }
     void Start()
     {
-        if (AccountSaveManager.instance != null)
-        {
-            Username_Text.text = AccountSaveManager.CurrentAccount.Username;
-            Gems_Text.text = AccountSaveManager.CurrentAccount.CurrencyData.UserGems.ToString();
-            Diamonds_Text.text = AccountSaveManager.CurrentAccount.CurrencyData.UserDiamonds.ToString();
-        }
+        ReloadAccount();
         Setting_Popup.SetActive(false);
+        Giftcode_Popup.SetActive(false);
+        if (PlayerPrefs.HasKey(UserDataKey.PLAYEDTUTORIAL))
+        {
+            Tutorial_Popup.SetActive(false);
+        }
+        else
+        {
+            Tutorial_Popup.SetActive(true);
+        }
         if (SoundManager.Instance != null)
         {
             musicSlider.onValueChanged.AddListener(SoundManager.Instance.SetMusicVolume);
@@ -60,10 +68,26 @@ public class MainMenu : MonoBehaviour
     {
         
     }
+    public void ReloadAccount()
+    {
+        if (AccountSaveManager.instance != null)
+        {
+            Username_Text.text = AccountSaveManager.CurrentAccount.Username;
+            Gems_Text.text = AccountSaveManager.CurrentAccount.CurrencyData.UserGems.ToString();
+            Diamonds_Text.text = AccountSaveManager.CurrentAccount.CurrencyData.UserDiamonds.ToString();
+        }
+    }
     public void Shop()
     {
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
         SceneKey.targetScene = SceneKey.ShopScene;
+        SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
+    }
+    public void Tutorial()
+    {
+        if (ModeManager.instance != null) ModeManager.instance.Play(tutorialMap);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
+        SceneKey.targetScene = SceneKey.TutorialScene;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     public void Play()
@@ -76,9 +100,21 @@ public class MainMenu : MonoBehaviour
     {
         Setting_Popup.SetActive(true);
     }
+    public void Giftcode()
+    {
+        Giftcode_Popup.SetActive(true);
+    }
     public void TurnOffSetting()
     {
         Setting_Popup.SetActive(false);
+    }
+    public void TurnOffGiftcode()
+    {
+        Giftcode_Popup.SetActive(false);
+    }
+    public void TurnOffTutorial()
+    {
+        Tutorial_Popup.SetActive(false);
     }
     public void LogOut()
     {

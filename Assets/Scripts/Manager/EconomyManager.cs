@@ -88,18 +88,7 @@ public class EconomyManager : MonoBehaviour
     public void EarnCoinEachWave(Gamemodes mode, int wave)
     {
         float Formula = 0;
-        if (mode.GetType() == typeof(Easy))
-        {
-            Formula = (int)Mathf.Pow(125 + 55 * wave, 1.2f);
-        }
-        else if (mode.GetType() == typeof(Medium))
-        {
-            Formula = (int)Mathf.Pow(125 + 55 * wave, 1.2f);
-        }
-        else if (mode.GetType() == typeof(Hard))
-        {
-            Formula = (int)Mathf.Pow(125 + 55 * wave, 1.2f);
-        }
+        mode.setCoinFormula(wave, ref Formula);
         AddCoin(Formula);
         Change_CurrentCoin();
         WaveReward.text = "Wave Reward: $" + (Formula);

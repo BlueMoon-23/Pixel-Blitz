@@ -16,4 +16,5 @@ public class UserDataKey
     public static string SHAKEEFFECT = "ShakeEffect";
     public static string SHOWEXPLOSION = "ShowExplosion";
     public static string SHOWMUZZLE = "ShowMuzzle";
+    public static string PLAYEDTUTORIAL = "PlayedTutorial";
 }

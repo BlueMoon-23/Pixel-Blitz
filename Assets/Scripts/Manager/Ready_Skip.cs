@@ -1,7 +1,8 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Ready_Skip : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class Ready_Skip : MonoBehaviour
     }
     public CanvasGroup ReadyUI;
     public GameObject WaypointArrows;
+    public UnityEvent OnReadyActivated;
     public static Ready_Skip instance;
     private void Awake()
     {
@@ -101,5 +103,7 @@ public class Ready_Skip : MonoBehaviour
     public void Ready()
     {
         isReady = true;
+        // Thay vì gọi đích danh TutorialManager, ta chỉ "phát tín hiệu"
+        OnReadyActivated?.Invoke();
     }
 }

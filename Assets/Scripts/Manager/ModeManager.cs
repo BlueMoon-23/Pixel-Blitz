@@ -14,6 +14,7 @@ public class ModeManager : MonoBehaviour
     public float Star;
     // Current Enemy Prefabs
     public List<BaseEnemy> enemy_Prefabs = new List<BaseEnemy>();
+    private Dictionary<string, GameObject> Gamemode_Dict = new Dictionary<string, GameObject>();
     private void Awake()
     {
         if (instance == null)
@@ -25,24 +26,14 @@ public class ModeManager : MonoBehaviour
         {
             Destroy(this);
         }
+        foreach (GameObject gamemode in Gamemode_Prefabs)
+        {
+            Gamemode_Dict.Add(gamemode.name, gamemode);
+        }
     }
     public void LoadGamemode()
     {
-        if (currentGamemode != null)
-        {
-            if (currentGamemode.GetType() == typeof(Easy))
-            {
-                MaxWave = 20;
-            }
-            if (currentGamemode.GetType() == typeof(Medium))
-            {
-                MaxWave = 25;
-            }
-            if (currentGamemode.GetType() == typeof(Hard))
-            {
-                MaxWave = 30;
-            }
-        }
+        MaxWave = currentGamemode.getMaxWave();
         currentGamemode = this.gameObject.GetComponentInChildren<Gamemodes>();
         // Không có dòng này sẽ báo lỗi coroutine không chạy vì "easy is inactive"
         // Lý do: coroutine gọi từ modemanager.instance.currentGamemode, nhưng currentGamemode lại trỏ về cái script trong prefab
@@ -61,20 +52,7 @@ public class ModeManager : MonoBehaviour
     public void Play(MapData mapData)
     {
         currentGamemode = mapData.gamemode;
-        int index = 0;
-        if (currentGamemode.GetType() == typeof(Easy))
-        {
-            index = 0;
-        }
-        else if (currentGamemode.GetType() == typeof(Medium))
-        {
-            index = 1;
-        }
-        else if (currentGamemode.GetType() == typeof(Hard))
-        {
-            index = 2;
-        }
-        GameObject gamemode_object = Instantiate(Gamemode_Prefabs[index], transform.position, Quaternion.identity);
+        GameObject gamemode_object = Instantiate(Gamemode_Dict[currentGamemode.GetType().ToString()], transform.position, Quaternion.identity);
         gamemode_object.transform.SetParent(transform, false);
         Star = mapData.mapInformation.StarRate;
     }

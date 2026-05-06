@@ -156,4 +156,25 @@ public class Easy : Gamemodes
                 }
         }
     }
+    public override void setGemReward(int wave, ref double BaseGem, ref int BonusGem, bool doVictory)
+    {
+        BaseGem = 2 * Mathf.Pow(wave, 1.25f);
+        if (doVictory) { BonusGem = 138; }
+    }
+    public override void setCoinFormula(int wave, ref float Formula)
+    {
+        Formula = (int)Mathf.Pow(125 + 55 * wave, 1.2f);
+    }
+    public override int getMaxWave()
+    {
+        return 20;
+    }
+    public override int getDifficulty()
+    {
+        return 1;
+    }
+    public override Color getColor()
+    {
+        return new Color32(165, 255, 107, 255);
+    }
 }

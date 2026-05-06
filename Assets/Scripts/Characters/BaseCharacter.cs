@@ -45,6 +45,8 @@ public abstract class BaseCharacter : MonoBehaviour
     protected float stunEndTime;
     // Kiểm tra đã reset hay chưa
     public bool StatsReseted = false; // PHẢI MẶC ĐỊNH LÀ FALSE, TRUE LÀ UPDATE SẼ CHẠY TRƯỚC LÀ SẼ BÁO NULL
+    // Báo cáo nhiệm vụ
+    public Action<int> OnLevelUp;
     protected virtual void OnEnable()
     {
         // Chỉnh lại một số stats
@@ -206,6 +208,7 @@ public abstract class BaseCharacter : MonoBehaviour
         {
             SellCost += (int)(UpgradeCost[i] / 3);
         }
+        OnLevelUp?.Invoke(Level);
     }
     public BaseEnemy FindFirstEnemy()
     {

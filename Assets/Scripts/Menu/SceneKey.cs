@@ -13,5 +13,6 @@ public class SceneKey
     public static string MapChoose = "MapChoose";
     public static string ShopScene = "ShopScene";
     public static string LoadingScene = "LoadingScene";
+    public static string TutorialScene = "Tutorial";
     public static string targetScene;
 }

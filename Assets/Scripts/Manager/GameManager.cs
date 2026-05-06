@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     {
         StartCoroutine(StartGame());
     }
-    private IEnumerator StartGame()
+    IEnumerator StartGame()
     {
         if (Ready_Skip.instance != null) yield return StartCoroutine(Ready_Skip.instance.GetReady());
         if (WaveManager.instance != null) yield return StartCoroutine(WaveManager.instance.SpawnEnemyWave(ModeManager.instance.currentGamemode, ModeManager.instance.MaxWave));

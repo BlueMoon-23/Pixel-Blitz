@@ -238,4 +238,25 @@ public class Hard : Gamemodes
                 }
         }
     }
+    public override void setGemReward(int wave, ref double BaseGem, ref int BonusGem, bool doVictory)
+    {
+        BaseGem = 0.28 * Mathf.Pow(wave, 2f) + 4.75 * wave;
+        if (doVictory) { BonusGem = 497; }
+    }
+    public override void setCoinFormula(int wave, ref float Formula)
+    {
+        Formula = (int)Mathf.Pow(125 + 55 * wave, 1.2f);
+    }
+    public override int getMaxWave()
+    {
+        return 30;
+    }
+    public override int getDifficulty()
+    {
+        return 3;
+    }
+    public override Color getColor()
+    {
+        return new Color32(255, 100, 76, 255);
+    }
 }

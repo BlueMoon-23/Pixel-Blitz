@@ -154,24 +154,7 @@ public class MapChoose : MonoBehaviour
         MapName.text = Maps[index].mapInformation.MapName;
         MapStarRate.text = Maps[index].mapInformation.StarRate.ToString();
         Gamemode.text = Maps[index].gamemode.name;
-        switch(Maps[index].gamemode.name)
-        {
-            case "Medium":
-                {
-                    Gamemode.color = new Color32(255, 187, 73, 255);
-                    break;
-                }
-            case "Hard":
-                {
-                    Gamemode.color = new Color32(255, 100, 76, 255);
-                    break;
-                }
-            default:
-                {
-                    Gamemode.color = new Color32(165, 255, 107, 255);
-                    break;
-                }
-        }
+        Gamemode.color = Maps[index].gamemode.getColor();
         if (AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters.Count < Maps[index].CharacterRequirement())
         {
             NextMap();

@@ -69,11 +69,10 @@ public class Win_Lose : MonoBehaviour
     public void Victory()
     {
         ClearObjects();
-        // Get reward
-        int gemreward = RewardCalculator.CalculateGem(WaveManager.instance.GetCurrentWave(), ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
-        CurrencySaveManager.instance.AddGem(gemreward);
-        int diamondreward = RewardCalculator.CalculateDiamond(WaveManager.instance.GetCurrentWave(), ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
-        CurrencySaveManager.instance.AddDiamonds(diamondreward);
+        int gemReward = RewardCalculator.CalculateGem(WaveManager.instance.GetCurrentWave(), ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
+        CurrencySaveManager.instance.AddGem(gemReward);
+        int diamondReward = RewardCalculator.CalculateDiamond(WaveManager.instance.GetCurrentWave(), ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
+        CurrencySaveManager.instance.AddDiamonds(diamondReward);
         if (SoundManager.Instance != null) { SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Victory_Sound); }
         // Show Score
         DOTween.KillAll();
@@ -89,22 +88,22 @@ public class Win_Lose : MonoBehaviour
             VictoryInfo.gameObject.SetActive(true);
             Victory_GamemodeText.text += ModeManager.instance.currentGamemode.GetType().Name;
             Victory_TimePlayedText.text = "Time Played: " + (TimeManager.instance.Get_TimePlayed() / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
-            if (gemreward == 0)
+            if (gemReward == 0)
             {
                 Victory_GemRewardText.gameObject.transform.parent.gameObject.SetActive(false);
             }
             else
             {
-                Victory_GemRewardText.text = gemreward.ToString();
+                Victory_GemRewardText.text = gemReward.ToString();
             }
             // Thêm text diamond cho hard mode nữa
-            if (diamondreward == 0)
+            if (diamondReward == 0)
             {
                 Victory_DiamondRewardText.gameObject.transform.parent.gameObject.SetActive(false);
             }
             else
             {
-                Victory_DiamondRewardText.text = diamondreward.ToString();
+                Victory_DiamondRewardText.text = diamondReward.ToString();
             }
             VictoryInfo.DOFade(1f, 1f).From(0f);
         });

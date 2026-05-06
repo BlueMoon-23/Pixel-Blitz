@@ -12,21 +12,7 @@ public class RewardCalculator : MonoBehaviour
         // Hard: 0.28*x^2 + 4.75x + 497
         double BaseGem = 0;
         int BonusGem = 0;
-        if (gamemodes.GetType() == typeof(Easy))
-        {
-            BaseGem = 2 * Mathf.Pow(wave, 1.25f);
-            if (doVictory) { BonusGem = 138; }
-        }
-        else if (gamemodes.GetType() == typeof(Medium))
-        {
-            BaseGem = 2 * Mathf.Pow(wave, 1.5f);
-            if (doVictory) { BonusGem = 171; }
-        }
-        else if (gamemodes.GetType() == typeof(Hard))
-        {
-            BaseGem = 0.28 * Mathf.Pow(wave, 2f) + 4.75 * wave;
-            if (doVictory) { BonusGem = 497; }
-        }
+        gamemodes.setGemReward(wave, ref BaseGem, ref BonusGem, doVictory);
         double starMultiplier = 1 + (star - 1) * 0.1f;
         int totalGem = (int)((BaseGem + BonusGem) * starMultiplier);
         return totalGem;

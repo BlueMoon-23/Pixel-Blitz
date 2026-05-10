@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class FireballBullet : BaseBullets
 {
-    public float RealDamage;
     void Start()
     {
         
@@ -27,7 +26,7 @@ public class FireballBullet : BaseBullets
                 BaseEnemy enemyGetDamaged = enemy.GetComponent<BaseEnemy>();
                 if (enemyGetDamaged != null)
                 {
-                    enemyGetDamaged.TakeDamage(RealDamage, character.canStrikethroughOrNot());
+                    enemyGetDamaged.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
                 }
             }
             // Tăng thời gian tồn tại của Vortex lên 0.5s

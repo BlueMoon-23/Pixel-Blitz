@@ -46,7 +46,7 @@ public class WaveManager : MonoBehaviour
                 // Reset lại vụ skip
                 Ready_Skip.instance.WantToSkip = false; // khong co lenh nay la neu skip roi thi wanttoskip = true, break vong while
                 if (skipCoroutine != null) { StopCoroutine(skipCoroutine); }
-                if (currentWave < MaxWave) { skipCoroutine = StartCoroutine(Ready_Skip.instance.Skip()); }
+                if (mode.GetType() != typeof(TutorialMode) && currentWave < MaxWave) { skipCoroutine = StartCoroutine(Ready_Skip.instance.Skip()); }
                 // Time handle
                 int time = 60;
                 if (currentWave == MaxWave) { time = 300; }

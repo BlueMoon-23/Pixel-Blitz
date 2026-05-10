@@ -19,14 +19,13 @@ public class HitCharacterExplosion : BaseExplosion
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        BaseCharacter character = collision.GetComponent<GroundCharacter>();
-        if (CanHitCliffCharacter && character == null)
-        {
-            character = collision.GetComponent<CliffCharacter>();
-        }
+        BaseCharacter character = collision.GetComponent<BaseCharacter>();
         if (character != null)
         {
-            character.StartCoroutine(character.GetStunned(StunDuration));
+            if (CanHitCliffCharacter || !character.profile.isCliff)
+            {
+                character.StartCoroutine(character.GetStunned(StunDuration));
+            }
         }
         if (CanHitSummonerUndead)
         {

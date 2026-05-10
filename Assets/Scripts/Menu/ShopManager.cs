@@ -108,6 +108,30 @@ public class ShopManager : MonoBehaviour
             }
         }
     }
+    private string HiddenDetectionText(CharacterProfile character)
+    {
+        for (int level = 0; level < character.characterLevelDatas.Count; level++)
+        {
+            if (character.characterLevelDatas[level].hasHiddenDetection)
+            {
+                if (level == 0) return "Yes";
+                else return "At level " + level;
+            }
+        }
+        return "No";
+    }
+    private string StrikethroughText(CharacterProfile character)
+    {
+        for (int level = 0; level < character.characterLevelDatas.Count; level++)
+        {
+            if (character.characterLevelDatas[level].canStrikethrough)
+            {
+                if (level == 0) return "Yes";
+                else return "At level " + level;
+            }
+        }
+        return "No";
+    }
     private void ShowCharacter(int allCharacter_index)
     {
         if (CharacterSaveManager.instance != null)
@@ -116,15 +140,15 @@ public class ShopManager : MonoBehaviour
             {
                 CharacterName.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CharacterName;
                 CharacterImage.sprite = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CharacterImage;
-                RangeStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.RangeStat.ToString();
-                DamageStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.DamageStat.ToString();
-                CooldownStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CooldownStat.ToString();
+                RangeStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.characterLevelDatas[0].RangeStat.ToString();
+                DamageStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.characterLevelDatas[0].DamageStat.ToString();
+                CooldownStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.characterLevelDatas[0].CooldownStat.ToString();
                 CostStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CostStat.ToString();
                 Tier.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.Tier;
                 Description.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.Description;
                 Special.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.Special;
-                HiddenDetection.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.HiddenDetection;
-                Strikethrough.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.Strikethrough;
+                HiddenDetection.text = HiddenDetectionText(CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile);
+                Strikethrough.text = StrikethroughText(CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile);
                 GemRequire.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.GemRequire.ToString();
                 DiamondRequire.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.DiamondRequire.ToString();
             }

@@ -60,7 +60,7 @@ public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler
         Camera camera = Camera.main;
         MousePosition.z = Mathf.Abs(camera.transform.position.z);
         Vector3 WorldPosition = camera.ScreenToWorldPoint(MousePosition);
-        if (baseCharacter.GetType().IsSubclassOf(typeof(CliffCharacter)))
+        if (baseCharacter.profile.isCliff)
         {
             Vector3Int TilePosition = PlacingCliff.WorldToCell(WorldPosition);
             // Kiểm tra có nằm ngoài phạm vi PlacingGround không

@@ -27,16 +27,6 @@ public class WizardSkillBox : MonoBehaviour
         SkillText.text = SkillName[ID - 1];
         SkillText.color = NameColor[ID - 1];
     }
-    public float GetDamageByID()
-    {
-        switch (CurrentSkillID)
-        {
-            case 1: { return 15f; }
-            case 2: { return 600f; }
-            case 3: { return 600f; }
-            default: { return 0f; }
-        }
-    }
     public void MoveUp()
     {
         if (CurrentSkillID < 3)

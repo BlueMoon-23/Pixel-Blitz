@@ -13,6 +13,7 @@ public class GameSetting : MonoBehaviour
     public Slider MusicSlider;
     public Slider SoundEffectSlider;
     public Slider UISoundSlider;
+    public Slider FPSSlider;
     [Header("Toggles")]
     public ToggleGroup AutoSkip;
     public Toggle DoAutoSkip;
@@ -55,6 +56,8 @@ public class GameSetting : MonoBehaviour
         else { UISoundSlider.value = 1f; }
         if (PlayerPrefs.HasKey(UserDataKey.SOUNDEFFECTSVOLUME)) { SoundEffectSlider.value = PlayerPrefs.GetFloat(UserDataKey.SOUNDEFFECTSVOLUME); }
         else { SoundEffectSlider.value = 1f; }
+        if (PlayerPrefs.HasKey(UserDataKey.FPS)) { FPSSlider.value = PlayerPrefs.GetFloat(UserDataKey.FPS); }
+        else { FPSSlider.value = 0f; }
         // khi lưu, cài 1 = true và 0 = false. GetInt("key", defaultvalue) tương đương với kiểm tra key, không có thì = defaultvalue
         _autoSkip = PlayerPrefs.GetInt(UserDataKey.AUTOSKIP, 0) == 1;
         _shakeEffect = PlayerPrefs.GetInt(UserDataKey.SHAKEEFFECT, 0) == 1;
@@ -151,5 +154,18 @@ public class GameSetting : MonoBehaviour
             }
             PlayerPrefs.SetInt(UserDataKey.SHOWMUZZLE, (_showMuzzle == true) ? 1 : 0);
         }
+    }
+    public void OnFPSSliderValueChanged(float value)
+    {
+        ApplyFPS(value);
+        PlayerPrefs.SetFloat(UserDataKey.FPS, value);
+        PlayerPrefs.Save();
+    }
+    private void ApplyFPS(float sliderValue)
+    {
+        int fps = 30 + ((int)sliderValue * 15);
+        Application.targetFrameRate = fps;
+        QualitySettings.vSyncCount = 0; // Luôn tắt VSync khi dùng targetFrameRate
+        Debug.Log($"FPS Applied: {fps}");
     }
 }

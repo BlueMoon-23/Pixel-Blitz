@@ -20,7 +20,6 @@ public class WizardVortex : BaseExplosion
         Clock = 0f;
         DurationClock = 0f;
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -41,6 +40,10 @@ public class WizardVortex : BaseExplosion
                 ExplosionPooler.instance.ReturnExplosion(this);
             }
         }
+    }
+    public void SetDamage(float Damage)
+    {
+        damageValue = Damage;
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {

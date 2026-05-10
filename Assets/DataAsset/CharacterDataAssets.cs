@@ -8,16 +8,13 @@ public class CharacterProfile : ScriptableObject
     // Cơ bản
     public string CharacterName;
     public Sprite CharacterImage;
-    public float RangeStat;
-    public float DamageStat;
-    public float CooldownStat;
     public float CostStat;
+    public bool isCliff;
+    public List<CharacterLevelData> characterLevelDatas = new List<CharacterLevelData>();
     // Của UI
     public string Tier;
     public string Description;
     public string Special;
-    public string HiddenDetection;
-    public string Strikethrough;
     // Giá tiền
     public int GemRequire;
     public int DiamondRequire;

@@ -143,7 +143,7 @@ public class BaseEnemy : MonoBehaviour
     }
     protected void ResetIncomingDamage()
     {
-        if (incomingDamage > 0 && Time.time - lastrecordedDamage > 1f)
+        if (incomingDamage > 0 && Time.time - lastrecordedDamage > 0.25f)
         {
             incomingDamage = 0;
         }

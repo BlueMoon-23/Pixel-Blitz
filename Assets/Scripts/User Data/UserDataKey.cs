@@ -12,6 +12,7 @@ public class UserDataKey
     public static string MUSICVOLUME = "MusicVolume";
     public static string UISOUNDSVOLUME = "UISoundsVolume";
     public static string SOUNDEFFECTSVOLUME = "SoundEffectsVolume";
+    public static string FPS = "FPS";
     public static string AUTOSKIP = "AutoSkip";
     public static string SHAKEEFFECT = "ShakeEffect";
     public static string SHOWEXPLOSION = "ShowExplosion";

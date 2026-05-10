@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Summoner : GroundCharacter
+public class Summoner : BaseCharacter
 {
     public GameObject GraveStackBar;
     public GameObject GravePrefab;
     private GameObject currentGrave;
     private float currentGraveStack = 0f;
+    [SerializeField] private float[] GraveStackByLevels;
+    [SerializeField] private int[] UndeadCountByLevels;
+    [SerializeField] private int[] UndeadHPByLevels;
     private float GraveStack;
     private int UndeadCount;
+    private float UndeadHP;
     private float Original_x_GraveStackScale;
     public GameObject SummonVFX;
     public GameObject[] Undeads_Level_0;
@@ -18,18 +22,9 @@ public class Summoner : GroundCharacter
     protected override void OnEnable()
     {
         base.OnEnable();
-        Range = 13f;
-        Damage = 7f;
-        Cooldown = 1.75f;
-        GraveStack = 50f;
-        UndeadCount = 2;
-        Cost = 1500;
-        Level = 0;
-        hasHiddenDetection = false;
-        canStrikethrough = true;
-        UpgradeCost = new float[] { 1000, 1600, 10800, 21000 };
-        SellCost = (int)(Cost / 3);
-        _hasAbility = true;
+        GraveStack = GraveStackByLevels[0];
+        UndeadCount = UndeadCountByLevels[0];
+        UndeadHP = UndeadHPByLevels[0];
         Staff_Attack_Duration = 0.417f;
         // Grave Bar
         Original_x_GraveStackScale = 4.5f;
@@ -47,92 +42,23 @@ public class Summoner : GroundCharacter
             // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
         }
     }
-    public override float GetRange()
+    public override void Upgrade()
     {
-        if (Range <= 13f) { return 13f; } // <= la chua duoc khoi tao
-        else return Range;
-    }
-    public override float GetCost()
-    {
-        if (Cost != 1500) { return 1500; }
-        else return Cost;
-    }
-    public override void UpgradeToLevel1()
-    {
-        Damage = 13f;
-        GraveStack = 100f;
-        UndeadCount = 3;
-        Level = 1;
-    }
-    public override void UpgradeToLevel2()
-    {
-        Cooldown = 1.5f;
-        Level = 2;
-    }
-    public override void UpgradeToLevel3()
-    {
-        Damage = 56f;
-        GraveStack = 728f;
-        Level = 3;
-    }
-    public override void UpgradeToLevel4()
-    {
-        Damage = 140;
-        GraveStack = 5200f;
-        UndeadCount = 5;
-        Level = 4;
-        base.UpgradeToLevel4();
+        base.Upgrade();
+        GraveStack = GraveStackByLevels[Level];
+        UndeadCount = UndeadCountByLevels[Level];
     }
     public override void SetUpgradeInformation()
     {
         if (characterUI != null)
         {
-            characterUI.characterName.text = "Summoner";
-            characterUI.characterImage.sprite = characterUI.characterImages[5]; // Copy paste nhớ chỉnh ở đây dùm con
-            switch (Level)
-            {
-                case 0:
-                    {
-                        characterUI.upgradeName.text = "Sexy Soul Stacker";
-                        characterUI.Info1.text = "Damage: 7 => 13";
-                        characterUI.Info2.text = "Grave Stack: 50 => 100";
-                        characterUI.Info3.text = "Undead count: 2 => 3";
-                        break;
-                    }
-                case 1:
-                    {
-                        characterUI.upgradeName.text = "Sexy Undead Travellers";
-                        characterUI.Info1.text = "Cooldown: 1.75s => 1.5s";
-                        characterUI.Info2.text = "Undead HP: 25 => 165";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-                case 2:
-                    {
-                        characterUI.upgradeName.text = "Sexy Bouncy Bullet";
-                        characterUI.Info1.text = "Damage: 13 => 56";
-                        characterUI.Info2.text = "Grave Stack: 100 => 728";
-                        characterUI.Info3.text = "Bullet now bounce behind enemies.";
-                        break;
-                    }
-                case 3:
-                    {
-                        characterUI.upgradeName.text = "Sexy Archaic Magician";
-                        characterUI.Info1.text = "Damage: 56 => 140";
-                        characterUI.Info2.text = "Grave Stack: 728 => 5200";
-                        characterUI.Info3.text = "Undead count: 3 => 5\nUndead HP: 165 => 1350";
-                        break;
-                    }
-                default:
-                    {
-                        characterUI.upgradeName.text = "";
-                        characterUI.Info1.text = "";
-                        characterUI.Info2.text = "";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-            }
             base.SetUpgradeInformation();
+            if (Level < 4)
+            {
+                SetStatInfo(6, "Grave Stack", GraveStack, GraveStackByLevels[Level + 1]);
+                SetStatInfo(7, "Undead Count", UndeadCount, UndeadCountByLevels[Level + 1]);
+                SetStatInfo(8, "Undead HP", UndeadHP, UndeadHPByLevels[Level + 1]);
+            }
         }
     }
     public void Stack_for_Grave(float Damage)

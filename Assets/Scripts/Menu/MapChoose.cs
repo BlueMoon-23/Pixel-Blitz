@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,8 +10,6 @@ public class MapChoose : MonoBehaviour
 {
     // Danh sách map
     [SerializeField] private List<MapData> Maps = new List<MapData>(); // Mảng 2 chiều kiểu C#
-    public MapInformation[] mapInformation;
-    public Gamemodes[] gamemodes;
     // Thông tin map được hiện trên cửa sổ
     [SerializeField] private int currentMapDataIndex;
     public Image MapImage;
@@ -37,32 +36,7 @@ public class MapChoose : MonoBehaviour
         {
             ModeManager.instance.DestroyGamemodeObject();
         }
-        // Tự động ghép mapinformation và gamemode tạo thành mapdata găm lên mảng 2 chiều Maps
-        // i là chiều dọc (gamemode)
-        // j là chiều ngang (map)
-        // => Truy cập phần tử bằng công thức: Maps[i * gamemodes.Length + j]
-        for (int i = 0; i < gamemodes.Length; i++)
-        {
-            for (int j = 0; j < mapInformation.Length; j++)
-            {
-                MapData mapData = new MapData();
-                mapData.mapInformation = mapInformation[i];
-                mapData.gamemode = gamemodes[j];
-                Maps.Add(mapData);
-            }
-        }
-        for (int i = 0; i < Maps.Count - 1; i++)
-        {
-            for (int j = i; j < Maps.Count; j++)
-            {
-                if (Maps[i].Difficulty() > Maps[j].Difficulty())
-                {
-                    MapData temp_Map = Maps[i];
-                    Maps[i] = Maps[j];
-                    Maps[j] = temp_Map;
-                }
-            }
-        }
+        Maps.Sort((x, y) => x.Difficulty().CompareTo(y.Difficulty()));
     }
     void Start()
     {
@@ -91,27 +65,9 @@ public class MapChoose : MonoBehaviour
         if (ModeManager.instance != null) {
             ModeManager.instance.Play(ChosenMap);
         }
-        switch(ChosenMap.mapInformation.name)
-        {
-            case "OmittedCastle":
-                {
-                    SceneKey.targetScene = SceneKey.OmittedCastle;
-                    SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
-                    break;
-                }
-            case "DeadShaft":
-                {
-                    SceneKey.targetScene = SceneKey.DeadShaft;
-                    SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
-                    break;
-                }
-            default:
-                {
-                    SceneKey.targetScene = SceneKey.Greenland;
-                    SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
-                    break; ;
-                }
-        }
+        SceneKey.targetScene = ChosenMap.targetScene;
+        Debug.Log(ChosenMap.targetScene);
+        SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     private IEnumerator ShowEquipAnnounce()
     {
@@ -162,13 +118,18 @@ public class MapChoose : MonoBehaviour
     }
     public void CompareMapData(MapData mapData)
     {
-        for (int i = 0; i < Maps.Count; i++)
+        int left = 0;
+        int right = Maps.Count - 1;
+        while (left <= right)
         {
-            if (mapData.mapInformation.name == Maps[i].mapInformation.name && mapData.gamemode.name == Maps[i].gamemode.name)
+            int i = (left + right) / 2;
+            if (mapData.Difficulty() == Maps[i].Difficulty() && mapData.mapInformation.name == Maps[i].mapInformation.name && mapData.gamemode.name == Maps[i].gamemode.name)
             {
                 currentMapDataIndex = i;
                 break;
             }
+            else if (mapData.Difficulty() < Maps[i].Difficulty()) right = i - 1;
+            else left = i + 1;
         }
         ShowMapUI(currentMapDataIndex);
         StopShowAvailableMaps();

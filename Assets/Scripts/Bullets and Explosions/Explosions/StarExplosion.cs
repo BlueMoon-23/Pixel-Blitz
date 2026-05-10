@@ -5,6 +5,7 @@ using UnityEngine.TextCore.Text;
 
 public class StarExplosion : MonoBehaviour
 {
+    private float damageValue;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,12 +17,16 @@ public class StarExplosion : MonoBehaviour
     {
         
     }
+    public void SetDamage(float Damage)
+    {
+        damageValue = Damage;
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         BaseEnemy baseEnemy = collision.gameObject.GetComponent<BaseEnemy>();
         if (baseEnemy != null)
         {
-            baseEnemy.TakeDamage(15f, true);
+            baseEnemy.TakeDamage(damageValue, true);
             baseEnemy.StartCoroutine(baseEnemy.GetStunned(1f));
         }
     }

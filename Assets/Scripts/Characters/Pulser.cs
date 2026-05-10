@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Pulser : GroundCharacter
+public class Pulser : BaseCharacter
 {
     public GameObject PulseBar;
     private float currentPulse = 0f;
+    [SerializeField] private float[] MaxPulseByLevels;
+    [SerializeField] private int[] ChargeTimeByLevels;
     private float MaxPulse;
     private bool reachedMaxPulse;
     private float ChargeTime = 4f;
@@ -15,20 +17,10 @@ public class Pulser : GroundCharacter
     protected override void OnEnable()
     {
         base.OnEnable();
-        Range = 8f;
-        Damage = 3f;
-        Cooldown = 0.1f;
-        Cost = 4250;
-        Level = 0;
         currentPulse = 0f;
-        ChargeTime = 4f;
-        hasHiddenDetection = false;
-        canStrikethrough = true;
+        ChargeTime = ChargeTimeByLevels[0];
         reachedMaxPulse = false;
-        UpgradeCost = new float[] { 2500, 7000, 20700, 57000 };
-        SellCost = (int)(Cost / 3);
-        MaxPulse = 150f;
-        // Grave Bar
+        MaxPulse = MaxPulseByLevels[0];
         Original_x_PulseBarScale = 4.5f;
         // Update
         PulseBar.transform.localScale = new Vector3(Original_x_PulseBarScale * currentPulse / MaxPulse, PulseBar.transform.localScale.y, PulseBar.transform.localScale.z);
@@ -52,95 +44,22 @@ public class Pulser : GroundCharacter
             }
         }
     }
-    public override float GetRange()
+    public override void Upgrade()
     {
-        if (Range <= 8f) { return 8f; } // <= la chua duoc khoi tao
-        else return Range;
-    }
-    public override float GetCost()
-    {
-        if (Cost != 4250) { return 4250; }
-        else return Cost;
-    }
-    public override void UpgradeToLevel1()
-    {
-        Range = 9;
-        Damage = 5f;
-        hasHiddenDetection = true;
-        Level = 1;
-    }
-    public override void UpgradeToLevel2()
-    {
-        MaxPulse = 600f;
-        Damage = 10f;
-        Level = 2;
-    }
-    public override void UpgradeToLevel3()
-    {
-        Range = 12;
-        MaxPulse = 1250f;
-        Damage = 25f;
-        ChargeTime = 3f;
-        Level = 3;
-    }
-    public override void UpgradeToLevel4()
-    {
-        Range = 14;
-        MaxPulse = 4000f;
-        Damage = 75f;
-        Level = 4;
-        base.UpgradeToLevel4();
+        base.Upgrade();
+        MaxPulse = MaxPulseByLevels[Level];
+        ChargeTime = ChargeTimeByLevels[Level];
     }
     public override void SetUpgradeInformation()
     {
         if (characterUI != null)
         {
-            characterUI.characterName.text = "Pulser";
-            characterUI.characterImage.sprite = characterUI.characterImages[6];
-            switch (Level)
-            {
-                case 0:
-                    {
-                        characterUI.upgradeName.text = "Radar Integration";
-                        characterUI.Info1.text = "Range: 8 => 9";
-                        characterUI.Info2.text = "Damage: 3 => 5";
-                        characterUI.Info3.text = "+ Hidden detection";
-                        break;
-                    }
-                case 1:
-                    {
-                        characterUI.upgradeName.text = "Searing Stream";
-                        characterUI.Info1.text = "Max Pulse: 150 => 600";
-                        characterUI.Info2.text = "Damage: 5 => 10";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-                case 2:
-                    {
-                        characterUI.upgradeName.text = "Corrupted Raycaster";
-                        characterUI.Info1.text = "Range: 9 => 12";
-                        characterUI.Info2.text = "Damage: 10 => 25";
-                        characterUI.Info3.text = "Max Pulse: 600 => 1250\nCharge Time: 4s => 3s";
-                        break;
-                    }
-                case 3:
-                    {
-                        characterUI.upgradeName.text = "Jade Apocalypse";
-                        characterUI.Info1.text = "Range: 12 => 14";
-                        characterUI.Info2.text = "Damage: 25 => 75";
-                        characterUI.Info3.text = "Max Pulse: 1250 => 4000";
-                        break;
-                    }
-                default:
-                    {
-                        characterUI.upgradeName.text = "";
-                        characterUI.Info1.text = "";
-                        characterUI.Info2.text = "";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-            }
             base.SetUpgradeInformation();
+            if (Level < 4)
+            {
+                SetStatInfo(6, "Max Pulse", MaxPulse, MaxPulseByLevels[Level + 1]);
+                SetStatInfo(7, "Charge Time", ChargeTime, ChargeTimeByLevels[Level + 1]);
+            }
         }
     }
     public override void AttackWithoutAnimation()

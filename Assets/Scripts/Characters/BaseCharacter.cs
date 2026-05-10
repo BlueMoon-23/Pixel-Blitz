@@ -2,19 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
+using UnityEngine.TextCore.Text;
 
 public abstract class BaseCharacter : MonoBehaviour
 {
     // Basic stats
+    [Header("Original Stats")]
+    public CharacterProfile profile;
     protected float Range = 1; // Range = 1 <=> tầm bắn là hình tròn nằm trong 1 ô tilemap
     protected float Damage;
     protected float Cooldown;
     protected float Clock;
     protected float Cost;
-    protected float[] UpgradeCost;
-    protected float SellCost;
-    protected int Level;
+    protected string SpecialDescription;
     protected bool isCliff;
     protected bool hasHiddenDetection;
     protected bool canStrikethrough;
@@ -23,28 +23,33 @@ public abstract class BaseCharacter : MonoBehaviour
     {
         get { return _hasAbility; }
     }
+    protected int Level;
     // Other references
+    [Header("Range")]
     public GameObject Range_Prefab;
     protected CharacterUIControll characterUI;
     protected Vector3 CircleScale;
     protected RangeScript range;
-    public GameObject bullet_Prefab;
     // Max level Change
+    [Header("Unit Root")]
     public GameObject OriginalUnitRoot;
     public GameObject MaxLevelUnitRoot;
     // Attack animation
+    [Header("Bullet")]
+    public GameObject bullet_Prefab;
+    public GameObject Bullet_StartPosition;
+    public GameObject BulletMuzzle;
     protected SPUM_Prefabs SPUM_Prefabs;
     public Dictionary<PlayerState, int> IndexPair = new();
     protected float Bow_Attack_Duration;
     protected float Staff_Attack_Duration;
-    public GameObject Bullet_StartPosition;
-    public GameObject BulletMuzzle;
     // Stunned Effect
+    [Header("Effect")]
     public GameObject StunnedEffect;
     protected bool isStunned = false;
     protected float stunEndTime;
     // Kiểm tra đã reset hay chưa
-    public bool StatsReseted = false; // PHẢI MẶC ĐỊNH LÀ FALSE, TRUE LÀ UPDATE SẼ CHẠY TRƯỚC LÀ SẼ BÁO NULL
+    protected bool StatsReseted = false; // PHẢI MẶC ĐỊNH LÀ FALSE, TRUE LÀ UPDATE SẼ CHẠY TRƯỚC LÀ SẼ BÁO NULL
     // Báo cáo nhiệm vụ
     public Action<int> OnLevelUp;
     protected virtual void OnEnable()
@@ -53,6 +58,15 @@ public abstract class BaseCharacter : MonoBehaviour
         StatsReseted = false; // khóa update/move cho đến khi xong stats
         isStunned = false;
         stunEndTime = Time.time;
+        //
+        Range = profile.characterLevelDatas[0].RangeStat;
+        Damage = profile.characterLevelDatas[0].DamageStat;
+        Cooldown = profile.characterLevelDatas[0].CooldownStat;
+        Cost = profile.CostStat;
+        hasHiddenDetection = profile.characterLevelDatas[0].hasHiddenDetection;
+        canStrikethrough = profile.characterLevelDatas[0].canStrikethrough;
+        _hasAbility = profile.characterLevelDatas[0].hasAbility;
+        Level = 0;
         StartCoroutine(ResetStats());
     }
     protected IEnumerator ResetStats()
@@ -82,16 +96,25 @@ public abstract class BaseCharacter : MonoBehaviour
         StartCoroutine(ResetShadow());
         StatsReseted = true;
     }
-    // Abstract methods
-    public abstract float GetCost();
-    public abstract void UpgradeToLevel1();
-    public abstract void UpgradeToLevel2();
-    public abstract void UpgradeToLevel3();
-    public abstract void UpgradeToLevel4();
-    public abstract void SetAbilityIcon();
-    public abstract void Ability(Vector3 position);
     // Normal methods
-    public virtual float GetRange() { return 1f; }
+    public virtual void SetAbilityIcon()
+    {
+        // cài riêng
+    }
+    public virtual void Ability(Vector3 position)
+    {
+        // cài riêng
+    }
+    public float GetCost()
+    {
+        if (Cost != profile.CostStat) { return profile.CostStat; }
+        else return Cost;
+    }
+    public float GetRange()
+    {
+        if (Range <= profile.characterLevelDatas[0].RangeStat) { return profile.characterLevelDatas[0].RangeStat; } // <= la chua duoc khoi tao
+        else return Range;
+    }
     public bool hasHiddenDetectionOrNot()
     {
         return hasHiddenDetection;
@@ -100,7 +123,7 @@ public abstract class BaseCharacter : MonoBehaviour
     {
         return canStrikethrough;
     }
-    public float GetDamage()
+    public virtual float GetDamage()
     {
         return Damage;
     }
@@ -112,16 +135,17 @@ public abstract class BaseCharacter : MonoBehaviour
     {
         return Level;
     }
-    public float GetUpgradeCost(int level)
+    public float GetUpgradeCost()
     {
-        if (level < 4)
-        {
-            return UpgradeCost[level];
-        }
-        else return 0;
+        return profile.characterLevelDatas[Level + 1].UpgradeCost;
     }
     public float GetSellCost()
     {
+        float SellCost = (int)(Cost / 3);
+        for (int i = 0; i <= Level; i++)
+        {
+            SellCost += (int)(profile.characterLevelDatas[i].UpgradeCost) / 3;
+        }
         return SellCost;
     }
     protected void SetRangeCircle()
@@ -130,143 +154,175 @@ public abstract class BaseCharacter : MonoBehaviour
         Range_Prefab.transform.localScale = CircleScale * Range;
         Range_Prefab.GetComponent<Renderer>().enabled = false;
     }
+    // Template để hỗ trợ hàm dưới
+    protected void SetStatInfo<T>(int index, string label, T currentVal, T nextVal)
+    {
+        // So sánh giá trị hiện tại và giá trị kế tiếp
+        bool isChanged = !EqualityComparer<T>.Default.Equals(currentVal, nextVal);
+        // Lấy UI từ Hash Map (Tự động sinh nếu chưa có)
+        var textUI = CharacterUIControll.instance.GetOrCreateInfo(index);
+        textUI.gameObject.SetActive(isChanged);
+        if (isChanged)
+        {
+            textUI.text = $"{label}: {currentVal} => {nextVal}";
+        }
+    }
+    protected void SetStatInfo(int index, string label, bool currentEffect, bool nextEffect)
+    {
+        var textUI = CharacterUIControll.instance.GetOrCreateInfo(index);
+        if (!currentEffect && nextEffect)
+        {
+            textUI.gameObject.SetActive(true);
+            textUI.text = label;
+        }
+        else
+        {
+            textUI.gameObject.SetActive(false);
+        }
+    }
     public virtual void SetUpgradeInformation()
     {
         if (characterUI != null)
         {
+            characterUI.characterName.text = profile.CharacterName;
+            characterUI.characterImage.sprite = profile.CharacterImage;
             if (Level < 4)
             {
-                characterUI.upgradeCost.text = "Upgrade (-$" + UpgradeCost[Level] + ")";
+                // Chỉ hiện thông tin thăng cấp nếu có sự sai khác
+                characterUI.upgradeName.text = profile.characterLevelDatas[Level + 1].UpgradeName;
+                SetStatInfo(0, "Range", Range, profile.characterLevelDatas[Level + 1].RangeStat);
+                SetStatInfo(1, "Damage", Damage, profile.characterLevelDatas[Level + 1].DamageStat);
+                SetStatInfo(2, "Cooldown", Cooldown, profile.characterLevelDatas[Level + 1].CooldownStat);
+                SetStatInfo(3, "+ Hidden Detection", hasHiddenDetection, profile.characterLevelDatas[Level + 1].hasHiddenDetection);
+                SetStatInfo(4, "+ Strikethrough", canStrikethrough, profile.characterLevelDatas[Level + 1].canStrikethrough);
+                var textUI = CharacterUIControll.instance.GetOrCreateInfo(5);
+                if (SpecialDescription != profile.characterLevelDatas[Level + 1].Special)
+                {
+                    textUI.gameObject.SetActive(true);
+                    textUI.text = profile.characterLevelDatas[Level + 1].Special;
+                }
+                else
+                {
+                    textUI.gameObject.SetActive(false);
+                }
+                CharacterUIControll.instance.TurnOffExternalInfo();
+                characterUI.upgradeCost.text = "Upgrade (-$" + profile.characterLevelDatas[Level + 1].UpgradeCost + ")";
             }
             else
             {
+                characterUI.upgradeName.text = "";
+                CharacterUIControll.instance.TurnOffAllInfo();
                 characterUI.upgradeCost.text = "Max Level";
             }
-            characterUI.sellCost.text = "Sell (+$" + SellCost + ")";
+            characterUI.sellCost.text = "Sell (+$" + GetSellCost() + ")";
             characterUI.RangeStats.text = Range.ToString();
-            Wizard wizard = this as Wizard;
-            if (wizard != null)
-            {
-                characterUI.DamageStats.text = wizard.GetVirtualDamage().ToString();
-            }
-            else
-            {
-                characterUI.DamageStats.text = Damage.ToString(); // damage bị lỗi từ bên wizard, nên sửa thêm
-            }
+            characterUI.DamageStats.text = Damage.ToString(); // damage bị lỗi từ bên wizard, nên sửa thêm
             characterUI.CooldownStats.text = Cooldown.ToString();
-            if (hasHiddenDetection)
-            {
-                characterUI.HiddenDetectionIcon.alpha = 1f;
-            }
-            else
-            {
-                characterUI.HiddenDetectionIcon.alpha = 0f;
-            }
-            if (canStrikethrough)
-            {
-                characterUI.StrikethroughIcon.alpha = 1f;
-            }
-            else
-            {
-                characterUI.StrikethroughIcon.alpha = 0f;
-            }
+            characterUI.HiddenDetectionIcon.alpha = (hasHiddenDetection) ? 1f : 0f;
+            characterUI.StrikethroughIcon.alpha = (canStrikethrough) ? 1f : 0f;
         }
     }
-    public void Upgrade()
+    public virtual void Upgrade()
     {
-        switch (Level)
-        {
-            case 0:
-                {
-                    UpgradeToLevel1();
-                    break;
-                }
-            case 1:
-                {
-                    UpgradeToLevel2();
-                    break;
-                }
-            case 2:
-                {
-                    UpgradeToLevel3();
-                    break;
-                }
-            case 3:
-                {
-                    UpgradeToLevel4();
-                    break;
-                }
-            default:
-                {
-                    break;
-                }
-        }
+        Level++;
+        Range = profile.characterLevelDatas[Level].RangeStat;
+        Damage = profile.characterLevelDatas[Level].DamageStat;
+        Cooldown = profile.characterLevelDatas[Level].CooldownStat;
+        SpecialDescription = profile.characterLevelDatas[Level].Special;
+        hasHiddenDetection = profile.characterLevelDatas[Level].hasHiddenDetection;
+        canStrikethrough = profile.characterLevelDatas[Level].canStrikethrough;
+        _hasAbility = profile.characterLevelDatas[Level].hasAbility;
         SetUpgradeInformation();
         Range = GetRange();
         Range_Prefab.transform.localScale = CircleScale * Range;
-        for (int i = 0; i < Level; i++)
+        // Thêm hiệu ứng cầu vòng cho level max
+        if (Level == 4)
         {
-            SellCost += (int)(UpgradeCost[i] / 3);
+            if (OriginalUnitRoot != null)
+            {
+                OriginalUnitRoot.SetActive(false);
+            }
+            if (MaxLevelUnitRoot != null)
+            {
+                MaxLevelUnitRoot.SetActive(true);
+                Animator maxlevelanimator = MaxLevelUnitRoot.GetComponent<Animator>();
+                if (maxlevelanimator != null)
+                {
+                    SPUM_Prefabs._anim = maxlevelanimator;
+                }
+                // Animation
+                SPUM_Prefabs = GetComponent<SPUM_Prefabs>();
+                if (SPUM_Prefabs == null)
+                {
+                    SPUM_Prefabs = transform.GetChild(0).GetComponent<SPUM_Prefabs>();
+                    if (!SPUM_Prefabs.allListsHaveItemsExist())
+                    {
+                        SPUM_Prefabs.PopulateAnimationLists();
+                    }
+                }
+                SPUM_Prefabs.OverrideControllerInit();
+                foreach (PlayerState state in Enum.GetValues(typeof(PlayerState)))
+                {
+                    IndexPair[state] = 0;
+                }
+            }
         }
         OnLevelUp?.Invoke(Level);
     }
     public BaseEnemy FindFirstEnemy()
     {
+        int max_position = -1;
         float max_distance = 0f;
         for (int i = 0; i < range.enemies_in_range.Count; i++)
         {
             if (!range.enemies_in_range[i].isDieOrNot())
             {
-                max_distance = Mathf.Max(max_distance, range.enemies_in_range[i].Distance);
+                if (max_distance < range.enemies_in_range[i].Distance)
+                {
+                    max_distance = range.enemies_in_range[i].Distance;
+                    max_position = i;
+                }
             }
         }
-        for (int i = 0; i < range.enemies_in_range.Count; i++)
+        if (max_position == -1) return null;
+        else
         {
-            if (max_distance == range.enemies_in_range[i].Distance && !range.enemies_in_range[i].isDieOrNot())
+            Wizard wizard = this as Wizard;
+            if (wizard == null)
             {
-                range.enemies_in_range[i].TakeIncomingDamage(Damage, canStrikethrough);
-                return range.enemies_in_range[i];
+                range.enemies_in_range[max_position].TakeIncomingDamage(Damage, canStrikethrough);
             }
+            return range.enemies_in_range[max_position];
         }
-        return null;
     }
+    // tối ưu hóa theo bài toán TopK => Priority queue
     public List<BaseEnemy> FindThreeFirstEnemies()
     {
-        // 2 1
-        List<float> Enemy_Distances = new List<float>();
-        for (int i = 0; i < range.enemies_in_range.Count; i++)
+        PriorityQueue<BaseEnemy, float> queue = new PriorityQueue<BaseEnemy, float>();
+        foreach (BaseEnemy enemy in range.enemies_in_range)
         {
-            if (!range.enemies_in_range[i].isDieOrNot())
+            if (enemy.isDieOrNot()) continue;
+            if (queue.Count < 3)
             {
-                Enemy_Distances.Add(range.enemies_in_range[i].Distance);
+                queue.Enqueue(enemy, enemy.Distance);
+            }
+            else
+            {
+                if (enemy.Distance > queue.PeekPriority())
+                {
+                    queue.Dequeue();
+                    queue.Enqueue(enemy, enemy.Distance);
+                }
             }
         }
-        Enemy_Distances.Sort((a, b) => b.CompareTo(a));
         List<BaseEnemy> Enemies_Result = new List<BaseEnemy>();
-        int Safe_Enemy_Distance_Index = 0;
-        switch (Enemy_Distances.Count)
-        {
-            case 0:
-            case 1:
-            case 2:
-                {
-                    Safe_Enemy_Distance_Index = Enemy_Distances.Count; break;
-                }
-            default:
-                {
-                    Safe_Enemy_Distance_Index = 3;
-                    break;
-                }
-        }
-        for (int i = 0; i < Safe_Enemy_Distance_Index; i++)
-        {
-            for (int j = 0; j < range.enemies_in_range.Count; j++)
+        while (queue.Count > 0) {
+            BaseEnemy enemy = queue.Dequeue();
+            Enemies_Result.Add(enemy);
+            Wizard wizard = this as Wizard;
+            if (wizard == null)
             {
-                if (range.enemies_in_range[j].Distance == Enemy_Distances[i] && !range.enemies_in_range[j].isDieOrNot())
-                {
-                    Enemies_Result.Add(range.enemies_in_range[j]);
-                    range.enemies_in_range[j].TakeIncomingDamage(Damage, canStrikethrough);
-                }
+                enemy.TakeIncomingDamage(Damage, canStrikethrough);
             }
         }
         return Enemies_Result;
@@ -440,4 +496,47 @@ public abstract class BaseCharacter : MonoBehaviour
             }
         }
     }
+}
+
+// internal giúp class này chỉ xuất hiện trong code
+internal class PriorityQueue<TElement, TPriority> where TPriority : System.IComparable<TPriority>
+{
+    private List<(TElement Element, TPriority Priority)> _nodes = new List<(TElement, TPriority)>();
+    public int Count => _nodes.Count;
+    public void Enqueue(TElement element, TPriority priority)
+    {
+        _nodes.Add((element, priority));
+        int i = _nodes.Count - 1;
+        // Shift-up
+        while (i > 0)
+        {
+            int parent = (i - 1) / 2;
+            if (_nodes[i].Priority.CompareTo(_nodes[parent].Priority) >= 0) break;
+            var temp = _nodes[i]; _nodes[i] = _nodes[parent]; _nodes[parent] = temp;
+            i = parent;
+        }
+    }
+    public TElement Dequeue()
+    {
+        var result = _nodes[0].Element;
+        _nodes[0] = _nodes[_nodes.Count - 1];
+        _nodes.RemoveAt(_nodes.Count - 1);
+        int i = 0;
+        // Heapify
+        while (true)
+        {
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+            int smallest = i;
+
+            if (left < _nodes.Count && _nodes[left].Priority.CompareTo(_nodes[smallest].Priority) < 0) smallest = left;
+            if (right < _nodes.Count && _nodes[right].Priority.CompareTo(_nodes[smallest].Priority) < 0) smallest = right;
+
+            if (smallest == i) break;
+            var temp = _nodes[i]; _nodes[i] = _nodes[smallest]; _nodes[smallest] = temp;
+            i = smallest;
+        }
+        return result;
+    }
+    public TPriority PeekPriority() => _nodes[0].Priority;
 }

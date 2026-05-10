@@ -30,7 +30,7 @@ public class Mauler : BaseEnemy
         {
             // Tìm character. Do getpopulation có cả cliff character nên phải áp thuật toán tìm lại cho đến khi index khác cliff character
             int character_index_position = Random.Range(0, CharacterManager.instance.GetPopulation());
-            while (CharacterManager.instance.GetCharacterByIndex(character_index_position).GetType() == typeof(CliffCharacter))
+            while (CharacterManager.instance.GetCharacterByIndex(character_index_position).profile.isCliff)
             {
                 character_index_position = Random.Range(0, CharacterManager.instance.GetPopulation());
             }

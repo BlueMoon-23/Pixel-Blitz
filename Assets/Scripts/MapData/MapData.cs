@@ -7,6 +7,7 @@ using UnityEngine;
 public class MapData
 {
     public MapInformation mapInformation;
+    public string targetScene;
     public Gamemodes gamemode;
     public float Difficulty()
     {

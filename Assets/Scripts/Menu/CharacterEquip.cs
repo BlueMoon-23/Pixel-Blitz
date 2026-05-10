@@ -122,9 +122,9 @@ public class CharacterEquip : MonoBehaviour
         chosenCharacter = character;
         CharacterName.text = chosenCharacter.characterData.characterProfile.CharacterName;
         CharacterImage.sprite = chosenCharacter.characterData.characterProfile.CharacterImage;
-        RangeStat.text = chosenCharacter.characterData.characterProfile.RangeStat.ToString();
-        DamageStat.text = chosenCharacter.characterData.characterProfile.DamageStat.ToString();
-        CooldownStat.text = chosenCharacter.characterData.characterProfile.CooldownStat.ToString();
+        RangeStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].RangeStat.ToString();
+        DamageStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].DamageStat.ToString();
+        CooldownStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].CooldownStat.ToString();
         CostStat.text = chosenCharacter.characterData.characterProfile.CostStat.ToString();
         // Kiểm tra đã được equip vào loadout chưa
         for (int i = 0; i < characterLoadout.Count; i++)

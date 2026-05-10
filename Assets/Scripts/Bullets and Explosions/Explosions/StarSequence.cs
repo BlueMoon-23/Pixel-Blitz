@@ -5,6 +5,8 @@ using UnityEngine;
 public class StarSequence : BaseExplosion
 {
     // Start is called before the first frame update
+    private float damageValue = 0f;
+
     public GameObject[] StarExplosions; // lắp theo hệ đếm -2, -1, 0, 1 , 2
     void OnEnable()
     {
@@ -20,12 +22,26 @@ public class StarSequence : BaseExplosion
     {
         
     }
+    public void SetDamage(float Damage)
+    {
+        damageValue = Damage;
+    }
+    private void setExplodeDamage(GameObject Explostion, float Damage)
+    {
+        StarExplosion starExplosion = Explostion.GetComponent<StarExplosion>();
+        if (starExplosion != null)
+        {
+            starExplosion.SetDamage(Damage);
+        }
+    }
     private IEnumerator ExplodeInSequence()
     {
         for (int i = 0; i <= 2; i++)
         {
             StarExplosions[i + 2].SetActive(true);
+            setExplodeDamage(StarExplosions[i + 2], damageValue);
             StarExplosions[-i + 2].SetActive(true);
+            setExplodeDamage(StarExplosions[-i + 2], damageValue);
             yield return new WaitForSeconds(0.5f);
             StarExplosions[i + 2].SetActive(false);
             StarExplosions[-i + 2].SetActive(false);

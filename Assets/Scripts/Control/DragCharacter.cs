@@ -28,7 +28,7 @@ public class DragCharacter : DragThing
     {
         canvasGroup.blocksRaycasts = false;
         // Placing
-        if (baseCharacter.GetType().IsSubclassOf(typeof(CliffCharacter)))
+        if (baseCharacter.profile.isCliff)
         {
             PlacingCliffUI.SetActive(true);
         }

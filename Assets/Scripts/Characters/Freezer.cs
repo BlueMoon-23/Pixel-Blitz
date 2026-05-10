@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class Freezer : GroundCharacter
+public class Freezer : BaseCharacter
 {
+    [SerializeField] private float[] FreezeTimeByLevels;
+    [SerializeField] private int[] FreezeCountByLevels;
     private float _FreezeTime;
     public float FreezeTime
     {
@@ -17,18 +20,8 @@ public class Freezer : GroundCharacter
     protected override void OnEnable()
     {
         base.OnEnable();
-        Range = 4f;
-        Damage = 1f;
-        Cooldown = 3f;
-        Cost = 450f;
-        Level = 0;
-        hasHiddenDetection = false;
-        canStrikethrough = false;
-        UpgradeCost = new float[] { 650, 700, 750, 3100 };
-        SellCost = (int)(Cost / 3);
-        _FreezeTime = 0.5f;
-        _FreezeCount = 3;
-        _hasAbility = false;
+        _FreezeTime = FreezeTimeByLevels[0];
+        _FreezeCount = FreezeCountByLevels[0];
     }
 
     // Update is called once per frame
@@ -40,90 +33,22 @@ public class Freezer : GroundCharacter
             // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
         }
     }
-    public override float GetRange()
+    public override void Upgrade()
     {
-        if (Range <= 4f) { return 4f; } // <= la chua duoc khoi tao
-        else return Range;
-    }
-    public override float GetCost()
-    {
-        if (Cost != 300f) { return 300f; }
-        else return Cost;
-    }
-    public override void UpgradeToLevel1()
-    {
-        Damage = 2f;
-        Cooldown = 2f;
-        Level = 1;
-    }
-    public override void UpgradeToLevel2()
-    {
-        Range = 6f;
-        _FreezeTime = 1f;
-        Level = 2;
-    }
-    public override void UpgradeToLevel3()
-    {
-        canStrikethrough = true;
-        _FreezeCount = 2;
-        Level = 3;
-    }
-    public override void UpgradeToLevel4()
-    {
-        Damage = 5f;
-        Level = 4;
-        base.UpgradeToLevel4();
+        base.Upgrade();
+        _FreezeTime = FreezeTimeByLevels[Level];
+        _FreezeCount = FreezeCountByLevels[Level];
     }
     public override void SetUpgradeInformation()
     {
         if (characterUI != null)
         {
-            characterUI.characterName.text = "Freezer";
-            characterUI.characterImage.sprite = characterUI.characterImages[1];
-            switch (Level)
-            {
-                case 1:
-                    {
-                        characterUI.upgradeName.text = "Frost shot";
-                        characterUI.Info1.text = "Range: 4 => 6";
-                        characterUI.Info2.text = "Freeze time: 0.5s => 1s";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-                case 2:
-                    {
-                        characterUI.upgradeName.text = "Piercing Shards";
-                        characterUI.Info1.text = "Freeze hit count: 3 => 2";
-                        characterUI.Info2.text = "+ Strikethrough";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-                case 3:
-                    {
-                        characterUI.upgradeName.text = "Glacial Glowing";
-                        characterUI.Info1.text = "Bullets now explode.";
-                        characterUI.Info2.text = "Damage: 2 => 5";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-                case 4:
-                    {
-                        characterUI.upgradeName.text = "";
-                        characterUI.Info1.text = "";
-                        characterUI.Info2.text = "";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-                default:
-                    {
-                        characterUI.upgradeName.text = "Flash Freeze";
-                        characterUI.Info1.text = "Cooldown: 3 => 2";
-                        characterUI.Info2.text = "Damage: 1 => 2";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-            }
             base.SetUpgradeInformation();
+            if (Level < 4)
+            {
+                SetStatInfo(6, "Freeze time", _FreezeTime, FreezeTimeByLevels[Level + 1]);
+                SetStatInfo(7, "Freeze hit count", _FreezeCount, FreezeCountByLevels[Level + 1]);
+            }
         }
     }
     public override void AttackWithoutAnimation()

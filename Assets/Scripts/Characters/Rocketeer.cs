@@ -2,23 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Rocketeer : CliffCharacter
+public class Rocketeer : BaseCharacter
 {
+    [SerializeField] private float[] ExplosionRadiusByLevels;
     private float ExplosionRadius;
     protected override void OnEnable()
     {
         base.OnEnable();
-        Range = 10f;
-        Damage = 12f;
-        Cooldown = 3f;
-        Cost = 1100;
-        ExplosionRadius = 1;
-        Level = 0;
-        hasHiddenDetection = false;
-        canStrikethrough = true;
-        UpgradeCost = new float[] { 2300, 4100, 9700, 30400 };
-        SellCost = (int)(Cost / 3);
-        _hasAbility = false;
+        ExplosionRadius = ExplosionRadiusByLevels[0];
     }
 
     // Update is called once per frame
@@ -30,92 +21,21 @@ public class Rocketeer : CliffCharacter
             // Không có if này thì đạn vẫn sinh ra do lệnh tấn công ở update còn lệnh stunned là 1 lần gọi
         }
     }
-    public override float GetRange()
-    {
-        if (Range <= 10f) { return 10f; } // <= la chua duoc khoi tao
-        else return Range;
-    }
-    public override float GetCost()
-    {
-        if (Cost != 1100) { return 1100; }
-        else return Cost;
-    }
     public float GetExplosionRadius() { return ExplosionRadius; }
-    public override void UpgradeToLevel1()
+    public override void Upgrade()
     {
-        Damage = 25f;
-        ExplosionRadius = 1.5f;
-        Level = 1;
-    }
-    public override void UpgradeToLevel2()
-    {
-        Range = 12f;
-        Damage = 45f;
-        Level = 2;
-    }
-    public override void UpgradeToLevel3()
-    {
-        Damage = 105f;
-        Range = 15f;
-        ExplosionRadius = 2.5f;
-        Level = 3;
-    }
-    public override void UpgradeToLevel4()
-    {
-        Damage = 350f;
-        Level = 4;
-        base.UpgradeToLevel4();
+        base.Upgrade();
+        ExplosionRadius = ExplosionRadiusByLevels[Level];
     }
     public override void SetUpgradeInformation()
     {
         if (characterUI != null)
         {
-            characterUI.characterName.text = "Rocketeer";
-            characterUI.characterImage.sprite = characterUI.characterImages[4]; // Copy paste nhớ chỉnh ở đây dùm con
-            switch (Level)
-            {
-                case 0:
-                    {
-                        characterUI.upgradeName.text = "Blast Off";
-                        characterUI.Info1.text = "Damage: 12 => 25";
-                        characterUI.Info2.text = "Explosion Radius: 1 => 1.5";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-                case 1:
-                    {
-                        characterUI.upgradeName.text = "Long-Frontal Fire";
-                        characterUI.Info1.text = "Range: 10 => 12";
-                        characterUI.Info2.text = "Damage: 25 => 45";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-                case 2:
-                    {
-                        characterUI.upgradeName.text = "Penetrating Warhead";
-                        characterUI.Info1.text = "Range: 12 => 15";
-                        characterUI.Info2.text = "Damage: 45 => 105";
-                        characterUI.Info3.text = "Explosion Radius: 1.5 => 2.5";
-                        break;
-                    }
-                case 3:
-                    {
-                        characterUI.upgradeName.text = "Heart on Fire Fragments";
-                        characterUI.Info1.text = "Damage: 105 => 350";
-                        characterUI.Info2.text = "Rockets now launch 4 bombs on its impact, each deals 50 damage";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-                default:
-                    {
-                        characterUI.upgradeName.text = "";
-                        characterUI.Info1.text = "";
-                        characterUI.Info2.text = "";
-                        characterUI.Info3.text = "";
-                        break;
-                    }
-            }
             base.SetUpgradeInformation();
+            if (Level < 4)
+            {
+                SetStatInfo(6, "Explosion Radius", ExplosionRadius, ExplosionRadiusByLevels[Level + 1]);
+            }
         }
     }
 }

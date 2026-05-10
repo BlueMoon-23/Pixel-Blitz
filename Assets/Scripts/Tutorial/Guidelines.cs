@@ -10,7 +10,7 @@ public class Guidelines : MonoBehaviour
     public string fullText;
     public float timeBetweenChars = 0.05f; // Tốc độ hiện từng chữ
     public CanvasGroup DialogueBox;
-    private bool isTyping = true;
+    //private bool isTyping = true;
     IEnumerator ShowTextByChar()
     {
         textDisplay.text = ""; // Xóa sạch chữ ban đầu
@@ -23,7 +23,7 @@ public class Guidelines : MonoBehaviour
             // Đợi một khoảng thời gian rất ngắn
             yield return new WaitForSeconds(timeBetweenChars);
         }
-        isTyping = false;
+        //isTyping = false;
         Disappear();
     }
     public void Appear()

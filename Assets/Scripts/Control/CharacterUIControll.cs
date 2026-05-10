@@ -26,9 +26,6 @@ public class CharacterUIControll : MonoBehaviour
     public Image characterImage;
     public RectTransform UpgradeContent;
     public TextMeshProUGUI upgradeName;
-    public TextMeshProUGUI Info1;
-    public TextMeshProUGUI Info2;
-    public TextMeshProUGUI Info3;
     public TextMeshProUGUI upgradeCost;
     public TextMeshProUGUI sellCost;
     public TextMeshProUGUI RangeStats;
@@ -43,6 +40,14 @@ public class CharacterUIControll : MonoBehaviour
     public Button AbilityButton;
     public Image AbilityCurrentIcon;
     public Sprite[] AbilityIcons;
+    [Header("Info Pool Settings")]
+    [SerializeField] private TextMeshProUGUI infoPrefab; // Kéo Prefab dòng chữ vào đây
+    [SerializeField] private Transform container;      // Kéo UI Panel chứa layout vào đây
+    // Hash Map quản lý các dòng text theo chỉ số (Index)
+    private Dictionary<int, TextMeshProUGUI> infoMap = new Dictionary<int, TextMeshProUGUI>();
+    /// <summary>
+    /// Lấy hoặc tạo mới một dòng Info dựa trên Index
+    /// </summary>
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.E) && UpgradeButton.isActiveAndEnabled) 
@@ -68,16 +73,16 @@ public class CharacterUIControll : MonoBehaviour
     {
         if (EconomyManager.instance != null)
         {
-            if (CurrentCharacter.GetUpgradeCost(CurrentCharacter.GetLevel()) <= EconomyManager.instance.PlayerCoin) 
+            if (CurrentCharacter.GetUpgradeCost() <= EconomyManager.instance.PlayerCoin) 
             {
-                CurrentCharacter.Upgrade();
-                if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Upgrade_Sound);
-                EconomyManager.instance.Purchase(CurrentCharacter.GetUpgradeCost(CurrentCharacter.GetLevel() - 1));
+                EconomyManager.instance.Purchase(CurrentCharacter.GetUpgradeCost());
                 EconomyManager.instance.Change_CurrentCoin();
+                if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Upgrade_Sound);
+                CurrentCharacter.Upgrade();
             }
             else
             {
-                EconomyManager.instance.Announce_CantUpgrade(CurrentCharacter.GetUpgradeCost(CurrentCharacter.GetLevel()));
+                EconomyManager.instance.Announce_CantUpgrade(CurrentCharacter.GetUpgradeCost());
             }
         }
         // Ngoai if
@@ -115,6 +120,36 @@ public class CharacterUIControll : MonoBehaviour
         else
         {
             Debug.Log("Wizard = null");
+        }
+    }
+    public TextMeshProUGUI GetOrCreateInfo(int index)
+    {
+        // Kiểm tra xem trong Hash Map đã có index này chưa
+        if (!infoMap.ContainsKey(index))
+        {
+            // Nếu chưa có, tạo mới từ Prefab và thêm vào Map
+            var newInfo = Instantiate(infoPrefab, container);
+            newInfo.name = $"Info_{index}";
+            infoMap.Add(index, newInfo);
+        }
+
+        return infoMap[index];
+    }
+    public void TurnOffAllInfo()
+    {
+        foreach (var info in infoMap.Values)
+        {
+            info.gameObject.SetActive(false);
+        }
+    }
+    /// <summary>
+    /// Tắt hết info ngoài 5 info chính
+    /// </summary>
+    public void TurnOffExternalInfo()
+    {
+        for (int i = 6; i < infoMap.Count; i++)
+        {
+            infoMap[i].gameObject.SetActive(false);
         }
     }
 }

@@ -79,45 +79,51 @@ public class MainMenu : MonoBehaviour
     }
     public void Shop()
     {
-        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
         SceneKey.targetScene = SceneKey.ShopScene;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     public void Tutorial()
     {
         if (ModeManager.instance != null) ModeManager.instance.Play(tutorialMap);
-        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
         SceneKey.targetScene = SceneKey.TutorialScene;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     public void Play()
     {
-        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
         SceneKey.targetScene = SceneKey.MapChoose;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     public void Setting()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
         Setting_Popup.SetActive(true);
     }
     public void Giftcode()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
         Giftcode_Popup.SetActive(true);
     }
     public void TurnOffSetting()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
         Setting_Popup.SetActive(false);
     }
     public void TurnOffGiftcode()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
         Giftcode_Popup.SetActive(false);
     }
     public void TurnOffTutorial()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         Tutorial_Popup.SetActive(false);
     }
     public void LogOut()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         SceneKey.targetScene = SceneKey.UserRegister;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }

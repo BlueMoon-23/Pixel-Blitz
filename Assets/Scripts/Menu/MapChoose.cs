@@ -65,6 +65,7 @@ public class MapChoose : MonoBehaviour
         if (ModeManager.instance != null) {
             ModeManager.instance.Play(ChosenMap);
         }
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
         SceneKey.targetScene = ChosenMap.targetScene;
         Debug.Log(ChosenMap.targetScene);
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
@@ -75,6 +76,7 @@ public class MapChoose : MonoBehaviour
         {
             CharacterEquip.instance.LoadoutGroup.SetActive(false);
             CharacterEquip.instance.EquipAnnounce.SetActive(true);
+            if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Place_Sound);
             yield return new WaitForSeconds(1f);
             CharacterEquip.instance.LoadoutGroup.SetActive(true);
             CharacterEquip.instance.EquipAnnounce.SetActive(false);
@@ -90,6 +92,7 @@ public class MapChoose : MonoBehaviour
         {
             currentMapDataIndex = Maps.Count - 1;
         }
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.MoveButton_Sound);
         ShowMapUI(currentMapDataIndex);
     }
     public void NextMap()
@@ -102,6 +105,7 @@ public class MapChoose : MonoBehaviour
         {
             currentMapDataIndex = 0;
         }
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.MoveButton_Sound);
         ShowMapUI(currentMapDataIndex);
     }
     public void ShowMapUI(int index)
@@ -136,15 +140,18 @@ public class MapChoose : MonoBehaviour
     }
     public void Exit()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         SceneManager.LoadScene(SceneKey.MainMenu);
     }
     public void ShowAvailableMaps()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.ChooseMap_Sound);
         AvailableMapInfo.SetActive(true);
         InventoryInfo.SetActive(false);
     }
     public void StopShowAvailableMaps()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.ChooseMap_Sound);
         AvailableMapInfo.SetActive(false);
         InventoryInfo.SetActive(true);
     }

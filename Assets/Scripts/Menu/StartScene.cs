@@ -36,6 +36,7 @@ public class StartScene : MonoBehaviour
         if (PlayerPrefs.HasKey(UserDataKey.ACCOUNT_KEY))
         {
             // SceneManager.LoadScene(SceneKey.MainMenu);
+            if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
             SceneKey.targetScene = SceneKey.MainMenu;
             SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
         }
@@ -46,10 +47,12 @@ public class StartScene : MonoBehaviour
     }
     public void CloseLoginPopup()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         LogIn_Popup.SetActive(false);
     }
     public void CloseSignupPopup()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         SignUp_Popup.SetActive(false);
     }
 }

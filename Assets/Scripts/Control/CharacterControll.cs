@@ -68,6 +68,7 @@ public class CharacterControll : MonoBehaviour
         {
             characterUI.UpgradeButton.interactable = true;
         }
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.ClickOnCharacter_Sound);
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(characterUI.UpgradeContent);
     }

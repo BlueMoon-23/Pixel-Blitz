@@ -23,7 +23,16 @@ public class SoundManager : MonoBehaviour
     public AudioClip Skip_Sound;
     public AudioClip Victory_Sound; // pianoairy
     public AudioClip Defeat_Sound; // airystring
+    public AudioClip OpenButton_Sound; // ui click open scifi, nhớ kiếm lại đó vì không thích cái này
     public AudioClip Play_Sound; // ui click open scifi, nhớ kiếm lại đó vì không thích cái này
+    public AudioClip SpeedUp_Sound; 
+    public AudioClip BuyCharacter_Sound; // Success_Point_big
+    public AudioClip MoveButton_Sound; // swipe_screen_3
+    public AudioClip NearEndWave_Sound; // countdown_cute_loop
+    public AudioClip ClickOnCharacter_Sound; // UI_Screen_Swoosh_3, áp dụng cho select character ngoài map và ấn vào character
+    public AudioClip CloseButton_Sound; // Click_Close_scifi, dùng cho close button và exit
+    public AudioClip ChooseMap_Sound; // UI_Screen_Swoosh_4
+    public AudioClip Setting_Sound; // UI_Click_Select_2
     // Nhóm Sound Effects
     [Header("Enemy Sound Effects")]
     public AudioClip StompGround_Sound;
@@ -37,9 +46,10 @@ public class SoundManager : MonoBehaviour
     public AudioClip RangerBulletExplosion;
     public AudioClip RocketeerBulletExplosion;
     public AudioClip SummonerBulletExplosion;
+    public AudioClip PulserLaserStart;
+    public AudioClip PulserLaserEnd;
     public AudioClip WizardFireballExplosion;
     public AudioClip WizardStarSequence;
-    public AudioClip WizardVortex; // chưa có đâu, mốt tìm sau
     private void Awake()
     {
         if (Instance == null)

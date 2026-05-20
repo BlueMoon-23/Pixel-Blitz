@@ -32,18 +32,22 @@ public class UserRegister : MonoBehaviour
     }
     public void OpenLoginPopup()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
         LogIn_Popup.SetActive(true);
     }
     public void OpenSignupPopup()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
         SignUp_Popup.SetActive(true);
     }
     public void CloseLoginPopup()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         LogIn_Popup.SetActive(false);
     }
     public void CloseSignupPopup()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         SignUp_Popup.SetActive(false);
     }
     public void QuitGame()

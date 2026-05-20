@@ -21,14 +21,7 @@ public class RangeScript : MonoBehaviour
         BaseEnemy enemy = collision.gameObject.GetComponent<BaseEnemy>();
         if (enemy != null)
         {
-            if (enemy.isHiddenOrNot() && !character.hasHiddenDetectionOrNot())
-            {
-
-            }
-            else
-            {
-                enemies_in_range.Add(enemy);
-            }
+            enemies_in_range.Add(enemy);
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
@@ -36,14 +29,7 @@ public class RangeScript : MonoBehaviour
         BaseEnemy enemy = collision.gameObject.GetComponent<BaseEnemy>();
         if (enemy != null)
         {
-            if (enemy.isHiddenOrNot() && !character.hasHiddenDetectionOrNot())
-            {
-
-            }
-            else
-            {
-                enemies_in_range.Remove(enemy);
-            }
+            enemies_in_range.Remove(enemy);
         }
     }
 }

@@ -60,6 +60,7 @@ public class ShopManager : MonoBehaviour
     }
     public void BackToMainMenu()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         SceneManager.LoadScene(SceneKey.MainMenu);
     }
     public void Previous()
@@ -72,6 +73,7 @@ public class ShopManager : MonoBehaviour
         {
             currentIndex = CharacterSaveManager.instance.allCharacters.Count - 1;
         }
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.MoveButton_Sound);
         ShowCharacter(currentIndex);
     }
     public void Next()
@@ -84,6 +86,7 @@ public class ShopManager : MonoBehaviour
         {
             currentIndex = 0;
         }
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.MoveButton_Sound);
         ShowCharacter(currentIndex);
     }
     public void Purchase()
@@ -104,6 +107,7 @@ public class ShopManager : MonoBehaviour
                     purchaseButton.SetActive(false);
                     cantpurchaseButton.SetActive(false);
                     ownedButton.SetActive(true);
+                    if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.BuyCharacter_Sound);
                 }
             }
         }

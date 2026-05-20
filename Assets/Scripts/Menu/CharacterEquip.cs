@@ -159,6 +159,7 @@ public class CharacterEquip : MonoBehaviour
         // Kéo chosenCharacter vào List<CharacterInfomation> CharacterLoadout
         characterLoadout.Add(chosenCharacter);
         CurrentIndex++;
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
         Close();
     }
     public void Unequip()
@@ -184,6 +185,7 @@ public class CharacterEquip : MonoBehaviour
                 break;
             }
         }
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         Close();
     }
 }

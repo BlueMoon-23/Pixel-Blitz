@@ -32,7 +32,7 @@ public class Rocketeer : BaseCharacter
         if (characterUI != null)
         {
             base.SetUpgradeInformation();
-            if (Level < 4)
+            if (Level < profile.characterLevelDatas.Count - 1)
             {
                 SetStatInfo(6, "Explosion Radius", ExplosionRadius, ExplosionRadiusByLevels[Level + 1]);
             }

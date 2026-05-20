@@ -132,6 +132,7 @@ public class SummonerUndead : MonoBehaviour
             }
             //Reset lại hp
             HP = MaxHP;
+            HP_RedBar.transform.localScale = new Vector3(Original_x_HPScale * HP / MaxHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)

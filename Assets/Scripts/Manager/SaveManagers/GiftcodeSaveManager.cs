@@ -42,6 +42,7 @@ public class GiftcodeSaveManager : MonoBehaviour
         {
             if (inputField.text == giftcode.getCode())
             {
+                if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.EarnCoin_Sound);
                 doExist = true;
                 giftcode.Redeem();
                 break;

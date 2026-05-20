@@ -53,7 +53,7 @@ public class Summoner : BaseCharacter
         if (characterUI != null)
         {
             base.SetUpgradeInformation();
-            if (Level < 4)
+            if (Level < profile.characterLevelDatas.Count - 1)
             {
                 SetStatInfo(6, "Grave Stack", GraveStack, GraveStackByLevels[Level + 1]);
                 SetStatInfo(7, "Undead Count", UndeadCount, UndeadCountByLevels[Level + 1]);

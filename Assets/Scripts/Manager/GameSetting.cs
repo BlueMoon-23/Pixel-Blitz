@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class GameSetting : MonoBehaviour
 {
+    public bool isOn;
     // Setting Popup
     public GameObject SettingPopUp;
     public static GameSetting instance;
@@ -42,6 +43,7 @@ public class GameSetting : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        isOn = false;
         // Add lệnh chỉnh một cách tự động
         if (SoundManager.Instance != null)
         {
@@ -58,6 +60,7 @@ public class GameSetting : MonoBehaviour
         else { SoundEffectSlider.value = 1f; }
         if (PlayerPrefs.HasKey(UserDataKey.FPS)) { FPSSlider.value = PlayerPrefs.GetFloat(UserDataKey.FPS); }
         else { FPSSlider.value = 0f; }
+        ApplyFPS(FPSSlider.value);
         // khi lưu, cài 1 = true và 0 = false. GetInt("key", defaultvalue) tương đương với kiểm tra key, không có thì = defaultvalue
         _autoSkip = PlayerPrefs.GetInt(UserDataKey.AUTOSKIP, 0) == 1;
         _shakeEffect = PlayerPrefs.GetInt(UserDataKey.SHAKEEFFECT, 0) == 1;
@@ -74,13 +77,18 @@ public class GameSetting : MonoBehaviour
     }
     public void Setting()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
         SettingPopUp.SetActive(true);
+        isOn = true;
         Time.timeScale = 0f;
     }
     public void CloseSetting()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
+        isOn = false;
         SettingPopUp.SetActive(false);
-        Time.timeScale = 1f;
+        if (TimeSpeed.instance != null) Time.timeScale = TimeSpeed.instance.CurrentSpeed();
+        else Time.timeScale = 1f;
     }
     public void Surrender()
     {
@@ -89,6 +97,7 @@ public class GameSetting : MonoBehaviour
     }
     public void OnAutoSkipToggleChanged(bool isOn)
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Skip_Sound);
         // Kiểm tra toggle nào đang bật
         Toggle activeToggle = AutoSkip.ActiveToggles().FirstOrDefault();
         if (activeToggle != null)
@@ -106,6 +115,7 @@ public class GameSetting : MonoBehaviour
     }
     public void OnShakeEffectToggleChanged(bool isOn)
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Skip_Sound);
         // Kiểm tra toggle nào đang bật
         Toggle activeToggle = ShakeEffect.ActiveToggles().FirstOrDefault();
         if (activeToggle != null)
@@ -123,6 +133,7 @@ public class GameSetting : MonoBehaviour
     }
     public void OnShowExplosionToggleChanged(bool isOn)
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Skip_Sound);
         // Kiểm tra toggle nào đang bật
         Toggle activeToggle = ShowExplosion.ActiveToggles().FirstOrDefault();
         if (activeToggle != null)
@@ -140,6 +151,7 @@ public class GameSetting : MonoBehaviour
     }
     public void OnShowMuzzleToggleChanged(bool isOn)
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Skip_Sound);
         // Kiểm tra toggle nào đang bật
         Toggle activeToggle = ShowMuzzle.ActiveToggles().FirstOrDefault();
         if (activeToggle != null)
@@ -157,6 +169,7 @@ public class GameSetting : MonoBehaviour
     }
     public void OnFPSSliderValueChanged(float value)
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Skip_Sound);
         ApplyFPS(value);
         PlayerPrefs.SetFloat(UserDataKey.FPS, value);
         PlayerPrefs.Save();

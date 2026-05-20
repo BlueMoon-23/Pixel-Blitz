@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public abstract class BaseCharacter : MonoBehaviour
 {
@@ -186,7 +187,7 @@ public abstract class BaseCharacter : MonoBehaviour
         {
             characterUI.characterName.text = profile.CharacterName;
             characterUI.characterImage.sprite = profile.CharacterImage;
-            if (Level < 4)
+            if (Level < profile.characterLevelDatas.Count - 1)
             {
                 // Chỉ hiện thông tin thăng cấp nếu có sự sai khác
                 characterUI.upgradeName.text = profile.characterLevelDatas[Level + 1].UpgradeName;
@@ -236,7 +237,7 @@ public abstract class BaseCharacter : MonoBehaviour
         Range = GetRange();
         Range_Prefab.transform.localScale = CircleScale * Range;
         // Thêm hiệu ứng cầu vòng cho level max
-        if (Level == 4)
+        if (Level == profile.characterLevelDatas.Count - 1)
         {
             if (OriginalUnitRoot != null)
             {
@@ -275,13 +276,12 @@ public abstract class BaseCharacter : MonoBehaviour
         float max_distance = 0f;
         for (int i = 0; i < range.enemies_in_range.Count; i++)
         {
-            if (!range.enemies_in_range[i].isDieOrNot())
+            if (range.enemies_in_range[i].isDieOrNot()) continue;
+            if (range.enemies_in_range[i].isHiddenOrNot() && !hasHiddenDetection) continue;
+            if (max_distance < range.enemies_in_range[i].Distance)
             {
-                if (max_distance < range.enemies_in_range[i].Distance)
-                {
-                    max_distance = range.enemies_in_range[i].Distance;
-                    max_position = i;
-                }
+                max_distance = range.enemies_in_range[i].Distance;
+                max_position = i;
             }
         }
         if (max_position == -1) return null;
@@ -302,6 +302,7 @@ public abstract class BaseCharacter : MonoBehaviour
         foreach (BaseEnemy enemy in range.enemies_in_range)
         {
             if (enemy.isDieOrNot()) continue;
+            if (enemy.isHiddenOrNot() && !hasHiddenDetection) continue;
             if (queue.Count < 3)
             {
                 queue.Enqueue(enemy, enemy.Distance);

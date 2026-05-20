@@ -44,7 +44,7 @@ public class Freezer : BaseCharacter
         if (characterUI != null)
         {
             base.SetUpgradeInformation();
-            if (Level < 4)
+            if (Level < profile.characterLevelDatas.Count - 1)
             {
                 SetStatInfo(6, "Freeze time", _FreezeTime, FreezeTimeByLevels[Level + 1]);
                 SetStatInfo(7, "Freeze hit count", _FreezeCount, FreezeCountByLevels[Level + 1]);

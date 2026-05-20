@@ -55,7 +55,7 @@ public class Pulser : BaseCharacter
         if (characterUI != null)
         {
             base.SetUpgradeInformation();
-            if (Level < 4)
+            if (Level < profile.characterLevelDatas.Count - 1)
             {
                 SetStatInfo(6, "Max Pulse", MaxPulse, MaxPulseByLevels[Level + 1]);
                 SetStatInfo(7, "Charge Time", ChargeTime, ChargeTimeByLevels[Level + 1]);
@@ -93,6 +93,7 @@ public class Pulser : BaseCharacter
             else
             {
                 Clock = Cooldown;
+                if (currentLaser.activeInHierarchy) if (SoundManager.Instance != null) SoundManager.Instance.SoundEffectSource.PlayOneShot(SoundManager.Instance.PulserLaserEnd);
                 currentLaser.SetActive(false);
             }
         }
@@ -109,6 +110,7 @@ public class Pulser : BaseCharacter
     }
     public IEnumerator StopAttack()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.SoundEffectSource.PlayOneShot(SoundManager.Instance.PulserLaserEnd);
         // Dừng tấn công trong 4s
         reachedMaxPulse = true;
         currentLaser.SetActive(false);

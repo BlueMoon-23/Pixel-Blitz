@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CharacterEquip : MonoBehaviour
@@ -23,6 +24,7 @@ public class CharacterEquip : MonoBehaviour
     private int CurrentIndex = 0; // 0, 1, 2, 3
     public GameObject Equip_Button;
     public GameObject Unequip_Button;
+    public GameObject Purchase_Button;
     // Thông báo người chơi bắt buộc phải equip ít nhất 1 character để vào game
     public GameObject LoadoutGroup;
     public GameObject EquipAnnounce;
@@ -122,10 +124,28 @@ public class CharacterEquip : MonoBehaviour
         chosenCharacter = character;
         CharacterName.text = chosenCharacter.characterData.characterProfile.CharacterName;
         CharacterImage.sprite = chosenCharacter.characterData.characterProfile.CharacterImage;
-        RangeStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].RangeStat.ToString();
-        DamageStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].DamageStat.ToString();
-        CooldownStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].CooldownStat.ToString();
-        CostStat.text = chosenCharacter.characterData.characterProfile.CostStat.ToString();
+        // Kiểm tra người chơi có character này chưa
+        if (!character.hasOwned)
+        {
+            Purchase_Button.gameObject.SetActive(true);
+            CharacterImage.color = Color.black;
+            Unequip_Button.gameObject.SetActive(false);
+            Equip_Button.gameObject.SetActive(false);
+            RangeStat.text = "?";
+            DamageStat.text = "?";
+            CooldownStat.text = "?";
+            CostStat.text = "?";
+            return;
+        }
+        else
+        {
+            CharacterImage.color = Color.white;
+            Purchase_Button.gameObject.SetActive(false);
+            RangeStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].RangeStat.ToString();
+            DamageStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].DamageStat.ToString();
+            CooldownStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].CooldownStat.ToString();
+            CostStat.text = chosenCharacter.characterData.characterProfile.CostStat.ToString();
+        }
         // Kiểm tra đã được equip vào loadout chưa
         for (int i = 0; i < characterLoadout.Count; i++)
         {
@@ -156,8 +176,12 @@ public class CharacterEquip : MonoBehaviour
         CharacterLoadoutCosts[CurrentIndex].gameObject.SetActive(true);
         CharacterLoadoutImages[CurrentIndex].sprite = chosenCharacter.characterData.characterProfile.CharacterImage;
         CharacterLoadoutCosts[CurrentIndex].text = "$" + chosenCharacter.characterData.characterProfile.CostStat.ToString();
-        // Kéo chosenCharacter vào List<CharacterInfomation> CharacterLoadout
+        // Kéo chosenCharacter vào List<CharacterInfomation> CharacterLoadout. CharacterLoadout save luôn, để khi nhấn nút purchase xong quay lại sẽ tiện
         characterLoadout.Add(chosenCharacter);
+        if (CharacterLoadout.instance != null)
+        {
+            CharacterLoadout.instance.Set_CharacterLoadout_Prefab();
+        }
         CurrentIndex++;
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
         Close();
@@ -187,5 +211,24 @@ public class CharacterEquip : MonoBehaviour
         }
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         Close();
+    }
+    // Đổi scene về lại ShopScene, đồng thời chỉ đúng về con character đó
+    public void Purchase()
+    {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
+        if (CharacterSaveManager.instance != null)
+        {
+            for (int index = 0; index < CharacterSaveManager.instance.allCharacters.Count; index++)
+            {
+                Debug.Log("Dang tim character " + chosenCharacter.characterData.characterID);
+                if (CharacterSaveManager.instance.allCharacters[index].characterID == chosenCharacter.characterData.characterID)
+                {
+                    SceneKey.targetCharacterIndex = index;
+                    break;
+                }
+            }
+        }
+        SceneKey.targetScene = SceneKey.ShopScene;
+        SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
 }

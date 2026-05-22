@@ -15,4 +15,5 @@ public class SceneKey
     public static string LoadingScene = "LoadingScene";
     public static string TutorialScene = "Tutorial";
     public static string targetScene;
+    public static int targetCharacterIndex;
 }

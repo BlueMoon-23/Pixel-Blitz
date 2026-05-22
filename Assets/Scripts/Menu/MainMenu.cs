@@ -14,6 +14,7 @@ public class MainMenu : MonoBehaviour
     public GameObject Setting_Popup;
     public GameObject Giftcode_Popup;
     public GameObject Tutorial_Popup;
+    public GameObject Tutorial_Dimed;
     public Slider musicSlider;
     public Slider UISlider;
     // Tutorial
@@ -40,10 +41,12 @@ public class MainMenu : MonoBehaviour
         Giftcode_Popup.SetActive(false);
         if (PlayerPrefs.HasKey(UserDataKey.PLAYEDTUTORIAL))
         {
+            Tutorial_Dimed.SetActive(false);
             Tutorial_Popup.SetActive(false);
         }
         else
         {
+            Tutorial_Dimed.SetActive(true);
             Tutorial_Popup.SetActive(true);
         }
         if (SoundManager.Instance != null)
@@ -81,6 +84,7 @@ public class MainMenu : MonoBehaviour
     {
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
         SceneKey.targetScene = SceneKey.ShopScene;
+        SceneKey.targetCharacterIndex = 0;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     public void Tutorial()
@@ -120,6 +124,7 @@ public class MainMenu : MonoBehaviour
     {
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         Tutorial_Popup.SetActive(false);
+        Tutorial_Dimed.SetActive(false);
     }
     public void LogOut()
     {

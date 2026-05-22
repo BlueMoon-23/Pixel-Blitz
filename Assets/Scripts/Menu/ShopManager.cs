@@ -50,7 +50,7 @@ public class ShopManager : MonoBehaviour
     void Start()
     {
         UpdateCurrencyTexts();
-        ShowCharacter(currentIndex);
+        ShowCharacter(SceneKey.targetCharacterIndex);
     }
 
     // Update is called once per frame
@@ -136,7 +136,7 @@ public class ShopManager : MonoBehaviour
         }
         return "No";
     }
-    private void ShowCharacter(int allCharacter_index)
+    public void ShowCharacter(int allCharacter_index)
     {
         if (CharacterSaveManager.instance != null)
         {

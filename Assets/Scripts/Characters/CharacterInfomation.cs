@@ -29,16 +29,11 @@ public class CharacterInfomation : MonoBehaviour
         }
         if (!hasOwned)
         {
-            /*foreach (Transform child in this.transform) // vòng lặp duyệt qua các phần tử con trong phần tử cha trên hierarchy
+            foreach (Transform child in this.transform) // vòng lặp duyệt qua các phần tử con trong phần tử cha trên hierarchy
             {
-                child.gameObject.SetActive(false);
+                Image characterImage = child.GetComponent<Image>();
+                if (characterImage != null) characterImage.color = Color.black;
             }
-            Button thisButton = GetComponent<Button>();
-            if (thisButton != null)
-            {
-                thisButton.enabled = false;
-            }*/
-            this.gameObject.SetActive(false);
         }
         else
         {

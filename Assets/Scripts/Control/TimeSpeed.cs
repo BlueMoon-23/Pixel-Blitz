@@ -25,7 +25,7 @@ public class TimeSpeed : MonoBehaviour
     void Start()
     {
         Time.timeScale = 1f;
-        SpeedText.text = "1x";
+        if (SpeedText != null) SpeedText.text = "1x";
     }
 
     // Update is called once per frame

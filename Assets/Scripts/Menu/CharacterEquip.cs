@@ -180,7 +180,7 @@ public class CharacterEquip : MonoBehaviour
         characterLoadout.Add(chosenCharacter);
         if (CharacterLoadout.instance != null)
         {
-            CharacterLoadout.instance.Set_CharacterLoadout_Prefab();
+            CharacterLoadout.instance.SetCharacterLoadout();
         }
         CurrentIndex++;
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
@@ -208,6 +208,10 @@ public class CharacterEquip : MonoBehaviour
                 CharacterLoadoutCosts[CurrentIndex].gameObject.SetActive(false);
                 break;
             }
+        }
+        if (CharacterLoadout.instance != null)
+        {
+            CharacterLoadout.instance.SetCharacterLoadout();
         }
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.CloseButton_Sound);
         Close();

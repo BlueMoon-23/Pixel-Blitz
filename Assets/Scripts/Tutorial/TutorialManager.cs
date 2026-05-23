@@ -1,7 +1,10 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class TutorialManager : MonoBehaviour
 {
@@ -9,6 +12,9 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] public Guidelines[] guidelines;
     private Archer targetArcher;
     private Musketeer targetMusketeer;
+    public GameObject ArcherGroup;
+    public GameObject MusketeerGroup;
+    public GameObject TutorialDimed;
     public static TutorialManager instance;
     private void Awake()
     {
@@ -25,6 +31,9 @@ public class TutorialManager : MonoBehaviour
     void Start()
     {
         checklists[0].Appear();
+        ArcherGroup.SetActive(false);
+        MusketeerGroup.SetActive(false);
+        TutorialDimed.SetActive(false);
     }
 
     // Update is called once per frame
@@ -36,10 +45,41 @@ public class TutorialManager : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
         checklists[wave].Appear();
+        switch (wave)
+        {
+            case 1:
+                {
+                    ArcherGroup.SetActive(true);
+                    MusketeerGroup.SetActive(false);
+                    break;
+                }
+            case 2:
+                {
+                    ArcherGroup.SetActive(false);
+                    MusketeerGroup.SetActive(true);
+                    break;
+                }
+            case 3:
+                {
+                    targetMusketeer.gameObject.SetActive(false);
+                    ArcherGroup.SetActive(false);
+                    MusketeerGroup.SetActive(false);
+                    break;
+                }
+            case 4:
+                {
+                    targetArcher.gameObject.SetActive(false);
+                    ArcherGroup.SetActive(false);
+                    MusketeerGroup.SetActive(false);
+                    break;
+                }
+        }
         while (!checklists[wave].isComplete)
         {
+            TutorialDimed.SetActive(false);
             yield return new WaitForSeconds(1f);
         }
+        if (wave < 4) TutorialDimed.SetActive(true);
     }
     void OnEnable()
     {
@@ -58,6 +98,7 @@ public class TutorialManager : MonoBehaviour
             // Hoàn thành checklist kéo Archer
             checklists[1].finish_1stCheck();
             targetArcher = obj.GetComponent<Archer>();
+            ArcherGroup.SetActive(false);
             // "Găm" sự kiện ngay vào con Archer vừa bắt được
             targetArcher.OnLevelUp += (level) => {
                 if (level == 1)
@@ -70,6 +111,7 @@ public class TutorialManager : MonoBehaviour
                 {
                     checklists[3].finish_2ndCheck();
                     guidelines[1].Appear();
+                    targetMusketeer.gameObject.SetActive(true);
                 }
             };
         }
@@ -77,6 +119,7 @@ public class TutorialManager : MonoBehaviour
         {
             checklists[2].finish_1stCheck();
             targetMusketeer = obj.GetComponent<Musketeer>();
+            MusketeerGroup.SetActive(false);
             // "Găm" sự kiện ngay vào con Archer vừa bắt được
             targetMusketeer.OnLevelUp += (level) => {
                 if (level == 1) checklists[4].finish_1stCheck();
@@ -84,6 +127,7 @@ public class TutorialManager : MonoBehaviour
                 {
                     checklists[4].finish_2ndCheck();
                     guidelines[2].Appear();
+                    targetArcher.gameObject.SetActive(true);
                     PlayedTutorial();
                 }
             };

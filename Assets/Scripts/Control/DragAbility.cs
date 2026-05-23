@@ -12,6 +12,8 @@ public class DragAbility : DragThing
     public enum AbilityDragType { None, GroundPlacement, WaypointPlacement }
     public AbilityDragType currentDragType = AbilityDragType.None;
     private GameObject[] Range_Prefab;
+    // Truyền range vào đây để các drag sau hiện range chỉ định đúng range
+    public float DragRange; 
     protected new void Awake()
     {
         if (instance == null)
@@ -84,17 +86,15 @@ public class DragAbility : DragThing
         CancelPlacing.SetActive(true);
         // Range
         RangeUI.SetActive(true);
-        // Set range = 15 sẵn luôn
-        RangeUI.transform.localScale = new Vector3(RangeUI.transform.localScale.x * 15, RangeUI.transform.localScale.y * 15, RangeUI.transform.localScale.z * 15);
+        RangeUI.transform.localScale = new Vector3(RangeUI.transform.localScale.x * DragRange, RangeUI.transform.localScale.y * DragRange, RangeUI.transform.localScale.z * DragRange);
         range_RectTransform.anchoredPosition = m_RectTransform.anchoredPosition - new Vector2(0f, 30f);
-
     }
     private void GroundPlacementEndDrag(PointerEventData eventData)
     {
         canvasGroup.blocksRaycasts = true;
         PlacingGroundUI.SetActive(false);
         RangeUI.SetActive(false);
-        RangeUI.transform.localScale = new Vector3(2 / 3f, 2 / 3f, 2 / 3f);
+        RangeUI.transform.localScale = new Vector3(1f, 1f, 1f);
         CancelPlacing.SetActive(false);
         GameObject cancelPlacing = eventData.pointerCurrentRaycast.gameObject;
         if (cancelPlacing.CompareTag("CancelPlacing"))

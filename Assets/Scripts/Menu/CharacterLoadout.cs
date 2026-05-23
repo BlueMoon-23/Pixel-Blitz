@@ -19,7 +19,7 @@ public class CharacterLoadout : MonoBehaviour
     }
     public List<CharacterInfomation> characterLoadout = new List<CharacterInfomation>();
     public GameObject[] baseCharacters;
-    public void GetCharacterLoadout()
+    public void SetCharacterLoadout()
     {
         if (CharacterEquip.instance != null)
         {
@@ -35,7 +35,7 @@ public class CharacterLoadout : MonoBehaviour
     }
     public void Set_CharacterLoadout_Prefab()
     {
-        GetCharacterLoadout();
+        SetCharacterLoadout();
         for (int i = 0; i < characterLoadout.Count; i++)
         {
             for (int j = 0; j < baseCharacters.Length; j++)

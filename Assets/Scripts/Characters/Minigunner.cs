@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Minigunner : BaseCharacter
 {
-    public GameObject ClonePrefab;
+    [Header("Minigunner Clone")]
+    public MinigunnerClone ClonePrefab;
     private GameObject currentClone;
     // Update is called once per frame
     void Update()
@@ -19,6 +20,7 @@ public class Minigunner : BaseCharacter
     {
         characterUI.AbilityCurrentIcon.sprite = characterUI.AbilityIcons[0];
         DragAbility.instance.currentDragType = DragAbility.AbilityDragType.GroundPlacement;
+        DragAbility.instance.DragRange = ClonePrefab.profile.characterLevelDatas[4].RangeStat;
     }
     public override void Ability(Vector3 position)
     {
@@ -28,7 +30,7 @@ public class Minigunner : BaseCharacter
             if (position != Vector3.zero && !(CharacterManager.instance.hasCharacterinPosition(position)))
             {
                 if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Place_Sound);
-                currentClone = Instantiate(ClonePrefab, position, Quaternion.identity);
+                currentClone = Instantiate(ClonePrefab.gameObject, position, Quaternion.identity);
                 CharacterManager.instance.AddPosition(position);
             }
         }
@@ -39,7 +41,7 @@ public class Minigunner : BaseCharacter
             if (position != Vector3.zero && !(CharacterManager.instance.hasCharacterinPosition(position)))
             {
                 if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Place_Sound);
-                currentClone = Instantiate(ClonePrefab, position, Quaternion.identity);
+                currentClone = Instantiate(ClonePrefab.gameObject, position, Quaternion.identity);
                 CharacterManager.instance.AddPosition(position);
             }
         }

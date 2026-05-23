@@ -277,7 +277,7 @@ public abstract class BaseCharacter : MonoBehaviour
         for (int i = 0; i < range.enemies_in_range.Count; i++)
         {
             if (range.enemies_in_range[i].isDieOrNot()) continue;
-            if (range.enemies_in_range[i].isHiddenOrNot() && !hasHiddenDetection) continue;
+            if (range.enemies_in_range[i].isHidden && !hasHiddenDetection) continue;
             if (max_distance < range.enemies_in_range[i].Distance)
             {
                 max_distance = range.enemies_in_range[i].Distance;
@@ -302,7 +302,7 @@ public abstract class BaseCharacter : MonoBehaviour
         foreach (BaseEnemy enemy in range.enemies_in_range)
         {
             if (enemy.isDieOrNot()) continue;
-            if (enemy.isHiddenOrNot() && !hasHiddenDetection) continue;
+            if (enemy.isHidden && !hasHiddenDetection) continue;
             if (queue.Count < 3)
             {
                 queue.Enqueue(enemy, enemy.Distance);

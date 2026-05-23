@@ -13,10 +13,15 @@ public class BaseEnemy : MonoBehaviour
     protected float HP;
     protected float Speed;
     protected EnemyModifiers enemyModifiers;
-    [SerializeField] protected bool isHidden;
-    [SerializeField] protected bool isArmored;
+    protected bool _isHidden;
+    public bool isHidden
+    {
+        get { return _isHidden; }
+        set { _isHidden = value; }
+    }
+    protected bool isArmored;
     public GameObject Center; // đây là chỗ để các character nhắm bắn vào
-    [SerializeField] protected float incomingDamage = 0; // damage ảo, dùng để check xem nếu mục tiêu sắp chết rồi thì nhắm vào con khác
+    protected float incomingDamage = 0; // damage ảo, dùng để check xem nếu mục tiêu sắp chết rồi thì nhắm vào con khác
     protected float lastrecordedDamage = 0f;
     // Move
     public GameObject[] Waypoints;
@@ -90,7 +95,7 @@ public class BaseEnemy : MonoBehaviour
             // Reset Stats thiệt nè
             HP = enemyStats.MaxHP;
             Speed = enemyStats.OldSpeed;
-            isHidden = enemyStats.isHidden;
+            _isHidden = enemyStats.isHidden;
             isArmored = enemyStats.isArmored;
             incomingDamage = 0f;
             lastrecordedDamage = Time.time;
@@ -123,10 +128,6 @@ public class BaseEnemy : MonoBehaviour
             Die();
             ResetIncomingDamage();
         }
-    }
-    public bool isHiddenOrNot()
-    {
-        return isHidden;
     }
     public float GetHP() { return HP; }
     public void TakeIncomingDamage(float Damage, bool canStrikethrough)

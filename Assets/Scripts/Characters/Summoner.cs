@@ -47,6 +47,7 @@ public class Summoner : BaseCharacter
         base.Upgrade();
         GraveStack = GraveStackByLevels[Level];
         UndeadCount = UndeadCountByLevels[Level];
+        UndeadHP = UndeadHPByLevels[Level];
     }
     public override void SetUpgradeInformation()
     {

@@ -41,6 +41,10 @@ public class MapChoose : MonoBehaviour
     void Start()
     {
         ShowMapUI(0);
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayBGM(SoundManager.Instance.MenuMusic);
+        }
     }
     // Update is called once per frame
     void Update()
@@ -66,8 +70,7 @@ public class MapChoose : MonoBehaviour
             ModeManager.instance.Play(ChosenMap);
         }
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
-        SceneKey.targetScene = ChosenMap.targetScene;
-        Debug.Log(ChosenMap.targetScene);
+        SceneKey.targetScene = ChosenMap.mapInformation.targetScene;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     private IEnumerator ShowEquipAnnounce()

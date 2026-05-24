@@ -49,7 +49,14 @@ public class WaveManager : MonoBehaviour
                 if (mode.GetType() != typeof(TutorialMode) && currentWave < MaxWave) { skipCoroutine = StartCoroutine(Ready_Skip.instance.Skip()); }
                 // Time handle
                 int time = 60;
-                if (currentWave == MaxWave) { time = 300; }
+                if (currentWave == MaxWave) { 
+                    time = 300; 
+                    // Bậc nhạc boss nếu là wave cuối
+                    if (SoundManager.Instance != null)
+                    {
+                        SoundManager.Instance.PlayBGM(SoundManager.Instance.BossThemeMusic);
+                    }
+                }
                 currentTimeLeft.text = (time / 60).ToString("D2") + " : " + (time % 60).ToString("D2");
                 do
                 {

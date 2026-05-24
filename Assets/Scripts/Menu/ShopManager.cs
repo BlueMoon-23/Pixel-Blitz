@@ -51,6 +51,10 @@ public class ShopManager : MonoBehaviour
     {
         UpdateCurrencyTexts();
         ShowCharacter(SceneKey.targetCharacterIndex);
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayBGM(SoundManager.Instance.MenuMusic);
+        }
     }
 
     // Update is called once per frame

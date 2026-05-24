@@ -53,6 +53,7 @@ public class MainMenu : MonoBehaviour
         {
             musicSlider.onValueChanged.AddListener(SoundManager.Instance.SetMusicVolume);
             UISlider.onValueChanged.AddListener(SoundManager.Instance.SetUISoundsVolume);
+            SoundManager.Instance.PlayBGM(SoundManager.Instance.MenuMusic);
         }
         if (PlayerPrefs.HasKey("MusicVolume") && PlayerPrefs.HasKey("UISoundsVolume"))
         {

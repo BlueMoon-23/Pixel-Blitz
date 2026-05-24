@@ -12,6 +12,12 @@ public class ModeManager : MonoBehaviour
     public Gamemodes currentGamemode; // Khi người chơi nhấn nút play, phải truyền cái currentGamemode vô
     public int MaxWave;
     public float Star;
+    // Truyền nhạc xuống đây
+    private AudioClip _currentMapBGM;
+    public AudioClip currentMapBGM
+    {
+        get { return _currentMapBGM; }
+    }
     // Current Enemy Prefabs
     public List<BaseEnemy> enemy_Prefabs = new List<BaseEnemy>();
     private Dictionary<string, GameObject> Gamemode_Dict = new Dictionary<string, GameObject>();
@@ -55,6 +61,7 @@ public class ModeManager : MonoBehaviour
         GameObject gamemode_object = Instantiate(Gamemode_Dict[currentGamemode.GetType().ToString()], transform.position, Quaternion.identity);
         gamemode_object.transform.SetParent(transform, false);
         Star = mapData.mapInformation.StarRate;
+        _currentMapBGM = mapData.mapInformation.MapBGM;
     }
     public void DestroyGamemodeObject()
     {

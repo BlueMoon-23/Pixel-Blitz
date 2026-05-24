@@ -28,7 +28,15 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator StartGame()
     {
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayBGM(null);
+        }
         if (Ready_Skip.instance != null) yield return StartCoroutine(Ready_Skip.instance.GetReady());
+        if (ModeManager.instance != null && SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayBGM(ModeManager.instance.currentMapBGM);
+        }
         if (WaveManager.instance != null) yield return StartCoroutine(WaveManager.instance.SpawnEnemyWave(ModeManager.instance.currentGamemode, ModeManager.instance.MaxWave));
     }
     void Update()

@@ -57,6 +57,7 @@ public class Win_Lose : MonoBehaviour
     }
     public void ClearObjects()
     {
+        if (SoundManager.Instance != null) SoundManager.Instance.PlayBGM(null);
         if (EnemyManager.instance != null) { EnemyManager.instance.ClearPool(); }
         if (CharacterManager.instance != null) { CharacterManager.instance.DestroyAllCharacters(); }
         if (BulletPooler.instance != null) { BulletPooler.instance.ClearPool(); }

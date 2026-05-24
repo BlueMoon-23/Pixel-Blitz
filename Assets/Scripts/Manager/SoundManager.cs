@@ -11,9 +11,14 @@ public class SoundManager : MonoBehaviour
     public AudioSource UISource;
     public AudioSource SoundEffectSource;
     public AudioMixer audioMixer; // thằng này bắt buộc phải găm vào chứ không dùng getcomponent được vì nó là assets
-
     // Cac sound
     // Nhóm Sound FX / UI Sounds
+    [Header("Music / OST")]
+    public AudioClip MenuMusic;
+    public AudioClip BossThemeMusic;
+    public AudioClip GreenlandMusic;
+    public AudioClip OmittedCastleMusic;
+    public AudioClip DeadShaftMusic;
     [Header("UI Sounds")]
     public AudioClip Upgrade_Sound;
     public AudioClip Place_Sound;
@@ -71,6 +76,28 @@ public class SoundManager : MonoBehaviour
     void Update()
     {
 
+    }
+    /// <summary>
+    /// Truyền audioclip vào đây để chơi nhạc. Truyền null nếu muốn tắt nhạc
+    /// </summary>
+    /// <param name="nextClip"></param>
+    public void PlayBGM(AudioClip nextClip)
+    {
+        if (nextClip == null)
+        {
+            if (MusicSource.isPlaying) MusicSource.Stop();
+            MusicSource.clip = null;
+            return;
+        }
+        if (MusicSource.clip == nextClip && MusicSource.isPlaying)
+        {
+            // Nếu trùng và nhạc đang phát, giữ nguyên
+            return;
+        }
+        // Nếu là một bài nhạc hoàn toàn khác, đổi nhạc
+        MusicSource.clip = nextClip;
+        MusicSource.loop = true;
+        MusicSource.Play();
     }
     public void SetMusicVolume(float value)
     {

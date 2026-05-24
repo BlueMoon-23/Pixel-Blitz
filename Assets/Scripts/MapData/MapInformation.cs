@@ -7,5 +7,7 @@ public class MapInformation : MonoBehaviour
 {
     public Sprite MapImage;
     public string MapName;
+    public string targetScene;
     public float StarRate;
+    public AudioClip MapBGM;
 }

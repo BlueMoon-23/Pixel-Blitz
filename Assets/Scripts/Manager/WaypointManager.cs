@@ -7,6 +7,8 @@ public class WaypointManager : MonoBehaviour
     // Script này dùng để quản lý các waypoint. Enemy sẽ truy cập vào đây để tìm lấy waypoint thay vì tự tìm bằng lệnh find
     // Singleton
     public static WaypointManager instance;
+    public MapInformation currentMap;
+    private int callIndex = 0;
     private void Awake()
     {
         if (instance == null)
@@ -28,7 +30,21 @@ public class WaypointManager : MonoBehaviour
     /// </summary>
     public GameObject[] GetWaypoints(out int index) // out thay cho & trong c++ (int& index)
     {
-        int i = Random.Range(0, List_of_Waypoints.Length);
+        int i;
+        // Đa đường
+        if (currentMap.isMultiPath)
+        {
+            // Lấy đường theo thứ tự tăng dần của lệnh gọi Coroutine
+            i = callIndex % List_of_Waypoints.Length;
+            // Tăng biến đếm lên cho lệnh gọi ngay sau đó ở cùng Frame
+            callIndex++;
+        }
+        else
+        {
+            // Random path / đơn đường
+            i = Random.Range(0, List_of_Waypoints.Length);
+        }
+
         index = i;
         return List_of_Waypoints[i].Waypoints;
     }
@@ -39,5 +55,13 @@ public class WaypointManager : MonoBehaviour
             return List_of_Waypoints[index].Waypoints;
         }
         else return null;
+    }
+    // Hàm này của Unity tự chạy ở cuối mỗi Frame để reset lại biến đếm về 0
+    private void LateUpdate()
+    {
+        if (callIndex != 0)
+        {
+            callIndex = 0;
+        }
     }
 }

@@ -41,8 +41,21 @@ public class WaveManager : MonoBehaviour
                 currentWaveText.text = currentWave.ToString() + " / " + MaxWave.ToString();
                 // Thưởng tiền
                 if (EconomyManager.instance != null) EconomyManager.instance.EarnCoinEachWave(mode, currentWave);
-                // Sinh quái
-                mode.StartCoroutine(mode.SpawnEnemyWave(currentWave));
+                // Sinh quái chia theo mode
+                if (WaypointManager.instance != null)
+                {
+                    if (WaypointManager.instance.currentMap.isMultiPath)
+                    {
+                        for (int i = 0; i < WaypointManager.instance.List_of_Waypoints.Length; i++)
+                        {
+                            mode.StartCoroutine(mode.SpawnEnemyWave(currentWave));
+                        }
+                    }
+                    else
+                    {
+                        mode.StartCoroutine(mode.SpawnEnemyWave(currentWave));
+                    }
+                }
                 // Reset lại vụ skip
                 Ready_Skip.instance.WantToSkip = false; // khong co lenh nay la neu skip roi thi wanttoskip = true, break vong while
                 if (skipCoroutine != null) { StopCoroutine(skipCoroutine); }

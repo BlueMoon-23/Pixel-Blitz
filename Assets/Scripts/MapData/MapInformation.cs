@@ -9,5 +9,6 @@ public class MapInformation : MonoBehaviour
     public string MapName;
     public string targetScene;
     public float StarRate;
+    public bool isMultiPath;
     public AudioClip MapBGM;
 }

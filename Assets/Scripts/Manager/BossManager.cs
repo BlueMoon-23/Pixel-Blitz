@@ -7,11 +7,8 @@ using UnityEngine.UI;
 public class BossManager : MonoBehaviour
 {
     // Boss HP
-    public GameObject BossHPGroup;
-    public TextMeshProUGUI BossName;
-    public TextMeshProUGUI BossHPText;
-    public Image BossHPBar;
     public static BossManager instance;
+    public BossHPGroup[] bossHP;
     private void Awake()
     {
         if (instance == null)

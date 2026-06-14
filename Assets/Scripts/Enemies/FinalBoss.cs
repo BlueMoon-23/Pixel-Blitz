@@ -30,7 +30,8 @@ public class FinalBoss : BaseEnemy
         yield return new WaitForSeconds(0.01f);
         if (BossManager.instance != null)
         {
-            BossManager.instance.BossHPText.text = HP + " / " + enemyStats.MaxHP;
+            int tag_index = Waypoint_SelectedIndex <= BossManager.instance.bossHP.Length ? Waypoint_SelectedIndex : BossManager.instance.bossHP.Length;
+            BossManager.instance.bossHP[tag_index].BossHPText.text = HP + " / " + enemyStats.MaxHP;
         }
         StartCoroutine(DoAbility(AbilityCount));
     }
@@ -170,8 +171,9 @@ public class FinalBoss : BaseEnemy
         base.TakeDamage(Damage, canStrikethrough);
         if (BossManager.instance != null)
         {
-            BossManager.instance.BossHPText.text = HP + " / " + enemyStats.MaxHP;
-            BossManager.instance.BossHPBar.transform.localScale = new Vector3(HP / enemyStats.MaxHP, BossManager.instance.BossHPBar.transform.localScale.y, BossManager.instance.BossHPBar.transform.localScale.z);
+            int tag_index = Waypoint_SelectedIndex <= BossManager.instance.bossHP.Length ? Waypoint_SelectedIndex : BossManager.instance.bossHP.Length;
+            BossManager.instance.bossHP[tag_index].BossHPText.text = HP + " / " + enemyStats.MaxHP;
+            BossManager.instance.bossHP[tag_index].BossHPBar.transform.localScale = new Vector3(HP / enemyStats.MaxHP, BossManager.instance.bossHP[tag_index].BossHPBar.transform.localScale.y, BossManager.instance.bossHP[tag_index].BossHPBar.transform.localScale.z);
         }
     }
     protected override void Die()

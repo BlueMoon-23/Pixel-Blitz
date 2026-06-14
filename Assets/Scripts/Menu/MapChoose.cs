@@ -69,6 +69,11 @@ public class MapChoose : MonoBehaviour
         if (ModeManager.instance != null) {
             ModeManager.instance.Play(ChosenMap);
         }
+        // Lưu lịch sử trận đấu
+        if (MatchSaveManager.instance != null)
+        {
+            MatchSaveManager.instance.CreateMatch(ChosenMap, CharacterLoadout.instance.characterLoadout);
+        }
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
         SceneKey.targetScene = ChosenMap.mapInformation.targetScene;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);

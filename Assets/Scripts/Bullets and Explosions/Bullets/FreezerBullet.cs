@@ -25,6 +25,55 @@ public class FreezerBullet : BaseBullets
     {
         Move();
     }
+    protected override void ExplodeOnImpact()
+    {
+        if (character != null && character.GetLevel() < 4)
+        {
+            if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
+            {
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                if (explosionSFX != null)
+                {
+                    explosionSFX.transform.position = this.transform.position;
+                    explosionSFX.transform.rotation = Quaternion.identity;
+                    ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+                }
+            }
+            if (BulletPooler.instance != null)
+            {
+                BulletPooler.instance.ReturnBullet(this);
+            }
+        }
+        else if (character.GetLevel() >= 4)
+        {
+            if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
+            {
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                if (explosionSFX != null)
+                {
+                    explosionSFX.transform.position = this.transform.position;
+                    explosionSFX.transform.rotation = Quaternion.identity;
+                    explosionSFX.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+                    ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+                }
+            }
+            else if (GameSetting.instance != null && GameSetting.instance != null && !GameSetting.instance._showExplosion)
+            {
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                if (explosionSFX != null)
+                {
+                    explosionSFX.transform.position = this.transform.position;
+                    explosionSFX.transform.rotation = Quaternion.identity;
+                    explosionSFX.transform.localScale = new Vector3(3f, 3f, 3f);
+                    ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+                }
+            }
+            if (BulletPooler.instance != null)
+            {
+                BulletPooler.instance.ReturnBullet(this);
+            }
+        }
+    }
     protected override void OnTriggerEnter2D(Collider2D collision)
     {
         if (character != null && character.GetLevel() < 4)
@@ -36,22 +85,7 @@ public class FreezerBullet : BaseBullets
                 Freezer freezer = character as Freezer; // as là toán tử ép kiểu
                 baseEnemy.GetFreeze(freezer.FreezeTime, freezer.FreezeCount);
                 baseEnemy.ModifySpeed(0.7f);
-                //GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
-                //Destroy(spawnedSFX, 0.5f);
-                if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
-                {
-                    BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
-                    if (explosionSFX != null)
-                    {
-                        explosionSFX.transform.position = this.transform.position;
-                        explosionSFX.transform.rotation = Quaternion.identity;
-                        ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
-                    }
-                }
-                if (BulletPooler.instance != null)
-                {
-                    BulletPooler.instance.ReturnBullet(this);
-                }
+                ExplodeOnImpact();
             }
         }
         else if (character.GetLevel() >= 4)
@@ -72,35 +106,7 @@ public class FreezerBullet : BaseBullets
                         baseEnemy.ModifySpeed(0.7f);
                     }
                 }
-                //GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
-                //spawnedSFX.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-                //Destroy(spawnedSFX, 0.5f);
-                if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
-                {
-                    BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
-                    if (explosionSFX != null)
-                    {
-                        explosionSFX.transform.position = this.transform.position;
-                        explosionSFX.transform.rotation = Quaternion.identity;
-                        explosionSFX.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-                        ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
-                    }
-                }
-                else if (GameSetting.instance != null && GameSetting.instance != null && !GameSetting.instance._showExplosion)
-                {
-                    BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
-                    if (explosionSFX != null)
-                    {
-                        explosionSFX.transform.position = this.transform.position;
-                        explosionSFX.transform.rotation = Quaternion.identity;
-                        explosionSFX.transform.localScale = new Vector3(3f, 3f, 3f);
-                        ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
-                    }
-                }
-                if (BulletPooler.instance != null)
-                {
-                    BulletPooler.instance.ReturnBullet(this);
-                }
+                ExplodeOnImpact();
             }
         }
     }

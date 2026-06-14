@@ -46,6 +46,11 @@ public class Win_Lose : MonoBehaviour
     }
     public void Restart()
     {
+        // Làm lại ván mới
+        if (MatchSaveManager.instance != null)
+        {
+            MatchSaveManager.instance.RestartMatch();
+        }
         Scene currentScene = SceneManager.GetActiveScene();
         SceneKey.targetScene = currentScene.name;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
@@ -55,7 +60,7 @@ public class Win_Lose : MonoBehaviour
         SceneKey.targetScene = SceneKey.MapChoose;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
-    public void ClearObjects()
+    private void ClearObjects()
     {
         if (SoundManager.Instance != null) SoundManager.Instance.PlayBGM(null);
         if (EnemyManager.instance != null) { EnemyManager.instance.ClearPool(); }
@@ -67,9 +72,17 @@ public class Win_Lose : MonoBehaviour
         // xuất hiện tình trạng khi chơi lại lần 2 thì prefab chưa bị clear, dẫn đến việc reference lộn xộn
         if (ModeManager.instance != null) { ModeManager.instance.ClearEnemyPrefab(); }
     }
+    private void RecordMatch()
+    {
+        if (AccountSaveManager.instance == null || MatchSaveManager.instance == null) return;
+        if (!Defeated) AccountSaveManager.CurrentAccount.ClearedTimes++;
+        AccountSaveManager.CurrentAccount.AttemptTimes++;
+        MatchSaveManager.instance.UpdateCurrentMatch(!Defeated, TimeManager.instance.Get_TimePlayed());
+    }
     public void Victory()
     {
         ClearObjects();
+        RecordMatch(); // ghi trước, rồi nhờ currencysavemanager lưu hộ mình
         int gemReward = RewardCalculator.CalculateGem(WaveManager.instance.GetCurrentWave(), ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
         CurrencySaveManager.instance.AddGem(gemReward);
         int diamondReward = RewardCalculator.CalculateDiamond(WaveManager.instance.GetCurrentWave(), ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
@@ -123,6 +136,7 @@ public class Win_Lose : MonoBehaviour
     public void Defeat()
     {
         ClearObjects();
+        RecordMatch();
         // Get reward
         int gemreward = RewardCalculator.CalculateGem(WaveManager.instance.GetCurrentWave(), ModeManager.instance.Star, ModeManager.instance.currentGamemode, false);
         CurrencySaveManager.instance.AddGem(gemreward);

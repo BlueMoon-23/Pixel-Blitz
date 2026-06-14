@@ -53,6 +53,11 @@ public class CharacterLoadout : MonoBehaviour
                     CharacterInfomation characterData = newCharacter.AddComponent<CharacterInfomation>();
                     // CharacterData là 1 con trỏ, không ghi characterData = CharacterLoadout[i] được
                     characterData.characterData = characterLoadout[i].characterData;
+                    // Lưu loadout hiện tại lên most uses
+                    if (AccountSaveManager.instance != null)
+                    {
+                        AccountSaveManager.CurrentAccount.userCharacterData.RecordCharacter(characterLoadout[i].characterData);
+                    }
                     newCharacter.SetActive(false);
                 }
             }

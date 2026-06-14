@@ -224,7 +224,6 @@ public class CharacterEquip : MonoBehaviour
         {
             for (int index = 0; index < CharacterSaveManager.instance.allCharacters.Count; index++)
             {
-                Debug.Log("Dang tim character " + chosenCharacter.characterData.characterID);
                 if (CharacterSaveManager.instance.allCharacters[index].characterID == chosenCharacter.characterData.characterID)
                 {
                     SceneKey.targetCharacterIndex = index;

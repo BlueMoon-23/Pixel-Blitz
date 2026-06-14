@@ -16,6 +16,7 @@ public class SummonerUndead : MonoBehaviour
     // Move
     [SerializeField] private GameObject[] Waypoints;
     [SerializeField] private int Waypoint_CurrentIndex; // thằng này sẽ chỉ enemy đi đâu
+    [SerializeField] private List<WaypointInformation> ValidWaypoint; // summoner undead phải tự biết được mình sẽ đi waypoint nào => mới đúng cho random path và multi path
     // Move animation
     protected SPUM_Prefabs SPUM_Prefabs;
     public Dictionary<PlayerState, int> IndexPair = new();
@@ -54,15 +55,27 @@ public class SummonerUndead : MonoBehaviour
         Original_x_HPScale = HP_RedBar.transform.localScale.x;
         yield return null;
         // Start
+        ValidWaypoint.Clear(); // clear kết quả trước đó
         if (WaypointManager.instance != null)
         {
-            Waypoints = WaypointManager.instance.GetWaypoints(out int Waypoints_index);
-            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoints_index);
+            foreach (WaypointInformation Path in WaypointManager.instance.List_of_Waypoints)
+            {
+                for (int i = 0; i < Path.Waypoints.Length - 1; i++)
+                {
+                    if (x_Between_2_Waypoints(i, transform.position.x, Path.Waypoints) && y_Between_2_Waypoints(i, transform.position.y, Path.Waypoints))
+                    {
+                        ValidWaypoint.Add(Path);
+                        break;
+                    }
+                }
+            }
+            int selected_index = UnityEngine.Random.Range(0, ValidWaypoint.Count);
+            Waypoints = ValidWaypoint[selected_index].Waypoints;
         }
         // Cơ chế xác định mình đang ở giữa 2 waypoint index nào
         for (int i = 0; i < Waypoints.Length - 1; i++)
         {
-            if (x_Between_2_Waypoints(i, transform.position.x) && y_Between_2_Waypoints(i, transform.position.y))
+            if (x_Between_2_Waypoints(i, transform.position.x, Waypoints) && y_Between_2_Waypoints(i, transform.position.y, Waypoints))
             {
                 Waypoint_CurrentIndex = i;
                 break;
@@ -70,11 +83,11 @@ public class SummonerUndead : MonoBehaviour
         }
         StatsReseted = true;
     }
-    private bool x_Between_2_Waypoints(int index, float x_position)
+    private bool x_Between_2_Waypoints(int index, float x_position, GameObject[] Waypoints)
     {
         return ((Waypoints[index].transform.position.x <= x_position && x_position <= Waypoints[index + 1].transform.position.x) || (Waypoints[index].transform.position.x >= x_position && x_position >= Waypoints[index + 1].transform.position.x));
     }
-    private bool y_Between_2_Waypoints(int index, float y_position)
+    private bool y_Between_2_Waypoints(int index, float y_position, GameObject[] Waypoints)
     {
         return ((Waypoints[index].transform.position.y <= y_position && y_position <= Waypoints[index + 1].transform.position.y) || (Waypoints[index].transform.position.y >= y_position && y_position >= Waypoints[index + 1].transform.position.y));
     }

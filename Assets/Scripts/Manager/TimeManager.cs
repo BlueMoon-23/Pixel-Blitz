@@ -41,7 +41,7 @@ public class TimeManager : MonoBehaviour
     public int Get_TimePlayed()
     {
         // StopCoroutine(TimeCount()); viết như này thì sẽ không dừng được do không xác định được coroutine. cần truyền coroutine bằng tham chiếu
-        StopCoroutine(Coroutine);
+        if (Coroutine != null) StopCoroutine(Coroutine);
         return TimePlayed;
     }
     public void SetCoroutine(Coroutine coroutine)

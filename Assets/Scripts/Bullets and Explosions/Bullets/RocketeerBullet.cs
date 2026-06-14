@@ -52,42 +52,7 @@ public class RocketeerBullet : BaseBullets
             BaseEnemy baseEnemy = collision.gameObject.GetComponent<BaseEnemy>();
             if (baseEnemy != null && baseEnemy == enemy)
             {
-                // Sinh ra 4 đạn con nổ 4 bên nếu character có level = 4
-                if (character.GetLevel() >= 4 && !isCluster)
-                {
-                    for (int i = 0; i < 4; i++)
-                    {
-                        // 0: -1 -1
-                        // 1: -1 1
-                        // 2: 1 -1
-                        // 3: 1 1
-                        float x = i < 2 ? -1 : 1;
-                        float y = i % 2 == 0 ? -1 : 1;
-                        Vector3 newDirection = new Vector3(x, y, 0).normalized;
-                        if (BulletPooler.instance != null)
-                        {
-                            BaseBullets ClusterRocket = BulletPooler.instance.GetBullet(this.BulletID);
-                            if (ClusterRocket != null)
-                            {
-                                ClusterRocket.transform.position = this.transform.position;
-                                ClusterRocket.transform.rotation = Quaternion.identity;
-                                // Cài lại thông số cho đạn
-                                RocketeerBullet ClusterRocketBullet = ClusterRocket.GetComponent<RocketeerBullet>();
-                                ClusterRocketBullet.BulletSpeed = 3.125f;
-                                ClusterRocketBullet.SetCharacter(character);
-                                ClusterRocketBullet.isCluster = true;
-                                ClusterRocketBullet.ClusterDirection = newDirection;
-                                if (BulletPooler.instance != null)
-                                {
-                                    BulletPooler.instance.StartCoroutine(BulletPooler.instance.DestroyCluster(ClusterRocketBullet, 1.0f));
-                                }
-                            }
-                        }
-                    }
-                }
-                // Sinh đạn trước khi nổ (bị destroy)
-                // Không bỏ logic sinh thêm đạn trong ondestroy
-                Explode();
+                ExplodeOnImpact();
             }
         }
     }
@@ -130,8 +95,44 @@ public class RocketeerBullet : BaseBullets
         this.transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
         this.transform.position += transform.up * BulletSpeed * Time.deltaTime;
     }
-    public void Explode()
+    protected override void ExplodeOnImpact()
     {
+        // Sinh ra 4 đạn con nổ 4 bên nếu character có level = 4
+        if (character.GetLevel() >= 4 && !isCluster)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                // 0: -1 -1
+                // 1: -1 1
+                // 2: 1 -1
+                // 3: 1 1
+                float x = i < 2 ? -1 : 1;
+                float y = i % 2 == 0 ? -1 : 1;
+                Vector3 newDirection = new Vector3(x, y, 0).normalized;
+                if (BulletPooler.instance != null)
+                {
+                    BaseBullets ClusterRocket = BulletPooler.instance.GetBullet(this.BulletID);
+                    if (ClusterRocket != null)
+                    {
+                        ClusterRocket.transform.position = this.transform.position;
+                        ClusterRocket.transform.rotation = Quaternion.identity;
+                        // Cài lại thông số cho đạn
+                        RocketeerBullet ClusterRocketBullet = ClusterRocket.GetComponent<RocketeerBullet>();
+                        ClusterRocketBullet.BulletSpeed = 3.125f;
+                        ClusterRocketBullet.SetCharacter(character);
+                        ClusterRocketBullet.isCluster = true;
+                        ClusterRocketBullet.ClusterDirection = newDirection;
+                        if (BulletPooler.instance != null)
+                        {
+                            BulletPooler.instance.StartCoroutine(BulletPooler.instance.DestroyCluster(ClusterRocketBullet, 1.0f));
+                        }
+                    }
+                }
+            }
+        }
+        // Sinh đạn trước khi nổ (bị destroy)
+        // Không bỏ logic sinh thêm đạn trong ondestroy
+        //
         // Tạo 1 vòng tròn collider, rồi gây damage lên toàn bộ enemy trong vòng này
         Collider2D[] enemyInRadius = Physics2D.OverlapCircleAll(transform.position, ExplosionRadius);
         foreach (Collider2D enemy in enemyInRadius)
@@ -186,5 +187,9 @@ public class RocketeerBullet : BaseBullets
         {
             BulletPooler.instance.ReturnBullet(this);
         }
+    }
+    public void Explode()
+    {
+        ExplodeOnImpact();
     }
 }

@@ -8,7 +8,7 @@ public class Pulser : BaseCharacter
     public GameObject PulseBar;
     private float currentPulse = 0f;
     [SerializeField] private float[] MaxPulseByLevels;
-    [SerializeField] private int[] ChargeTimeByLevels;
+    [SerializeField] private float[] ChargeTimeByLevels;
     private float MaxPulse;
     private bool reachedMaxPulse;
     private float ChargeTime = 4f;

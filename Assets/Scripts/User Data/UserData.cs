@@ -14,6 +14,12 @@ public class UserData
     public List<UserCodeData> redeemedCodes;
     // Cái này hỏi CharacterSaveManager
     public UserCharacterData userCharacterData;
+    // Cái này hỏi MatchSaveManager
+    public List<MatchData> userMatchData;
+    // Cái này bên win_lose sẽ sửa
+    public int ClearedTimes = 0;
+    public int RoundTimes = 0;
+    public int AttemptTimes = 0;
     // Cái này hỏi TutorialManager
     public bool hasPlayedTutorial;
 }

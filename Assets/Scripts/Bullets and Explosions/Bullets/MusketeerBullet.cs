@@ -15,6 +15,10 @@ public class MusketeerBullet : BaseBullets
     {
         Move();
     }
+    protected override void ExplodeOnImpact()
+    {
+        base.ExplodeOnImpact();
+    }
     protected override void OnTriggerEnter2D(Collider2D collision)
     {
         BaseEnemy baseEnemy = collision.gameObject.GetComponent<BaseEnemy>();
@@ -33,20 +37,7 @@ public class MusketeerBullet : BaseBullets
                     }
                 }
             }
-            if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
-            {
-                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
-                if (explosionSFX != null)
-                {
-                    explosionSFX.transform.position = this.transform.position;
-                    explosionSFX.transform.rotation = Quaternion.identity;
-                    ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
-                }
-            }
-            if (BulletPooler.instance != null)
-            {
-                BulletPooler.instance.ReturnBullet(this);
-            }
+            ExplodeOnImpact();
         }
     }
 }

@@ -33,7 +33,7 @@ public class GiftcodeSaveManager : MonoBehaviour
     public IEnumerator ResetAnnouncement()
     {
         yield return new WaitForSeconds(2);
-        announcement.text = "";
+        if (announcement != null) announcement.text = "";
     }
     public void RedeemCode()
     {

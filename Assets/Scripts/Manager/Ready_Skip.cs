@@ -77,7 +77,7 @@ public class Ready_Skip : MonoBehaviour
                     SkipUI.gameObject.SetActive(true);
                     SkipUI.DOFade(1f, 0.5f).From(0f);
                 });
-                sequence.AppendInterval(43f);
+                yield return new WaitForSeconds(43f);
                 sequence.AppendCallback(() =>
                 {
                     SkipUI.DOFade(0f, 0.5f).From(1f);

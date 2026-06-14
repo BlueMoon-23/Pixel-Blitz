@@ -15,6 +15,7 @@ public class MainMenu : MonoBehaviour
     public GameObject Giftcode_Popup;
     public GameObject Tutorial_Popup;
     public GameObject Tutorial_Dimed;
+    public GameObject Profile_Popup;
     public Slider musicSlider;
     public Slider UISlider;
     // Tutorial
@@ -111,6 +112,11 @@ public class MainMenu : MonoBehaviour
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
         Giftcode_Popup.SetActive(true);
     }
+    public void Profile()
+    {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
+        Profile_Popup.SetActive(true);
+    }
     public void TurnOffSetting()
     {
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
@@ -120,6 +126,11 @@ public class MainMenu : MonoBehaviour
     {
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
         Giftcode_Popup.SetActive(false);
+    }
+    public void TurnOffProfile()
+    {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Setting_Sound);
+        Profile_Popup.SetActive(false);
     }
     public void TurnOffTutorial()
     {

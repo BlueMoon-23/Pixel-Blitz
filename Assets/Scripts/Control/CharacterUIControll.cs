@@ -21,21 +21,29 @@ public class CharacterUIControll : MonoBehaviour
     }
     private GameObject[] Range_Prefab;
     public Sprite[] characterImages;
+    public BaseCharacter CurrentCharacter;
     //
+    [Header("Character")]
     public TextMeshProUGUI characterName;
     public Image characterImage;
+    public Image characterGlow;
+    [Header("Total Damage")]
+    public TextMeshProUGUI characterTotalDamage;
+    [Header("Upgrade")]
     public RectTransform UpgradeContent;
     public TextMeshProUGUI upgradeName;
     public TextMeshProUGUI upgradeCost;
+    [Header("Stats")]
     public TextMeshProUGUI sellCost;
     public TextMeshProUGUI RangeStats;
     public TextMeshProUGUI DamageStats;
     public TextMeshProUGUI CooldownStats;
     //
-    public BaseCharacter CurrentCharacter;
+    [Header("Icon")]
     public CanvasGroup HiddenDetectionIcon;
     public CanvasGroup StrikethroughIcon;
     //
+    [Header("Button")]
     public Button UpgradeButton;
     public Button AbilityButton;
     public Image AbilityCurrentIcon;

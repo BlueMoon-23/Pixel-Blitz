@@ -100,7 +100,7 @@ public class Win_Lose : MonoBehaviour
         sequence.AppendInterval(2f).AppendCallback(() =>
         {
             VictoryInfo.gameObject.SetActive(true);
-            Victory_GamemodeText.text += ModeManager.instance.currentGamemode.GetType().Name;
+            Victory_GamemodeText.text = ModeManager.instance.currentMap.MapName + " | " + ModeManager.instance.currentGamemode.GetType().Name;
             Victory_TimePlayedText.text = "Time Played: " + (TimeManager.instance.Get_TimePlayed() / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
             if (gemReward == 0)
             {
@@ -155,7 +155,7 @@ public class Win_Lose : MonoBehaviour
         sequence.AppendInterval(2f).AppendCallback(() =>
         {
             DefeatInfo.gameObject.SetActive(true);
-            Defeat_GamemodeText.text += ModeManager.instance.currentGamemode.GetType().Name;
+            Defeat_GamemodeText.text = ModeManager.instance.currentMap.MapName + " | " + ModeManager.instance.currentGamemode.GetType().Name;
             Defeat_TimePlayedText.text = "Time Played: " + (TimeManager.instance.Get_TimePlayed() / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
             if (gemreward == 0)
             {

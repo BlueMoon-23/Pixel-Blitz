@@ -9,10 +9,11 @@ public class MapScroll : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, 
 {
     private Camera camera;
     private Vector3 dragOrigin;
-    public Tilemap tilemap;
+    private Tilemap tilemap;
     private void Awake()
     {
         camera = Camera.main;
+        tilemap = ModeManager.instance.currentMap.ViewBounds;
     }
     public void OnPointerDown(PointerEventData eventData)
     {

@@ -27,7 +27,6 @@ public class WaveManager : MonoBehaviour
     public int GetCurrentWave() { return currentWave; }
     public IEnumerator SpawnEnemyWave(Gamemodes mode, int MaxWave)
     {
-        Ready_Skip.instance.ReadyUI.gameObject.SetActive(false);
         Coroutine coroutine = TimeManager.instance.StartCoroutine(TimeManager.instance.TimeCount());
         TimeManager.instance.SetCoroutine(coroutine);
         for (currentWave = 1; currentWave <= MaxWave; currentWave++)
@@ -42,9 +41,9 @@ public class WaveManager : MonoBehaviour
                 // Thưởng tiền
                 if (EconomyManager.instance != null) EconomyManager.instance.EarnCoinEachWave(mode, currentWave);
                 // Sinh quái chia theo mode
-                if (WaypointManager.instance != null)
+                if (WaypointManager.instance != null && ModeManager.instance != null)
                 {
-                    if (WaypointManager.instance.currentMap.isMultiPath)
+                    if (ModeManager.instance.currentMap.isMultiPath)
                     {
                         for (int i = 0; i < WaypointManager.instance.List_of_Waypoints.Length; i++)
                         {

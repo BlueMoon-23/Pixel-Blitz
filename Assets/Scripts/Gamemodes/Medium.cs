@@ -173,14 +173,6 @@ public class Medium : Gamemodes
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 3, 1.25f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1, 1.25f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.MediumFinalBoss, 1, 1f));
-                    if (BossManager.instance != null)
-                    {
-                        foreach (BossHPGroup groups in BossManager.instance.bossHP)
-                        {
-                            groups.bossHPGroup.SetActive(true);
-                            groups.BossName.text = "Abyssal Void Gatekeeper";
-                        }
-                    }
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 3, 1.25f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 3, 1f));
                     break;

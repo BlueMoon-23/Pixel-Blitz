@@ -19,7 +19,7 @@ public class CharacterSlotGroupControll : MonoBehaviour
             foreach (Transform child in CharacterLoadout.instance.transform)
             {
                 CharacterSlots[index].gameObject.SetActive(true);
-                CharacterSlots[index].CharacterPrefab = child.gameObject;
+                CharacterSlots[index].SetCharacterPrefab(child.gameObject);
                 CharacterImages[index].sprite = child.GetComponent<CharacterInfomation>().characterData.characterProfile.CharacterImage;
                 CharacterCosts[index].gameObject.SetActive(true);
                 CharacterCosts[index].text = "$" + child.GetComponent<CharacterInfomation>().characterData.characterProfile.CostStat.ToString();

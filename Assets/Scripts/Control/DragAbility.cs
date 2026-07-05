@@ -8,12 +8,12 @@ using UnityEngine.Tilemaps;
 public class DragAbility : DragThing
 {
     public static DragAbility instance;
-    [SerializeField] private BaseCharacter currentCharacter; // truyền con minigunner có ability vào đây để khóa số lượng 1 clone
+    private BaseCharacter currentCharacter; // truyền con minigunner có ability vào đây để khóa số lượng 1 clone
     public enum AbilityDragType { None, GroundPlacement, WaypointPlacement }
-    public AbilityDragType currentDragType = AbilityDragType.None;
+    private AbilityDragType currentDragType = AbilityDragType.None;
     private GameObject[] Range_Prefab;
     // Truyền range vào đây để các drag sau hiện range chỉ định đúng range
-    public float DragRange; 
+    private float DragRange; 
     protected new void Awake()
     {
         if (instance == null)
@@ -30,7 +30,14 @@ public class DragAbility : DragThing
     {
         currentCharacter = character;
     }
-
+    public void SetDragType(AbilityDragType abilityDragType)
+    {
+        currentDragType = abilityDragType;
+    }
+    public void SetDragRange(float range)
+    {
+        DragRange = range;
+    }
     // Logic from DragCharacter
     protected override void OnPointerDown_Specific(PointerEventData eventData)
     {
@@ -123,7 +130,7 @@ public class DragAbility : DragThing
         WaypointUI.SetActive(true);
         CancelPlacing.SetActive(true);
         // Range
-        currentCharacter.Range_Prefab.GetComponent<Renderer>().enabled = true;
+        currentCharacter.characterAttack.Range_Prefab.GetComponent<Renderer>().enabled = true;
 
     }
     private void WaypointPlacementEndDrag(PointerEventData eventData)

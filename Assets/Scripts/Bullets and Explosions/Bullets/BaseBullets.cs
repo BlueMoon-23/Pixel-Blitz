@@ -10,11 +10,15 @@ public class BaseBullets : MonoBehaviour
     [SerializeField] protected float BulletSpeed = 10f;
     public int BulletID;
     // Serialize field giup unity biet duoc rang object nay can duoc luu tru
+    [Header("Explosion SFX")]
     public GameObject Explosion_SFX;
     public GameObject LowGraphic_Explosion_SFX;
-    void Start()
+    protected int BulletExplosionID;
+    protected int LowGraphic_BulletExplosionID;
+    protected void Start()
     {
-        
+        if (Explosion_SFX != null) BulletExplosionID = Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID;
+        if (LowGraphic_Explosion_SFX != null) LowGraphic_BulletExplosionID = LowGraphic_Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID;
     }
 
     // Update is called once per frame
@@ -55,7 +59,7 @@ public class BaseBullets : MonoBehaviour
     {
         if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
         {
-            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(BulletExplosionID);
             if (explosionSFX != null)
             {
                 explosionSFX.transform.position = this.transform.position;
@@ -75,7 +79,7 @@ public class BaseBullets : MonoBehaviour
         {
             if (character != null)
             {
-                baseEnemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                baseEnemy.TakeDamage(character, character.GetDamage(), character.canStrikethroughOrNot());          
             }
             //GameObject spawnedSFX = Instantiate(Explosion_SFX, this.transform.position, Quaternion.identity);
             //Destroy(spawnedSFX, 0.5f);

@@ -13,10 +13,6 @@ public class PulserLaser : BaseBullets
     {
         lineRenderer = GetComponent<LineRenderer>();
     }
-    void Start()
-    {
-
-    }
     // update của base bullet xóa pulserlaser nè
     private void Update()
     {
@@ -57,7 +53,7 @@ public class PulserLaser : BaseBullets
                 {
                     pulser.StackPulse(character.GetDamage() < enemy.GetHP() ? character.GetDamage() : enemy.GetHP());
                 }
-                enemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                enemy.TakeDamage(character, character.GetDamage(), character.canStrikethroughOrNot());
                 enemy.ModifySpeed(0.8f);
             }
         }

@@ -5,10 +5,7 @@ using UnityEngine;
 public class SceneKey
 {
     public static string StartScene = "StartScene";
-    public static string Greenland = "Greenland";
-    public static string OmittedCastle = "OmittedCastle";
-    public static string IceboundFortress = "IceboundFortress";
-    public static string DeadShaft = "DeadShaft";
+    public static string GameScene = "GameScene";
     public static string MainMenu = "MainMenu";
     public static string UserRegister = "UserRegister";
     public static string MapChoose = "MapChoose";

@@ -6,24 +6,24 @@ using UnityEngine.Tilemaps;
 
 public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler
 {
-    public Canvas canvas;
+    public static Canvas canvas;
     protected RectTransform m_RectTransform;
     protected Vector2 offset;
     protected CanvasGroup canvasGroup;
     protected Vector2 previous_RectTransform;
-    public Tilemap PlacingGround;
-    public Tilemap PlacingCliff;
-    public Tilemap PlacingWaypoint;
+    public static Tilemap PlacingGround;
+    public static Tilemap PlacingCliff;
+    public static Tilemap PlacingWaypoint;
     //
     public GameObject CharacterPrefab;
-    public GameObject PlacingGroundUI;
-    public GameObject PlacingCliffUI;
-    public GameObject WaypointUI;
-    public GameObject CancelPlacing;
+    public static GameObject PlacingGroundUI;
+    public static GameObject PlacingCliffUI;
+    public static GameObject WaypointUI;
+    public static GameObject CancelPlacing;
     // Range
     public GameObject RangeUI;
     protected RectTransform range_RectTransform;
-    protected BaseCharacter baseCharacter;
+    [SerializeField] protected BaseCharacter baseCharacter;
     protected void Awake()
     {
         m_RectTransform = GetComponent<RectTransform>();
@@ -32,9 +32,23 @@ public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler
         // Range
         range_RectTransform = RangeUI.GetComponent<RectTransform>();
     }
-    void Start()
+    private void Start()
     {
         baseCharacter = CharacterPrefab.GetComponent<BaseCharacter>();
+        InitPlacing();
+    }
+    protected void InitPlacing()
+    {
+        canvas = FindFirstObjectByType<Canvas>();
+        PlacingGround = ModeManager.instance.currentMap.PlacingGround;
+        PlacingCliff = ModeManager.instance.currentMap.PlacingCliff;
+        PlacingWaypoint = ModeManager.instance.currentMap.PlacingWaypoint;
+        PlacingGroundUI = ModeManager.instance.currentMap.PlacingGroundUI;
+        PlacingCliffUI = ModeManager.instance.currentMap.PlacingCliffUI;
+        WaypointUI = ModeManager.instance.currentMap.WaypointUI;
+        // Xử lý cancel placing
+        Transform cancel = canvas.transform.Find("CancelPlacing");
+        if (cancel != null) { CancelPlacing = cancel.gameObject; }
     }
     protected abstract void OnPointerDown_Specific(PointerEventData eventData);
     protected abstract void OnBeginDrag_Specific(PointerEventData eventData);

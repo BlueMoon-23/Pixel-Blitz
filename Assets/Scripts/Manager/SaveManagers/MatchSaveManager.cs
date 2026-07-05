@@ -41,6 +41,10 @@ public class MatchSaveManager : MonoBehaviour
     {
         if (matchData.MapName == mapData.mapInformation.MapName && matchData.Gamemode == mapData.gamemode.name)
         {
+            if (loadout.Count != userMatchData.list[userMatchData.list.Count - 1].CharacterLoadout.Count)
+            {
+                return false;
+            }
             foreach (CharacterInfomation character1 in loadout)
             {
                 bool isFound = false;
@@ -54,13 +58,11 @@ public class MatchSaveManager : MonoBehaviour
                 }
                 if (!isFound)
                 {
-                    Debug.Log("Co su sai khac ve character: " + character1.characterData.characterID);
                     return false;
                 }
             }
             return true;
         }
-        Debug.Log("Co su sai khac ve thong tin chung");
         return false;
     }
     public void CreateMatch(MapData mapData, List<CharacterInfomation> loadout)

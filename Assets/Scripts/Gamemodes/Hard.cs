@@ -220,15 +220,6 @@ public class Hard : Gamemodes
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 3, 1f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 1, 1f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HardFinalBoss, 1, 1.25f));
-                    if (BossManager.instance != null)
-                    {
-                        foreach (BossHPGroup groups in BossManager.instance.bossHP)
-                        {
-                            groups.bossHPGroup.SetActive(true);
-                            groups.BossName.text = "Secret Glamour Angel";
-                        }
-                    }
-
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 10, 0.75f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 4, 1f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1, 1.25f));

@@ -27,7 +27,7 @@ public class SummonerBullet : BaseBullets
     {
         if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
         {
-            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(BulletExplosionID);
             if (explosionSFX != null)
             {
                 explosionSFX.transform.position = this.transform.position;
@@ -89,7 +89,7 @@ public class SummonerBullet : BaseBullets
                     {
                         summoner.Stack_for_Grave(character.GetDamage() < baseEnemy.GetHP() ? character.GetDamage() : baseEnemy.GetHP());
                     }
-                    baseEnemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                    baseEnemy.TakeDamage(character, character.GetDamage(), character.canStrikethroughOrNot());
                 }
                 ExplodeOnImpact();
             }
@@ -106,7 +106,7 @@ public class SummonerBullet : BaseBullets
                     {
                         summoner.Stack_for_Grave(character.GetDamage() < baseEnemy.GetHP() ? character.GetDamage() : baseEnemy.GetHP());
                     }
-                    baseEnemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                    baseEnemy.TakeDamage(character, character.GetDamage(), character.canStrikethroughOrNot());
                 }
                 ExplodeOnImpact();
             }

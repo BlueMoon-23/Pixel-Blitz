@@ -1,14 +1,19 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
-
 public class DragCharacter : DragThing
 {
-    void Start()
+    private void Start()
     {
         baseCharacter = CharacterPrefab.GetComponent<BaseCharacter>();
+        InitPlacing();
+    }
+    public void SetCharacterPrefab(GameObject character)
+    {
+        CharacterPrefab = character;
     }
     protected override void OnPointerDown_Specific(PointerEventData eventData)
     {
@@ -39,7 +44,8 @@ public class DragCharacter : DragThing
         CancelPlacing.SetActive(true);
         // Range
         RangeUI.SetActive( true );
-        RangeUI.transform.localScale = new Vector3(RangeUI.transform.localScale.x * baseCharacter.GetRange(), RangeUI.transform.localScale.y * baseCharacter.GetRange(), RangeUI.transform.localScale.z * baseCharacter.GetRange());
+        RangeUI.transform.DOScale(new Vector3(RangeUI.transform.localScale.x * baseCharacter.GetRange(), RangeUI.transform.localScale.y * baseCharacter.GetRange(), RangeUI.transform.localScale.z * baseCharacter.GetRange()), 0.05f).From(0f);
+        //RangeUI.transform.localScale = new Vector3(RangeUI.transform.localScale.x * baseCharacter.GetRange(), RangeUI.transform.localScale.y * baseCharacter.GetRange(), RangeUI.transform.localScale.z * baseCharacter.GetRange());
         range_RectTransform.anchoredPosition = m_RectTransform.anchoredPosition - new Vector2(0f, 30f);
     }
     protected override void OnEndDrag_Specific(PointerEventData eventData)

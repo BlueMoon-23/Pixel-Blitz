@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 
@@ -13,8 +14,9 @@ public class RangerLaser : BaseBullets
         hasDealtDamage = false;
         lineRenderer = GetComponent<LineRenderer>();
     }
-    void Start()
+    private void Update()
     {
+
     }
 
     // Update is called once per frame
@@ -43,15 +45,22 @@ public class RangerLaser : BaseBullets
         {
             if (character != null && !hasDealtDamage)
             {
-                enemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                enemy.TakeDamage(character, character.GetDamage(), character.canStrikethroughOrNot());
                 hasDealtDamage = true;
                 // Stun for 1s when level 4
                 if (character.GetLevel() >= 4)
                 {
-                    enemy.StartCoroutine(enemy.GetStunned(1f));
+                    if (enemy != null && enemy.GetHP() > 0) enemy.StartCoroutine(enemy.enemyEffect.GetStunned(1f));
                 }
-                GameObject spawnedSFX = Instantiate(Explosion_SFX, enemy.transform.position, Quaternion.identity);
-                Destroy(spawnedSFX, 0.5f);
+                //GameObject spawnedSFX = Instantiate(Explosion_SFX, enemy.transform.position, Quaternion.identity);
+                //Destroy(spawnedSFX, 0.5f);
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(BulletExplosionID);
+                if (explosionSFX != null)
+                {
+                    explosionSFX.transform.position = enemy.transform.position;
+                    explosionSFX.transform.rotation = Quaternion.identity;
+                    ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(explosionSFX, 0.5f));
+                }
                 if (BulletPooler.instance != null)
                 {
                     BulletPooler.instance.StartCoroutine(BulletPooler.instance.ReturnBulletWithDelay(this, 0.25f));

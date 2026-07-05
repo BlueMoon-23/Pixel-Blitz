@@ -9,5 +9,6 @@ public class BossHPGroup : MonoBehaviour
     public GameObject bossHPGroup;
     public TextMeshProUGUI BossName;
     public TextMeshProUGUI BossHPText;
-    public Image BossHPBar;
+    public Image BossHP_RedBar;
+    public Image BossHP_WhiteBar;
 }

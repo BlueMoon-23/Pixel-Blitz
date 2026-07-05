@@ -31,7 +31,7 @@ public class FreezerBullet : BaseBullets
         {
             if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
             {
-                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(BulletExplosionID);
                 if (explosionSFX != null)
                 {
                     explosionSFX.transform.position = this.transform.position;
@@ -48,7 +48,7 @@ public class FreezerBullet : BaseBullets
         {
             if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
             {
-                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(BulletExplosionID);
                 if (explosionSFX != null)
                 {
                     explosionSFX.transform.position = this.transform.position;
@@ -59,7 +59,7 @@ public class FreezerBullet : BaseBullets
             }
             else if (GameSetting.instance != null && GameSetting.instance != null && !GameSetting.instance._showExplosion)
             {
-                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_BulletExplosionID);
                 if (explosionSFX != null)
                 {
                     explosionSFX.transform.position = this.transform.position;
@@ -81,9 +81,9 @@ public class FreezerBullet : BaseBullets
             BaseEnemy baseEnemy = collision.gameObject.GetComponent<BaseEnemy>();
             if (baseEnemy != null && baseEnemy == enemy)
             {
-                baseEnemy.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                baseEnemy.TakeDamage(character, character.GetDamage(), character.canStrikethroughOrNot());
                 Freezer freezer = character as Freezer; // as là toán tử ép kiểu
-                baseEnemy.GetFreeze(freezer.FreezeTime, freezer.FreezeCount);
+                baseEnemy.enemyEffect.GetFreeze(freezer.FreezeTime, freezer.FreezeCount);
                 baseEnemy.ModifySpeed(0.7f);
                 ExplodeOnImpact();
             }
@@ -100,10 +100,13 @@ public class FreezerBullet : BaseBullets
                     BaseEnemy enemyGetDamaged = enemy.GetComponent<BaseEnemy>();
                     if (enemyGetDamaged != null)
                     {
-                        enemyGetDamaged.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
-                        Freezer freezer = character as Freezer; // as là toán tử ép kiểu
-                        enemyGetDamaged.GetFreeze(freezer.FreezeTime, freezer.FreezeCount);
-                        baseEnemy.ModifySpeed(0.7f);
+                        enemyGetDamaged.TakeDamage(character, character.GetDamage(), character.canStrikethroughOrNot());
+                        if (enemyGetDamaged.GetHP() > 0)
+                        {
+                            Freezer freezer = character as Freezer; // as là toán tử ép kiểu
+                            enemyGetDamaged.enemyEffect.GetFreeze(freezer.FreezeTime, freezer.FreezeCount);
+                            baseEnemy.ModifySpeed(0.7f);
+                        }
                     }
                 }
                 ExplodeOnImpact();

@@ -8,8 +8,10 @@ public class ModeManager : MonoBehaviour
 {
     public static ModeManager instance;
     // Mode manager
-    public GameObject[] Gamemode_Prefabs;
+    public GameObject[] GamemodePrefabs;
     public Gamemodes currentGamemode; // Khi người chơi nhấn nút play, phải truyền cái currentGamemode vô
+    public GameObject[] MapPrefabs;
+    public MapInformation currentMap;
     public int MaxWave;
     public float Star;
     // Truyền nhạc xuống đây
@@ -21,6 +23,7 @@ public class ModeManager : MonoBehaviour
     // Current Enemy Prefabs
     public List<BaseEnemy> enemy_Prefabs = new List<BaseEnemy>();
     private Dictionary<string, GameObject> Gamemode_Dict = new Dictionary<string, GameObject>();
+    private Dictionary<string, GameObject> Map_Dict = new Dictionary<string, GameObject>();
     private void Awake()
     {
         if (instance == null)
@@ -32,10 +35,15 @@ public class ModeManager : MonoBehaviour
         {
             Destroy(this);
         }
-        foreach (GameObject gamemode in Gamemode_Prefabs)
+        foreach (GameObject gamemode in GamemodePrefabs)
         {
             Gamemode_Dict.Add(gamemode.name, gamemode);
         }
+        foreach (GameObject map in MapPrefabs)
+        {
+            Map_Dict.Add(map.name, map);
+        }
+        transform.position = Vector3.zero;
     }
     public void LoadGamemode()
     {
@@ -59,7 +67,10 @@ public class ModeManager : MonoBehaviour
     {
         currentGamemode = mapData.gamemode;
         GameObject gamemode_object = Instantiate(Gamemode_Dict[currentGamemode.GetType().ToString()], transform.position, Quaternion.identity);
+        GameObject map_object = Instantiate(Map_Dict[mapData.mapInformation.MapName.Replace(" ", "")], transform.position, Quaternion.identity);
         gamemode_object.transform.SetParent(transform, false);
+        currentMap = map_object.GetComponent<MapInformation>();
+        map_object.transform.SetParent(transform, false);
         Star = mapData.mapInformation.StarRate;
         _currentMapBGM = mapData.mapInformation.MapBGM;
     }

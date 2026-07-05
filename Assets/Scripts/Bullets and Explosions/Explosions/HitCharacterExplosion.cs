@@ -24,7 +24,7 @@ public class HitCharacterExplosion : BaseExplosion
         {
             if (CanHitCliffCharacter || !character.profile.isCliff)
             {
-                character.StartCoroutine(character.GetStunned(StunDuration));
+                character.characterEffect.StartCoroutine(character.characterEffect.GetStunned(StunDuration));
             }
         }
         if (CanHitSummonerUndead)

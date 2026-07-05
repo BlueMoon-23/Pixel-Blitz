@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using DG.Tweening;
 public class CharacterControll : MonoBehaviour
 {
     // Script này là cơ chế nhấn vào character và hiện lên character range và characterUI
@@ -46,7 +47,8 @@ public class CharacterControll : MonoBehaviour
         {
             Range_Prefab[i].GetComponent<Renderer>().enabled = false;
         }
-        character.Range_Prefab.GetComponent<Renderer>().enabled = true;
+        character.characterAttack.Range_Prefab.GetComponent<Renderer>().enabled = true;
+        character.characterAttack.Range_Prefab.transform.DOScale(character.characterAttack.Range_Prefab.transform.localScale, 0.05f).From(0f);
         characterUI.gameObject.SetActive(true);
         characterUI.CurrentCharacter = character;
         characterUI.CurrentCharacter.SetUpgradeInformation();

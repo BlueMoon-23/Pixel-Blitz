@@ -144,11 +144,11 @@ public class RocketeerBullet : BaseBullets
                 {
                     if (!isCluster)
                     {
-                        enemyGetDamaged.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                        enemyGetDamaged.TakeDamage(character, character.GetDamage(), character.canStrikethroughOrNot());
                     }
                     else
                     {
-                        enemyGetDamaged.TakeDamage(50, character.canStrikethroughOrNot());
+                        enemyGetDamaged.TakeDamage(character, 50, character.canStrikethroughOrNot());
                     }
                 }
             }
@@ -158,7 +158,7 @@ public class RocketeerBullet : BaseBullets
         //Destroy(spawnedSFX, 0.5f);
         if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
         {
-            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(BulletExplosionID);
             if (explosionSFX != null)
             {
                 explosionSFX.transform.position = this.transform.position;
@@ -169,7 +169,7 @@ public class RocketeerBullet : BaseBullets
         }
         else if (ExplosionPooler.instance != null && GameSetting.instance != null && !GameSetting.instance._showExplosion)
         {
-            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_BulletExplosionID);
             if (explosionSFX != null)
             {
                 explosionSFX.transform.position = this.transform.position;

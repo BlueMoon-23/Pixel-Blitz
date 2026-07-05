@@ -75,7 +75,7 @@ public class MapChoose : MonoBehaviour
             MatchSaveManager.instance.CreateMatch(ChosenMap, CharacterLoadout.instance.characterLoadout);
         }
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Play_Sound);
-        SceneKey.targetScene = ChosenMap.mapInformation.targetScene;
+        SceneKey.targetScene = SceneKey.GameScene;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
     private IEnumerator ShowEquipAnnounce()

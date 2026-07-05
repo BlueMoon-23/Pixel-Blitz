@@ -142,14 +142,6 @@ public class Easy : Gamemodes
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.SpeedyBoss, 8, 1));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 9, 1));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.EasyFinalBoss, 1, 1));
-                    if (BossManager.instance != null)
-                    {
-                        foreach (BossHPGroup groups in BossManager.instance.bossHP)
-                        {
-                            groups.bossHPGroup.SetActive(true);
-                            groups.BossName.text = "Scarlet Knight";
-                        }
-                    }
                     break;
                 }
             default:

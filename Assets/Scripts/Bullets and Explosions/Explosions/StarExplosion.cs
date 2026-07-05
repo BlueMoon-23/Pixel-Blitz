@@ -5,6 +5,7 @@ using UnityEngine.TextCore.Text;
 
 public class StarExplosion : MonoBehaviour
 {
+    private BaseCharacter wizard;
     private float damageValue;
     // Start is called before the first frame update
     void Start()
@@ -17,8 +18,9 @@ public class StarExplosion : MonoBehaviour
     {
         
     }
-    public void SetDamage(float Damage)
+    public void Initialize(BaseCharacter character, float Damage)
     {
+        wizard = character;
         damageValue = Damage;
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -26,8 +28,8 @@ public class StarExplosion : MonoBehaviour
         BaseEnemy baseEnemy = collision.gameObject.GetComponent<BaseEnemy>();
         if (baseEnemy != null)
         {
-            baseEnemy.TakeDamage(damageValue, true);
-            baseEnemy.StartCoroutine(baseEnemy.GetStunned(1f));
+            baseEnemy.TakeDamage(wizard, damageValue, true);
+            if (baseEnemy.GetHP() > 0) baseEnemy.StartCoroutine(baseEnemy.enemyEffect.GetStunned(1f));
         }
     }
 }

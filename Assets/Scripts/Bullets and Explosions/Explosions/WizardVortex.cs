@@ -5,6 +5,7 @@ using UnityEngine.TextCore.Text;
 
 public class WizardVortex : BaseExplosion
 {
+    private BaseCharacter wizard;
     private float damageInterval = 0.1f;
     private float damageValue = 20f;
     private float Clock = 0f;
@@ -28,7 +29,7 @@ public class WizardVortex : BaseExplosion
         {
             foreach (BaseEnemy enemy in EnemiesInVortex)
             {
-                enemy.TakeDamage(damageValue, true);
+                enemy.TakeDamage(wizard, damageValue, true);
             }
             Clock = 0f;
         }
@@ -41,8 +42,9 @@ public class WizardVortex : BaseExplosion
             }
         }
     }
-    public void SetDamage(float Damage)
+    public void Initialize(BaseCharacter character, float Damage)
     {
+        wizard = character;
         damageValue = Damage;
     }
     private void OnTriggerEnter2D(Collider2D collision)

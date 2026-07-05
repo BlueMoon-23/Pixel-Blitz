@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class FireballBullet : BaseBullets
 {
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -23,7 +18,7 @@ public class FireballBullet : BaseBullets
             BaseEnemy enemyGetDamaged = enemy.GetComponent<BaseEnemy>();
             if (enemyGetDamaged != null)
             {
-                enemyGetDamaged.TakeDamage(character.GetDamage(), character.canStrikethroughOrNot());
+                enemyGetDamaged.TakeDamage(character, character.GetDamage(), character.canStrikethroughOrNot());
             }
         }
         // Tăng thời gian tồn tại của Vortex lên 0.5s
@@ -42,7 +37,7 @@ public class FireballBullet : BaseBullets
         //Destroy(spawnedSFX, 0.5f);
         if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
         {
-            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(BulletExplosionID);
             if (explosionSFX != null)
             {
                 explosionSFX.transform.position = this.transform.position;
@@ -53,7 +48,7 @@ public class FireballBullet : BaseBullets
         }
         else if (ExplosionPooler.instance != null && GameSetting.instance != null && !GameSetting.instance._showExplosion)
         {
-            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_Explosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            BaseExplosion explosionSFX = ExplosionPooler.instance.GetExplosion(LowGraphic_BulletExplosionID);
             if (explosionSFX != null)
             {
                 explosionSFX.transform.position = this.transform.position;

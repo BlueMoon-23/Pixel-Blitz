@@ -7,7 +7,6 @@ public class WaypointManager : MonoBehaviour
     // Script này dùng để quản lý các waypoint. Enemy sẽ truy cập vào đây để tìm lấy waypoint thay vì tự tìm bằng lệnh find
     // Singleton
     public static WaypointManager instance;
-    public MapInformation currentMap;
     private int callIndex = 0;
     private void Awake()
     {
@@ -21,6 +20,10 @@ public class WaypointManager : MonoBehaviour
         }
     }
     public WaypointInformation[] List_of_Waypoints;
+    private void Start()
+    {
+        List_of_Waypoints = ModeManager.instance.currentMap.List_of_Waypoints;
+    }
     /// <summary>
     /// C++ có khái niệm về hàm truyền tham số (func(int& n), gọi func(a) thì giá trị của a sẽ bị thay đổi sau khi hết hàm func)
     /// Để thực hiện điều này trong C#, dùng 1 trong 2 từ khóa là out hoặc ref
@@ -32,7 +35,7 @@ public class WaypointManager : MonoBehaviour
     {
         int i;
         // Đa đường
-        if (currentMap.isMultiPath)
+        if (ModeManager.instance.currentMap.isMultiPath)
         {
             // Lấy đường theo thứ tự tăng dần của lệnh gọi Coroutine
             i = callIndex % List_of_Waypoints.Length;

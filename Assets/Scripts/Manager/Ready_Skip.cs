@@ -36,6 +36,10 @@ public class Ready_Skip : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    private void Start()
+    {
+        WaypointArrows = ModeManager.instance.currentMap.WaypointArrows;
+    }
     public IEnumerator GetReady()
     {
         //DOTween.KillAll();
@@ -103,6 +107,10 @@ public class Ready_Skip : MonoBehaviour
     public void Ready()
     {
         isReady = true;
+        ReadyUI.gameObject.SetActive(false);
+        WaypointArrows.gameObject.SetActive(false);
+        StopCoroutine(GetReady());
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.Skip_Sound);
         // Thay vì gọi đích danh TutorialManager, ta chỉ "phát tín hiệu"
         OnReadyActivated?.Invoke();
     }

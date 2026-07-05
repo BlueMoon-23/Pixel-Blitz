@@ -7,6 +7,7 @@ public abstract class Gamemodes : MonoBehaviour
     public enum EnemyName { Normal, Quick, Enraged, NormalBoss, Hidden, Armored, NormalMystery, Necromancer, NecromancerMinion, SkeletonBoss, HiddenBoss, Speed, SpeedyBoss, BossMystery, EasyFinalBoss, NormalKnight, SkeletonKnight, King, HeavyKnight, HorseRider, MediumFinalBoss, Soul, Ghost, Healer, Charger, Mauler, HardFinalBoss }
     public List<EnemyEntry> enemyEntries = new List<EnemyEntry>();
     protected Dictionary<EnemyName, BaseEnemy> EnemyList = new Dictionary<EnemyName, BaseEnemy>();
+    public string FinalBossName;
     // EnemySpawner
     protected GameObject EnemySpawner;
     // Thêm interval làm cho doSkip vô tình làm lố

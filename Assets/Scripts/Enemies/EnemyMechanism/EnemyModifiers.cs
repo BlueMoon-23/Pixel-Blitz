@@ -6,11 +6,11 @@ using UnityEngine;
 public class EnemyModifiers : MonoBehaviour
 {
     // Lưu toàn bộ các modifiers, liên quan đến việc tạo / nhận hiệu ứng vĩnh viễn
-    List<float> slowModifiers = new List<float>();
-    List<float> boostModifiers = new List<float>();
+    private SortedSet<float> slowModifiers = new SortedSet<float>();
+    private SortedSet<float> boostModifiers = new SortedSet<float>();
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -31,22 +31,26 @@ public class EnemyModifiers : MonoBehaviour
     {
         boostModifiers.Add(percent);
     }
+    public bool ContainsModifier(float percent)
+    {
+        return slowModifiers.Contains(percent) || boostModifiers.Contains(percent);
+    }
+    public void RemoveSlowModifier(float percent)
+    {
+        slowModifiers.Remove(percent);
+    }
+    public void RemoveSpeedUpModifier(float percent)
+    {
+        boostModifiers.Remove(percent);
+    }
     public float GetMinSlowPercent()
     {
-        float min = 1f;
-        for (int i = 0; i < slowModifiers.Count; i++)
-        {
-            if (slowModifiers[i] < min) { min = slowModifiers[i]; }
-        }
-        return min;
+        if (slowModifiers.Count == 0) return 1f;
+        return slowModifiers.Min;
     }
     public float GetMaxBoostPercent()
     {
-        float max = 1f;
-        for (int i = 0; i < boostModifiers.Count; i++)
-        {
-            if (boostModifiers[i] > max) { max = boostModifiers[i]; }
-        }
-        return max;
+        if (boostModifiers.Count == 0) return 1f;
+        return boostModifiers.Max;
     }
 }

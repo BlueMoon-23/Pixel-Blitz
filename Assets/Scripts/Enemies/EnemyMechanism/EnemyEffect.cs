@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
-public class EnemyEffect : MonoBehaviour
+public class EnemyEffect : MonoBehaviour, IStunnable, ISide
 {
+    public SIDE currentSIDE { get; set; }
     private BaseEnemy Enemy;
     // Script quản lý việc enemy bị stun / freeze / burn / ...
     [Header("Freeze effect")]
@@ -67,7 +69,7 @@ public class EnemyEffect : MonoBehaviour
     }
     public IEnumerator GetStunned(float StunDuration)
     {
-        if (Enemy is not FinalBoss)
+        if (!IsStunImmunity())
         {
             isStunned = true;
             if (ExplosionPooler.instance != null)
@@ -100,5 +102,17 @@ public class EnemyEffect : MonoBehaviour
         }
         FreezeCurrentStack = 0;
         yield break;
+    }
+    public void ApplyStun(float StunDuration)
+    {
+        StartCoroutine(GetStunned(StunDuration));
+    }
+    public bool IsStunImmunity()
+    {
+        return Enemy is FinalBoss;
+    }
+    public SIDE GetSide()
+    {
+        return SIDE.Enemy;
     }
 }

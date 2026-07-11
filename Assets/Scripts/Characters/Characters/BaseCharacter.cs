@@ -27,10 +27,18 @@ public abstract class BaseCharacter : MonoBehaviour
     {
         get { return _hasAbility; }
     }
+    [SerializeField] protected bool _isProtected;
+    public bool isProtected
+    {
+        get => _isProtected;
+        set => _isProtected = value;
+    }
     protected int Level;
     // Max level Change
     [Header("Unit Root")]
     public GameObject OriginalUnitRoot;
+    protected SpriteRenderer[] rendereers;
+    public Material OriginalMaterial;
     public Material MaxLevelMaterial;
     // Attack animation
     [Header("Bullet")]
@@ -44,6 +52,10 @@ public abstract class BaseCharacter : MonoBehaviour
     protected bool StatsReseted = false; // PHẢI MẶC ĐỊNH LÀ FALSE, TRUE LÀ UPDATE SẼ CHẠY TRƯỚC LÀ SẼ BÁO NULL
     // Báo cáo nhiệm vụ
     public Action<int> OnLevelUp;
+    protected void Awake()
+    {
+        rendereers = OriginalUnitRoot.GetComponentsInChildren<SpriteRenderer>();
+    }
     protected virtual void OnEnable()
     {
         characterAttack = GetComponent<CharacterAttack>();
@@ -60,6 +72,8 @@ public abstract class BaseCharacter : MonoBehaviour
         hasHiddenDetection = profile.characterLevelDatas[0].hasHiddenDetection;
         canStrikethrough = profile.characterLevelDatas[0].canStrikethrough;
         _hasAbility = profile.characterLevelDatas[0].hasAbility;
+        SpecialDescription = profile.characterLevelDatas[0].Special;
+        _isProtected = false;
         Level = 0;
         StartCoroutine(ResetStats());
     }
@@ -86,6 +100,12 @@ public abstract class BaseCharacter : MonoBehaviour
             IndexPair[state] = 0;
         }
         StatsReseted = true;
+        // Reset hiệu ứng cầu vòng cho level max
+
+        foreach (SpriteRenderer sr in rendereers)
+        {
+            if (OriginalMaterial != null) sr.material = OriginalMaterial;
+        }
     }
     // Normal methods
     public virtual void SetAbilityIcon()
@@ -251,10 +271,9 @@ public abstract class BaseCharacter : MonoBehaviour
         // Thêm hiệu ứng cầu vòng cho level max
         if (Level == profile.characterLevelDatas.Count - 1)
         {
-            SpriteRenderer[] rendereers = OriginalUnitRoot.GetComponentsInChildren<SpriteRenderer>();
             foreach (SpriteRenderer sr in rendereers)
             {
-                sr.material = MaxLevelMaterial;
+                if (MaxLevelMaterial != null) sr.material = MaxLevelMaterial;
             }
         }
         OnLevelUp?.Invoke(Level);

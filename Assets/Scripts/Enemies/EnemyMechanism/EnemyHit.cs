@@ -10,25 +10,12 @@ public class EnemyHit : MonoBehaviour
     // HP Bar;
     public GameObject HP_RedBar;
     public GameObject HP_WhiteBar;
-    private SpriteRenderer HPBar_Renderer;
     private Tween whiteBarTween;
     // Die
     public GameObject DieExplosion;
     void Start()
     {
         //HPBar_Renderer = HP_RedBar.GetComponent<SpriteRenderer>();
-    }
-    IEnumerator BeingHit()
-    {
-        if (HPBar_Renderer != null)
-        {
-            HPBar_Renderer.material = HitMaterial;
-        }
-        yield return new WaitForSeconds(0.05f);
-        if (HPBar_Renderer != null)
-        {
-            HPBar_Renderer.material = OriginalMaterial;
-        }
     }
     public void GetHit(EnemyStats enemyStats, BaseEnemy enemy)
     {

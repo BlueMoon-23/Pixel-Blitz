@@ -261,6 +261,10 @@ public class BaseEnemy : MonoBehaviour
             if (HP >= enemyStats.MaxHP) { HP = enemyStats.MaxHP; }
         }
     }
+    public bool ContainsModifier(float percent)
+    {
+        return enemyModifiers.ContainsModifier(percent);
+    }
     public void ModifySpeed(float percent)
     {
         if (!isFinalBoss)
@@ -277,6 +281,32 @@ public class BaseEnemy : MonoBehaviour
                 else
                 {
                     enemyModifiers.AddSlowModifier(percent);
+                }
+                slow_factor = enemyModifiers.GetMinSlowPercent();
+                boost_factor = enemyModifiers.GetMaxBoostPercent();
+            }
+            if (enemyStats != null) Speed = enemyStats.OldSpeed * slow_factor * boost_factor;
+        }
+        else
+        {
+            if (enemyStats != null) Speed = enemyStats.OldSpeed;
+        }
+    }
+    public void RemoveModifySpeed(float percent)
+    {
+        if (!isFinalBoss)
+        {
+            float slow_factor = 1f;
+            float boost_factor = 1f;
+            if (enemyModifiers != null)
+            {
+                if (percent >= 1)
+                {
+                    enemyModifiers.RemoveSpeedUpModifier(percent);
+                }
+                else
+                {
+                    enemyModifiers.RemoveSlowModifier(percent);
                 }
                 slow_factor = enemyModifiers.GetMinSlowPercent();
                 boost_factor = enemyModifiers.GetMaxBoostPercent();

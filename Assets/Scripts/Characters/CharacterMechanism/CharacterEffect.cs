@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterEffect : MonoBehaviour
+public class CharacterEffect : MonoBehaviour, IStunnable, ISide
 {
+    private BaseCharacter character;
     // Stunned Effect
     [Header("Effect")]
     public GameObject StunnedEffect;
@@ -27,6 +28,7 @@ public class CharacterEffect : MonoBehaviour
     }
     private void Start()
     {
+        character = GetComponent<BaseCharacter>();
         EffectID = StunnedEffect.GetComponent<BaseExplosion>().ExplosionID;
     }
     public IEnumerator GetStunned(float duration) // LOGIC CŨ LÀ STOP COROUTINE THÌ LÒI RA LỖI CỦA UNITY, NÊN ĐỔI CHỨ K CÓ SAI NGHEN
@@ -48,5 +50,26 @@ public class CharacterEffect : MonoBehaviour
         // vòng lặp kiểm tra thời gian stun ngay trong chính hàm này
         while (Time.time < stunEndTime) { yield return null; }
         isStunned = false;
+    }
+    public void ApplyStun(float StunDuration)
+    {
+        StartCoroutine(GetStunned(StunDuration));
+    }
+    public void SetStunImmunity()
+    {
+        if (character != null) character.isProtected = true;
+    }
+    public void RemoveStunImmunity()
+    {
+        if (character != null) character.isProtected = false;
+    }
+    public bool IsStunImmunity()
+    {
+        return character.isProtected;
+    }
+    public SIDE GetSide()
+    {
+        if (character != null && character.profile.isCliff) return SIDE.CliffCharacter;
+        return SIDE.GroundCharacter;
     }
 }

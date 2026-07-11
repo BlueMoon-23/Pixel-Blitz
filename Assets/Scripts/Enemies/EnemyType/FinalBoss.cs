@@ -9,9 +9,13 @@ public class FinalBoss : BaseEnemy
     // Medium: 100k HP, dậm sàn và ném kiếm vào character
     // Hard: 250k HP, dậm sàn, ném kiếm. khi máu còn 100k HP thì dậm sàn và chạy nhanh hơn (không ném kiếm nữa)
     public GameObject StompEffect; // ToonBodySlam
+    private int StompID;
     public GameObject LowGraphic_StompEffect;
+    private int LowGraphic_StompID;
     public GameObject SpiralStunEffect; // Sword spin purple
+    private int SpiralStunID;
     public GameObject LowGraphic_SpiralStunEffect;
+    private int LowGraphic_SpiralStunID;
     public GameObject FallingSword;
     public int AbilityCount; // easy = 1, medium = 2, hard = 3
     public bool shouldCastLowHpSkill;
@@ -21,6 +25,10 @@ public class FinalBoss : BaseEnemy
         yield return null;
         isFinalBoss = true;
         hasDied = false;
+        StompID = StompEffect.GetComponent<BaseExplosion>().ExplosionID;
+        LowGraphic_StompID = LowGraphic_StompEffect.GetComponent<BaseExplosion>().ExplosionID;
+        SpiralStunID = SpiralStunEffect.GetComponent<BaseExplosion>().ExplosionID;
+        LowGraphic_SpiralStunID = LowGraphic_SpiralStunEffect.GetComponent<BaseExplosion>().ExplosionID;
         // Chỉnh máu của boss theo số character mang theo của người chơi
         if (CharacterLoadout.instance != null)
         {
@@ -97,14 +105,14 @@ public class FinalBoss : BaseEnemy
         HitCharacterExplosion hitCharacterExplosion = newEffect.GetComponent<HitCharacterExplosion>();
         hitCharacterExplosion.StunDuration = 2f;
         Destroy(newEffect, 1f);*/
-        GameObject chosenExplosion_SFX = StompEffect;
+        int chosenID = StompID;
         if (GameSetting.instance != null && !GameSetting.instance._showExplosion)
         {
-            chosenExplosion_SFX = LowGraphic_StompEffect;
+            chosenID = LowGraphic_StompID;
         }
         if (ExplosionPooler.instance != null)
         {
-            BaseExplosion newEffect = ExplosionPooler.instance.GetExplosion(chosenExplosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+            BaseExplosion newEffect = ExplosionPooler.instance.GetExplosion(chosenID);
             if (newEffect != null)
             {
                 newEffect.transform.position = this.transform.position;
@@ -141,14 +149,14 @@ public class FinalBoss : BaseEnemy
                 HitCharacterExplosion hitCharacterExplosion = newEffect.GetComponent<HitCharacterExplosion>();
                 hitCharacterExplosion.StunDuration = 1f;
                 Destroy(newEffect, 1f);*/
-                GameObject chosenExplosion_SFX = SpiralStunEffect;
+                int chosenID = SpiralStunID;
                 if (GameSetting.instance != null && !GameSetting.instance._showExplosion)
                 {
-                    chosenExplosion_SFX = LowGraphic_SpiralStunEffect;
+                    chosenID = LowGraphic_SpiralStunID;
                 }
                 if (ExplosionPooler.instance != null)
                 {
-                    BaseExplosion newEffect = ExplosionPooler.instance.GetExplosion(chosenExplosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                    BaseExplosion newEffect = ExplosionPooler.instance.GetExplosion(chosenID);
                     if (newEffect != null)
                     {
                         newEffect.transform.position = CharacterManager.instance.GetCharacterByIndex(character_index_position).gameObject.transform.position;

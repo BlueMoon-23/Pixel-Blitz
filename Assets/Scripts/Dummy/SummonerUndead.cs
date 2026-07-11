@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
-using UnityEngine.UIElements;
-using static UnityEngine.EventSystems.EventTrigger;
 
-public class SummonerUndead : MonoBehaviour
+public class SummonerUndead : MonoBehaviour, IStunnable, ISide
 {
     private BaseCharacter summoner;
     [SerializeField] protected float HP;
     [SerializeField] protected float MaxHP;
     [SerializeField] protected float Speed;
     public int ID;
+    private bool isProtected;
     // Move
     [SerializeField] private GameObject[] Waypoints;
     [SerializeField] private int Waypoint_CurrentIndex; // thằng này sẽ chỉ enemy đi đâu
@@ -35,6 +33,7 @@ public class SummonerUndead : MonoBehaviour
     private IEnumerator ResetStats()
     {
         StatsReseted = false;
+        isProtected = false;
         yield return null;
         // Awake
         // Move animation
@@ -174,5 +173,33 @@ public class SummonerUndead : MonoBehaviour
             }
             HP_RedBar.transform.localScale = new Vector3(Original_x_HPScale * HP / MaxHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
         }
+    }
+    public IEnumerator GetStunned(float duration)
+    {
+        yield return null;
+        if (SummonerUndeadPooler.instance != null)
+        {
+            SummonerUndeadPooler.instance.ReturnUndead(this);
+        }
+    }
+    public void ApplyStun(float StunDuration)
+    {
+        StartCoroutine(GetStunned(StunDuration));
+    }
+    public void SetStunImmunity()
+    {
+        isProtected = true;
+    }
+    public void RemoveStunImmunity()
+    {
+        isProtected = false;
+    }
+    public bool IsStunImmunity()
+    {
+        return isProtected;
+    }
+    public SIDE GetSide()
+    {
+        return SIDE.Dummy;
     }
 }

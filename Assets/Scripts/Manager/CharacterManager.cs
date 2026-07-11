@@ -30,7 +30,7 @@ public class CharacterManager : MonoBehaviour
     private int Character_LimitPlacement = 20;
     public TextMeshProUGUI CurrentCharacter;
     public TextMeshProUGUI Announcement;
-    public enum CharacterName { Archer, Freezer, Musketeer, Minigunner, MinigunnerClone, Ranger, Rocketeer, Summoner, Pulser, Wizard};
+    public enum CharacterName { Archer, Freezer, Musketeer, Minigunner, MinigunnerClone, Ranger, Rocketeer, Summoner, Pulser, Wizard, Guardian};
     private Dictionary<CharacterName, int> Limit_for_1_Character = new Dictionary<CharacterName, int> { 
         { CharacterName.Archer, 8 },
         { CharacterName.Freezer, 4 },
@@ -42,6 +42,7 @@ public class CharacterManager : MonoBehaviour
         { CharacterName.Summoner, 3 },
         { CharacterName.Pulser, 4 },
         { CharacterName.Wizard, 6 },
+        { CharacterName.Guardian, 2 },
     };
     private Dictionary<CharacterName, int> CharacterQuantity = new Dictionary<CharacterName, int> {
         { CharacterName.Archer, 0 },
@@ -54,6 +55,7 @@ public class CharacterManager : MonoBehaviour
         { CharacterName.Summoner, 0 },
         { CharacterName.Pulser, 0 },
         { CharacterName.Wizard, 0 },
+        { CharacterName.Guardian, 0 },
     };
     public TextMeshProUGUI Limit_for_1_Character_Text;
     // Pooler

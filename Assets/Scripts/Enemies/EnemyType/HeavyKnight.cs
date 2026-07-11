@@ -6,8 +6,12 @@ public class HeavyKnight : BaseEnemy
 {
     public GameObject StompEffect;
     public GameObject LowGraphic_StompEffect;
+    private int StompID;
+    private int LowGraphic_StompID;
     void Start()
     {
+        StompID = StompEffect.GetComponent<BaseExplosion>().ExplosionID;
+        LowGraphic_StompID = LowGraphic_StompEffect.GetComponent<BaseExplosion>().ExplosionID;
         // Move road
         if (WaypointManager.instance != null)
         {
@@ -21,7 +25,6 @@ public class HeavyKnight : BaseEnemy
         yield return StartCoroutine(base.ResetStats());
         yield return null;
         isFinalBoss = false;
-        StartCoroutine(StompGround());
     }
     protected IEnumerator StompGround()
     {
@@ -38,14 +41,14 @@ public class HeavyKnight : BaseEnemy
             HitCharacterExplosion hitCharacterExplosion = newEffect.GetComponent<HitCharacterExplosion>();
             hitCharacterExplosion.StunDuration = 1f;
             Destroy(newEffect, 1f);*/
-            GameObject chosenExplosion_SFX = StompEffect;
+            int chosenID = StompID;
             if (GameSetting.instance != null && !GameSetting.instance._showExplosion)
             {
-                chosenExplosion_SFX = LowGraphic_StompEffect;
+                chosenID = LowGraphic_StompID;
             }
             if (ExplosionPooler.instance != null)
             {
-                BaseExplosion newEffect = ExplosionPooler.instance.GetExplosion(chosenExplosion_SFX.GetComponent<BaseExplosion>().ExplosionID);
+                BaseExplosion newEffect = ExplosionPooler.instance.GetExplosion(chosenID);
                 if (newEffect != null)
                 {
                     newEffect.transform.position = this.transform.position;

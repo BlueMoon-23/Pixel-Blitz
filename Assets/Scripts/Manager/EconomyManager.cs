@@ -45,7 +45,7 @@ public class EconomyManager : MonoBehaviour
     }
     public void Change_CurrentCoin()
     {
-        CurrentCoin.text = PlayerCoin.ToString();
+        CurrentCoin.text = PlayerCoin.ToString("N0");
     }
     public void Purchase(float Cost)
     {

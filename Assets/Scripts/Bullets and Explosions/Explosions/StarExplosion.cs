@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
-public class StarExplosion : MonoBehaviour
+public class StarExplosion : BaseExplosion
 {
     private BaseCharacter wizard;
     private float damageValue;

@@ -140,7 +140,7 @@ public class BaseEnemy : MonoBehaviour
         // Armored: nếu không xuyên giáp được thì KHÔNG TRỪ MÁU
         if ((isArmored && !canStrikethrough))
         {
-            //
+
         }
         else
         {

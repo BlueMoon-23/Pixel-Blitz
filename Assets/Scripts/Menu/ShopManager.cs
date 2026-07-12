@@ -148,6 +148,7 @@ public class ShopManager : MonoBehaviour
             if (CharacterSaveManager.instance.allCharacters[allCharacter_index] != null)
             {
                 CharacterName.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CharacterName;
+                CharacterName.color = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CharacterColor;
                 CharacterImage.sprite = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.CharacterImage;
                 RangeStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.characterLevelDatas[0].RangeStat.ToString();
                 DamageStat.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.characterLevelDatas[0].DamageStat.ToString();

@@ -33,8 +33,6 @@ public class Guardian : BaseCharacter
         base.OnEnable();
         DidExplode = false;
         Durability = DurabilityByLevels[0];
-        ExplodingEffect.Initialize(this, 0);
-        LowGraphicExplodingEffect.Initialize(this, 0);
         ExplodeID = ExplodingEffect.ExplosionID;
         LowGraphic_ExplodeID = LowGraphicExplodingEffect.ExplosionID;
         ProtectingField.transform.localScale = new Vector3(0.08f * Range, 0.08f * Range, 0.08f * Range);
@@ -111,6 +109,8 @@ public class Guardian : BaseCharacter
                     // Sửa scale theo 2 hiệu ứng khác nhau (bị chệch tỉ lệ scale)
                     int ratio = (chosenID == ExplodeID ? 1 : 2);
                     newEffect.transform.localScale = new Vector3(0.75f * ratio * Range, 0.75f * ratio * Range, 0.75f * ratio * Range);
+                    StarExplosion starExplosion = newEffect.GetComponent<StarExplosion>();
+                    if (starExplosion != null) starExplosion.Initialize(this, Damage);
                     ExplosionPooler.instance.StartCoroutine(ExplosionPooler.instance.ReturnExplosionWithDelay(newEffect, 0.5f));
                 }
             }

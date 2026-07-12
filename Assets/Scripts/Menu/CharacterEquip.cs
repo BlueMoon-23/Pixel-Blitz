@@ -12,6 +12,7 @@ public class CharacterEquip : MonoBehaviour
     // Chi tiết về cục character UI
     public TextMeshProUGUI CharacterName;
     public Image CharacterImage;
+    public Image CharacterGlow;
     public TextMeshProUGUI RangeStat;
     public TextMeshProUGUI DamageStat;
     public TextMeshProUGUI CooldownStat;
@@ -123,6 +124,8 @@ public class CharacterEquip : MonoBehaviour
         // Chỉnh thông tin
         chosenCharacter = character;
         CharacterName.text = chosenCharacter.characterData.characterProfile.CharacterName;
+        CharacterName.color = chosenCharacter.characterData.characterProfile.CharacterColor;
+        CharacterGlow.color = chosenCharacter.characterData.characterProfile.CharacterColor;
         CharacterImage.sprite = chosenCharacter.characterData.characterProfile.CharacterImage;
         // Kiểm tra người chơi có character này chưa
         if (!character.hasOwned)

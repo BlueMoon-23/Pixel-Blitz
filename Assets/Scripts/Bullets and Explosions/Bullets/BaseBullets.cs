@@ -6,7 +6,7 @@ public class BaseBullets : MonoBehaviour
 {
     [SerializeField] protected BaseCharacter character;
     [SerializeField] protected BaseEnemy enemy;
-    [SerializeField] protected Transform EnemyCenter;
+    [SerializeField] protected Vector3 EnemyCenter; // không xài Transform vì Vector3 là struct-type, lưu giá trị, còn Transform lưu tham chiếu
     [SerializeField] protected float BulletSpeed = 10f;
     public int BulletID;
     // Serialize field giup unity biet duoc rang object nay can duoc luu tru
@@ -33,24 +33,29 @@ public class BaseBullets : MonoBehaviour
     public void SetEnemy(BaseEnemy enemy) // gọi theo giây
     {
         this.enemy = enemy;
-        this.EnemyCenter = enemy.Center.transform;
+        this.EnemyCenter = enemy.Center.transform.position;
     }
     /// <summary>
-    /// Điều kiện move không phụ thuộc vào enemy. Khi enemy biến mất, tiếp tục di chuyển đến vị trí đã định sẵn, sau đó thực hiện nổ
+    /// Điều kiện move không phụ thuộc vào enemy. Khi enemy biến mất, tiếp tục di chuyển đến vị trí đã định sẵn, sau đó thực hiện nổ.
+    /// Sự di chuyển này là cố định luôn ngay khi xác định là enemy biến mất. Khi enemy quay lại sống lại thì đạn vẫn phải đi theo lối cũ
     /// </summary>
     protected void Move() // gọi theo frame
     {
-        if (enemy != null && enemy.gameObject.activeInHierarchy)
+        if (enemy != null && enemy.CanBeTargeted())
         {
-            this.EnemyCenter = enemy.Center.transform;
+            EnemyCenter = enemy.Center.transform.position;
+        }
+        else if (enemy != null && !enemy.CanBeTargeted())
+        {
+            enemy = null; // để khi enemy biến mất đạn sẽ không dí được nữa
         }
         // Kiểm tra khoảng cách đủ gần để thực hiện hành vi nổ tại chỗ
-        else if (Vector3.Distance(transform.position, EnemyCenter.position) <= BulletSpeed * Time.deltaTime + 0.05f)
+        else if (Vector3.Distance(transform.position, EnemyCenter) <= BulletSpeed * Time.deltaTime + 0.05f)
         {
             ExplodeOnImpact();
         }
         // Đi tới vị trí enemyCenter thay vì đích danh enemy
-        float Angle_in_Radian = Mathf.Atan2(EnemyCenter.transform.position.y - transform.position.y, EnemyCenter.transform.position.x - transform.position.x);
+        float Angle_in_Radian = Mathf.Atan2(EnemyCenter.y - transform.position.y, EnemyCenter.x - transform.position.x);
         Quaternion Angle_in_Quaternion = Quaternion.Euler(0, 0, Angle_in_Radian * Mathf.Rad2Deg - 90f);
         transform.rotation = Angle_in_Quaternion;
         transform.position += transform.up * BulletSpeed * Time.deltaTime;

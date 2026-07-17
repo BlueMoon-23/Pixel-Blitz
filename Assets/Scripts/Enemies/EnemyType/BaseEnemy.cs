@@ -11,6 +11,7 @@ public class BaseEnemy : MonoBehaviour
     // Stats gốc nằm ở EnemyStats, bao gồm những thứ sẽ bị reset, còn găm từ prefab xuống thì ở đây là đr
     protected EnemyStats enemyStats;
     protected EnemyModifiers enemyModifiers;
+    protected EnemyTeleport enemyTeleport;
     public EnemyEffect enemyEffect;
     protected EnemyHit enemyHit;
     protected float HP;
@@ -61,6 +62,7 @@ public class BaseEnemy : MonoBehaviour
         enemyModifiers = GetComponent<EnemyModifiers>();
         enemyEffect = GetComponent<EnemyEffect>();
         enemyHit = GetComponent<EnemyHit>();
+        enemyTeleport = GetComponent<EnemyTeleport>();
         if (enemyStats != null)
         {
             if (!isSummoned) Waypoint_CurrentIndex = 1; // xem lại tình huống ở necromancer và mystery enemies
@@ -317,5 +319,19 @@ public class BaseEnemy : MonoBehaviour
         {
             Speed = enemyStats.OldSpeed;
         }
+    }
+    /// <summary>
+    /// có thể chọn làm mục tiêu khi: đang active và không teleport
+    /// không thể chọn làm mục tiêu khi: đang không active hoặc đang active và đang teleport
+    /// </summary>
+    /// <returns></returns>
+    public bool CanBeTargeted()
+    {
+        if (!gameObject.activeInHierarchy) return false;
+        if (enemyTeleport != null && enemyTeleport.isTeleporting)
+        {
+            return false;
+        }
+        return true;
     }
 }

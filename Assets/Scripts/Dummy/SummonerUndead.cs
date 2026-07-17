@@ -83,6 +83,10 @@ public class SummonerUndead : MonoBehaviour, IStunnable, ISide
         }
         StatsReseted = true;
     }
+    public void ReduceWaypoint()
+    {
+        Waypoint_CurrentIndex--;
+    }
     public void SetCharacter(BaseCharacter character)
     {
         summoner = character;

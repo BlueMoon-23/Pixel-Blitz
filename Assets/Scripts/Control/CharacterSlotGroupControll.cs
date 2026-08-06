@@ -18,11 +18,12 @@ public class CharacterSlotGroupControll : MonoBehaviour
         {
             foreach (Transform child in CharacterLoadout.instance.transform)
             {
+                CharacterData cData = child.GetComponent<CharacterInfomation>().characterData;
                 CharacterSlots[index].gameObject.SetActive(true);
                 CharacterSlots[index].SetCharacterPrefab(child.gameObject);
-                CharacterImages[index].sprite = child.GetComponent<CharacterInfomation>().characterData.characterProfile.CharacterImage;
+                CharacterImages[index].sprite = cData.characterProfile.CharacterImage;
                 CharacterCosts[index].gameObject.SetActive(true);
-                CharacterCosts[index].text = "$" + child.GetComponent<CharacterInfomation>().characterData.characterProfile.CostStat.ToString();
+                CharacterCosts[index].text = "$" + WeaponCalculator.CalculateCost(cData.characterProfile.CostStat, cData.WeaponEquippedData).ToString();
                 index++;
             }
         }

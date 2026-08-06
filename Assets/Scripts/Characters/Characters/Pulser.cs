@@ -57,8 +57,8 @@ public class Pulser : BaseCharacter
             base.SetUpgradeInformation();
             if (Level < profile.characterLevelDatas.Count - 1)
             {
-                SetStatInfo(6, "Max Pulse", MaxPulse, MaxPulseByLevels[Level + 1]);
-                SetStatInfo(7, "Charge Time", ChargeTime, ChargeTimeByLevels[Level + 1]);
+                SetStatInfo(6, "Max Pulse", MaxPulse, MaxPulseByLevels[Level + 1], true);
+                SetStatInfo(7, "Charge Time", ChargeTime, ChargeTimeByLevels[Level + 1], false);
             }
         }
     }

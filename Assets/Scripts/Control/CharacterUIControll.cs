@@ -29,6 +29,8 @@ public class CharacterUIControll : MonoBehaviour
     public Image characterGlow;
     [Header("Total Damage")]
     public TextMeshProUGUI characterTotalDamage;
+    [Header("Attack Priority")]
+    public TextMeshProUGUI characterAttackPriority;
     [Header("Upgrade")]
     public RectTransform UpgradeContent;
     public TextMeshProUGUI upgradeName;
@@ -159,5 +161,18 @@ public class CharacterUIControll : MonoBehaviour
         {
             infoMap[i].gameObject.SetActive(false);
         }
+    }
+    /// <summary>
+    /// Chỉnh Attack Priority: First - Last - Closest - Farthest - Strongest - Weakest - Random
+    /// </summary>
+    public void ChangeAttackPriority()
+    {
+        string PriorityName = CurrentCharacter.characterAttack.MoveAttackPriority();
+        characterAttackPriority.text = $"<< {PriorityName} >>";
+    }
+    public void ShowAttackPriority()
+    {
+        string PriorityName = CurrentCharacter.characterAttack.GetAttackPriority();
+        characterAttackPriority.text = $"<< {PriorityName} >>";
     }
 }

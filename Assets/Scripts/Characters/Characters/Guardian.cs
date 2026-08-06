@@ -51,7 +51,7 @@ public class Guardian : BaseCharacter
             base.SetUpgradeInformation();
             if (Level < profile.characterLevelDatas.Count - 1)
             {
-                SetStatInfo(6, "Durability", DurabilityByLevels[Level], DurabilityByLevels[Level + 1]);
+                SetStatInfo(6, "Durability", DurabilityByLevels[Level], DurabilityByLevels[Level + 1], true);
             }
         }
     }
@@ -59,6 +59,8 @@ public class Guardian : BaseCharacter
     {
         base.Upgrade();
         Durability = DurabilityByLevels[Level];
+        ProtectingField.gameObject.SetActive(true);
+        ShieldBar.transform.localScale = new Vector3(Original_x_ShieldBarScale * Durability / DurabilityByLevels[Level], ShieldBar.transform.localScale.y, ShieldBar.transform.localScale.z);
         ProtectingField.transform.localScale = new Vector3(0.08f * Range, 0.08f * Range, 0.08f * Range);
     }
     private IEnumerator ShieldCharge()

@@ -23,6 +23,7 @@ public class Ready_Skip : MonoBehaviour
     }
     public CanvasGroup ReadyUI;
     public GameObject WaypointArrows;
+    private Sequence skipSequence;
     public UnityEvent OnReadyActivated;
     public static Ready_Skip instance;
     private void Awake()
@@ -68,28 +69,43 @@ public class Ready_Skip : MonoBehaviour
     public IEnumerator Skip()
     {
         yield return new WaitForSeconds(14f);
-        // Show Skip annouonce
-        //DOTween.KillAll();
         if (GameSetting.instance != null)
         {
-            if (GameSetting.instance._autoSkip) { DoSkip(); }
+            if (GameSetting.instance._autoSkip)
+            {
+                DoSkip();
+            }
             else
             {
-                Sequence sequence = DOTween.Sequence();
-                sequence.AppendCallback(() =>
+                skipSequence?.Kill();
+                skipSequence = DOTween.Sequence();
+                skipSequence.AppendCallback(() =>
                 {
                     SkipUI.gameObject.SetActive(true);
                     SkipUI.DOFade(1f, 0.5f).From(0f);
                 });
-                yield return new WaitForSeconds(43f);
-                sequence.AppendCallback(() =>
+                skipSequence.AppendInterval(43f);
+                skipSequence.AppendCallback(() =>
                 {
-                    SkipUI.DOFade(0f, 0.5f).From(1f);
+                    SkipUI.DOFade(0f, 0.5f);
                 });
-                sequence.AppendInterval(0.5f).AppendCallback(() => {
+                skipSequence.AppendInterval(0.5f);
+                skipSequence.AppendCallback(() =>
+                {
                     SkipUI.gameObject.SetActive(false);
                 });
             }
+        }
+    }
+    public void CancelSkipUI()
+    {
+        skipSequence?.Kill();
+        skipSequence = null;
+
+        if (SkipUI != null)
+        {
+            SkipUI.DOKill();
+            SkipUI.gameObject.SetActive(false);
         }
     }
     public void DoSkip()

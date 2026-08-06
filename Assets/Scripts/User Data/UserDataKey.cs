@@ -20,4 +20,6 @@ public class UserDataKey
     public static string SHOWEXPLOSION = "ShowExplosion";
     public static string SHOWMUZZLE = "ShowMuzzle";
     public static string PLAYEDTUTORIAL = "PlayedTutorial";
+    public static string OWNEDWEAPON_KEY = "OwnedWeapon";
+    public static string USEDWEAPON_KEY = "UsedWeapon";
 }

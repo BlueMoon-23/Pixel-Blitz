@@ -14,15 +14,16 @@ public class CharacterInfomation : MonoBehaviour
         get { return _hasOwned; }
         set { _hasOwned = value; }
     }
-    private void Start()
+    private void Awake()
     {
         if (AccountSaveManager.CurrentAccount != null)
         {
             for (int i = 0; i < AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters.Count; i++)
             {
-                if (this.characterData.characterProfile.CharacterName == AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters[i].characterProfile.CharacterName)
+                if (characterData != null && characterData.characterProfile.CharacterName == AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters[i].characterProfile.CharacterName)
                 {
                     hasOwned = true;
+                    characterData.WeaponEquippedData = AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters[i].WeaponEquippedData;
                     break;
                 }
             }

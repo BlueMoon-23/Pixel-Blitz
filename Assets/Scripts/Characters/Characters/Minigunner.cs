@@ -5,13 +5,13 @@ using UnityEngine;
 public class Minigunner : BaseCharacter
 {
     [Header("Minigunner Clone")]
-    public MinigunnerClone ClonePrefab;
+    [SerializeField] private MinigunnerClone ClonePrefab;
     private GameObject currentClone;
     public override void SetAbilityIcon()
     {
         characterUI.AbilityCurrentIcon.sprite = characterUI.AbilityIcons[0];
         DragAbility.instance.SetDragType(DragAbility.AbilityDragType.GroundPlacement);
-        DragAbility.instance.SetDragRange(ClonePrefab.profile.characterLevelDatas[4].RangeStat);
+        DragAbility.instance.SetDragRange(ClonePrefab.profile.characterLevelDatas[4].RangeStat * characterWeapon.WeaponEquipped.GetBuff(PerkType.Range));
     }
     public override void Ability(Vector3 position)
     {

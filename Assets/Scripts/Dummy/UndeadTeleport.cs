@@ -20,7 +20,7 @@ public class UndeadTeleport : MonoBehaviour, ITeleportable
             EndPortal = enemyPortal;
             isTeleporting = true;
             undead.gameObject.transform.position = EndPortal.gameObject.transform.position;
-            undead.ReduceWaypoint();
+            undead.TeleportToWaypoint(EndPortal.WaypointLocations);
         }
     }
     public void StopTeleport(EnemyPortal enemyPortal)

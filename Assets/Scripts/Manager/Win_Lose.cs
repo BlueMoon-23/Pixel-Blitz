@@ -83,6 +83,7 @@ public class Win_Lose : MonoBehaviour
     {
         ClearObjects();
         RecordMatch(); // ghi trước, rồi nhờ currencysavemanager lưu hộ mình
+        if (WeaponDropManager.instance != null) WeaponDropManager.instance.DropWeapon(); // Thưởng vũ khí cho người chơi
         int gemReward = RewardCalculator.CalculateGem(WaveManager.instance.GetCurrentWave(), ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);
         CurrencySaveManager.instance.AddGem(gemReward);
         int diamondReward = RewardCalculator.CalculateDiamond(WaveManager.instance.GetCurrentWave(), ModeManager.instance.Star, ModeManager.instance.currentGamemode, true);

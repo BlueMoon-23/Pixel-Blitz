@@ -9,6 +9,7 @@ public abstract class BaseCharacter : MonoBehaviour
     // Basic stats
     [Header("Original Stats. Các references đến các character component khác không cần gắn")]
     public CharacterProfile profile;
+    public CharacterWeapon characterWeapon;
     public CharacterAttack characterAttack;
     public CharacterEffect characterEffect;
     protected CharacterUIControll characterUI;
@@ -45,6 +46,8 @@ public abstract class BaseCharacter : MonoBehaviour
     public GameObject bullet_Prefab;
     public GameObject Bullet_StartPosition;
     public GameObject BulletMuzzle;
+    [Header("Weapon")]
+    [SerializeField] protected Sprite WeaponSprite;
     protected SPUM_Prefabs SPUM_Prefabs;
     public Dictionary<PlayerState, int> IndexPair = new();
     
@@ -55,26 +58,31 @@ public abstract class BaseCharacter : MonoBehaviour
     protected void Awake()
     {
         rendereers = OriginalUnitRoot.GetComponentsInChildren<SpriteRenderer>();
+        characterAttack = GetComponent<CharacterAttack>();
+        characterEffect = GetComponent<CharacterEffect>();
+        characterWeapon = GetComponent<CharacterWeapon>();
+        if (characterWeapon != null)
+        {
+            characterWeapon.AssignWeapon(profile);
+        }
     }
     protected virtual void OnEnable()
     {
-        characterAttack = GetComponent<CharacterAttack>();
-        characterEffect = GetComponent<CharacterEffect>();
         // Chỉnh lại một số stats
         StatsReseted = false; // khóa update/move cho đến khi xong stats
         characterEffect.ResetCharacterEffect();
         //
-        Range = profile.characterLevelDatas[0].RangeStat;
-        Damage = profile.characterLevelDatas[0].DamageStat;
-        TotalDamage = 0;
-        Cooldown = profile.characterLevelDatas[0].CooldownStat;
-        Cost = profile.CostStat;
+        Range = WeaponCalculator.CalculateRange(profile.characterLevelDatas[0].RangeStat, characterWeapon.WeaponEquipped);
+        Damage = WeaponCalculator.CalculateDamage(profile.characterLevelDatas[0].DamageStat, characterWeapon.WeaponEquipped);
+        Cooldown = WeaponCalculator.CalculateCooldown(profile.characterLevelDatas[0].CooldownStat, characterWeapon.WeaponEquipped);
+        Cost = WeaponCalculator.CalculateCost(profile.CostStat, characterWeapon.WeaponEquipped);
         hasHiddenDetection = profile.characterLevelDatas[0].hasHiddenDetection;
         canStrikethrough = profile.characterLevelDatas[0].canStrikethrough;
         _hasAbility = profile.characterLevelDatas[0].hasAbility;
         SpecialDescription = profile.characterLevelDatas[0].Special;
-        _isProtected = false;
         Level = 0;
+        TotalDamage = 0;
+        _isProtected = false;
         StartCoroutine(ResetStats());
     }
     protected IEnumerator ResetStats()
@@ -118,12 +126,26 @@ public abstract class BaseCharacter : MonoBehaviour
     }
     public float GetCost()
     {
-        if (Cost != profile.CostStat) { return profile.CostStat; }
+        if (characterWeapon == null && Cost != profile.CostStat) 
+        {
+            return profile.CostStat;
+        }
+        else if (Cost != WeaponCalculator.CalculateCost(profile.CostStat, characterWeapon.WeaponEquipped)) 
+        { 
+            return WeaponCalculator.CalculateCost(profile.CostStat, characterWeapon.WeaponEquipped); 
+        }
         else return Cost;
     }
     public float GetRange()
     {
-        if (Range <= profile.characterLevelDatas[0].RangeStat) { return profile.characterLevelDatas[0].RangeStat; } // <= la chua duoc khoi tao
+        if (characterWeapon == null && Range <= profile.characterLevelDatas[0].RangeStat)
+        {
+            return profile.characterLevelDatas[0].RangeStat;
+        }
+        else if (Range <= WeaponCalculator.CalculateRange(profile.characterLevelDatas[0].RangeStat, characterWeapon.WeaponEquipped)) 
+        { 
+            return WeaponCalculator.CalculateRange(profile.characterLevelDatas[0].RangeStat, characterWeapon.WeaponEquipped); 
+        } // <= la chua duoc khoi tao
         else return Range;
     }
     public bool hasHiddenDetectionOrNot()
@@ -156,14 +178,14 @@ public abstract class BaseCharacter : MonoBehaviour
     }
     public float GetUpgradeCost()
     {
-        return profile.characterLevelDatas[Level + 1].UpgradeCost;
+        return WeaponCalculator.CalculateCost(profile.characterLevelDatas[Level + 1].UpgradeCost, characterWeapon.WeaponEquipped);
     }
     public float GetSellCost()
     {
         float SellCost = (int)(Cost / 3);
         for (int i = 0; i <= Level; i++)
         {
-            SellCost += (int)(profile.characterLevelDatas[i].UpgradeCost) / 3;
+            SellCost += (int)(WeaponCalculator.CalculateCost(profile.characterLevelDatas[i].UpgradeCost, characterWeapon.WeaponEquipped) / 3);
         }
         return SellCost;
     }
@@ -183,7 +205,7 @@ public abstract class BaseCharacter : MonoBehaviour
         }
     }
     // Template để hỗ trợ hàm dưới
-    protected void SetStatInfo<T>(int index, string label, T currentVal, T nextVal)
+    protected void SetStatInfo<T>(int index, string label, T currentVal, T nextVal, bool isHigherBetter)
     {
         // So sánh giá trị hiện tại và giá trị kế tiếp
         bool isChanged = !EqualityComparer<T>.Default.Equals(currentVal, nextVal);
@@ -192,7 +214,23 @@ public abstract class BaseCharacter : MonoBehaviour
         textUI.gameObject.SetActive(isChanged);
         if (isChanged)
         {
-            textUI.text = $"{label}: {currentVal} => {nextVal}";
+            // Chuyển Color32 thành chuỗi Hex (VD: "A5FF6BFF") để dùng trong thẻ Rich Text
+            string greenHex = $"#{ColorUtility.ToHtmlStringRGBA(new Color32(165, 255, 107, 255))}";
+            string redHex = $"#{ColorUtility.ToHtmlStringRGBA(new Color32(255, 100, 76, 255))}";
+            // Mặc định dùng màu xanh
+            string colorHex = greenHex;
+            // So sánh giá trị nếu loại T hỗ trợ IComparable (int, float, double, v.v.)
+            int comparison = Comparer<T>.Default.Compare(currentVal, nextVal);
+            if (comparison < 0) // currentVal < nextVal (Tăng)
+            {
+                colorHex = isHigherBetter ? greenHex : redHex;
+            }
+            else if (comparison > 0) // currentVal > nextVal (Giảm)
+            {
+                colorHex = isHigherBetter ? redHex : greenHex;
+            }
+            // Bọc duy nhất nextVal vào thẻ <color>
+            textUI.text = $"{label}: {currentVal} => <color={colorHex}>{nextVal}</color>";
         }
     }
     protected void SetStatInfo(int index, string label, bool currentEffect, bool nextEffect)
@@ -223,9 +261,9 @@ public abstract class BaseCharacter : MonoBehaviour
                 // Chỉ hiện thông tin thăng cấp nếu có sự sai khác
                 characterUI.upgradeName.text = profile.characterLevelDatas[Level + 1].UpgradeName;
                 characterUI.upgradeName.color = profile.CharacterColor;
-                SetStatInfo(0, "Range", Range, profile.characterLevelDatas[Level + 1].RangeStat);
-                SetStatInfo(1, "Damage", Damage, profile.characterLevelDatas[Level + 1].DamageStat);
-                SetStatInfo(2, "Cooldown", Cooldown, profile.characterLevelDatas[Level + 1].CooldownStat);
+                SetStatInfo(0, "Range", Range, WeaponCalculator.CalculateRange(profile.characterLevelDatas[Level + 1].RangeStat, characterWeapon.WeaponEquipped), true);
+                SetStatInfo(1, "Damage", Damage, WeaponCalculator.CalculateDamage(profile.characterLevelDatas[Level + 1].DamageStat, characterWeapon.WeaponEquipped), true);
+                SetStatInfo(2, "Cooldown", Cooldown, WeaponCalculator.CalculateCooldown(profile.characterLevelDatas[Level + 1].CooldownStat, characterWeapon.WeaponEquipped), false);
                 SetStatInfo(3, "+ Hidden Detection", hasHiddenDetection, profile.characterLevelDatas[Level + 1].hasHiddenDetection);
                 SetStatInfo(4, "+ Strikethrough", canStrikethrough, profile.characterLevelDatas[Level + 1].canStrikethrough);
                 var textUI = CharacterUIControll.instance.GetOrCreateInfo(5);
@@ -239,7 +277,7 @@ public abstract class BaseCharacter : MonoBehaviour
                     textUI.gameObject.SetActive(false);
                 }
                 CharacterUIControll.instance.TurnOffExternalInfo();
-                characterUI.upgradeCost.text = "Upgrade (-$" + profile.characterLevelDatas[Level + 1].UpgradeCost + ")";
+                characterUI.upgradeCost.text = "Upgrade (-$" + WeaponCalculator.CalculateCost(profile.characterLevelDatas[Level + 1].UpgradeCost, characterWeapon.WeaponEquipped) + ")";
             }
             else
             {
@@ -258,9 +296,9 @@ public abstract class BaseCharacter : MonoBehaviour
     public virtual void Upgrade()
     {
         Level++;
-        Range = profile.characterLevelDatas[Level].RangeStat;
-        Damage = profile.characterLevelDatas[Level].DamageStat;
-        Cooldown = profile.characterLevelDatas[Level].CooldownStat;
+        Range = WeaponCalculator.CalculateRange(profile.characterLevelDatas[Level].RangeStat, characterWeapon.WeaponEquipped);
+        Damage = WeaponCalculator.CalculateDamage(profile.characterLevelDatas[Level].DamageStat, characterWeapon.WeaponEquipped);
+        Cooldown = WeaponCalculator.CalculateCooldown(profile.characterLevelDatas[Level].CooldownStat, characterWeapon.WeaponEquipped);
         SpecialDescription = profile.characterLevelDatas[Level].Special;
         hasHiddenDetection = profile.characterLevelDatas[Level].hasHiddenDetection;
         canStrikethrough = profile.characterLevelDatas[Level].canStrikethrough;

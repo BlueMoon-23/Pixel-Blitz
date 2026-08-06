@@ -84,6 +84,14 @@ public class DragCharacter : DragThing
                                 newCharacter.transform.rotation = Quaternion.identity;
                                 newCharacter.gameObject.SetActive(true);
                                 CharacterManager.instance.AddCharacterWithPosition(newCharacter, GetDropPosition(eventData.position));
+                                // Sửa tọa độ y của range character theo ý muốn của PlacingCliff
+                                // tránh trường hợp return pool xong range của character bị sửa vĩnh viễn
+                                newCharacter.characterAttack.Range_Prefab.transform.localPosition = Vector3.zero;
+                                RangeProjection rangeProjection = PlacingCliff.GetComponent<RangeProjection>();
+                                if (rangeProjection != null && newCharacter.profile.isCliff)
+                                {
+                                    newCharacter.characterAttack.Range_Prefab.transform.localPosition += new Vector3(0, rangeProjection.Adjusted_Y_Position, 0);
+                                }
                             }
                         }
                         EconomyManager.instance.Purchase(character.GetCost());

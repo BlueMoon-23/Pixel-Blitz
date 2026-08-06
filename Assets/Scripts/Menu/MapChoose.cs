@@ -19,6 +19,7 @@ public class MapChoose : MonoBehaviour
     // Map Index
     public GameObject AvailableMapInfo;
     public GameObject InventoryInfo;
+    public GameObject MapContent;
     // Singleton để truyền dữ liệu vào game scene ở hàm awake
     public static MapChoose instance;
     private void Awake()
@@ -162,5 +163,18 @@ public class MapChoose : MonoBehaviour
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.ChooseMap_Sound);
         AvailableMapInfo.SetActive(false);
         InventoryInfo.SetActive(true);
+    }
+    public void ChooseDifficulty(Gamemodes mode)
+    {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.MoveButton_Sound);
+        foreach (Transform child in MapContent.transform)
+        {
+            MapUI mapUI = child.GetComponent<MapUI>();
+            if (mapUI != null)
+            {
+                mapUI.mapData.gamemode = mode;
+                mapUI.Initialize();
+            }
+        }
     }
 }

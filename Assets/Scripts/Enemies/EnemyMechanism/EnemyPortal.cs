@@ -8,6 +8,8 @@ public class EnemyPortal : MonoBehaviour
     public EnemyPortal targetPortal; // Cổng đích
     // Quy tắc để không cho enemy teleport lại cổng cũ khi chạm cổng mới: gán EndPortal sẵn để không bị teleport back lại
     // Sau đó khi thoát khỏi collider cổng, gán EndPortal = null để cho nó teleport cổng mới
+    [Header("Truyền waypoint ở targetPortal vào")]
+    public GameObject[] WaypointLocations; // Với mỗi waypoint trong này, duyệt trong danh sách waypoint của enemy để xác định waypoint index
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // Tìm bất cứ object nào có khả năng dịch chuyển

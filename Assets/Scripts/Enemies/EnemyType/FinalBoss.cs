@@ -25,10 +25,10 @@ public class FinalBoss : BaseEnemy
         yield return null;
         isFinalBoss = true;
         hasDied = false;
-        StompID = StompEffect.GetComponent<BaseExplosion>().ExplosionID;
-        LowGraphic_StompID = LowGraphic_StompEffect.GetComponent<BaseExplosion>().ExplosionID;
-        SpiralStunID = SpiralStunEffect.GetComponent<BaseExplosion>().ExplosionID;
-        LowGraphic_SpiralStunID = LowGraphic_SpiralStunEffect.GetComponent<BaseExplosion>().ExplosionID;
+        if (StompEffect != null) StompID = StompEffect.GetComponent<BaseExplosion>().ExplosionID;
+        if (LowGraphic_StompEffect != null) LowGraphic_StompID = LowGraphic_StompEffect.GetComponent<BaseExplosion>().ExplosionID;
+        if (SpiralStunEffect != null) SpiralStunID = SpiralStunEffect.GetComponent<BaseExplosion>().ExplosionID;
+        if (LowGraphic_SpiralStunEffect != null) LowGraphic_SpiralStunID = LowGraphic_SpiralStunEffect.GetComponent<BaseExplosion>().ExplosionID;
         // Chỉnh máu của boss theo số character mang theo của người chơi
         if (CharacterLoadout.instance != null)
         {

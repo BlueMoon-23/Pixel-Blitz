@@ -16,6 +16,8 @@ public class UserData
     public UserCharacterData userCharacterData;
     // Cái này hỏi MatchSaveManager
     public List<MatchData> userMatchData;
+    // Cái này hỏi WeaponSaveManager
+    public UserWeaponData userWeaponData;
     // Cái này bên win_lose sẽ sửa
     public int ClearedTimes = 0;
     public int RoundTimes = 0;

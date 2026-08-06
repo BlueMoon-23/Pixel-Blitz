@@ -148,7 +148,7 @@ public class RocketeerBullet : BaseBullets
                     }
                     else
                     {
-                        enemyGetDamaged.TakeDamage(character, 50, character.canStrikethroughOrNot());
+                        enemyGetDamaged.TakeDamage(character, WeaponCalculator.CalculateDamage(50, character.characterWeapon.WeaponEquipped), character.canStrikethroughOrNot());
                     }
                 }
             }

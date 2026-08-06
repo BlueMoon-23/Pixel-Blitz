@@ -12,6 +12,7 @@ public class SceneKey
     public static string ShopScene = "ShopScene";
     public static string LoadingScene = "LoadingScene";
     public static string TutorialScene = "Tutorial";
+    public static string ChestScene = "ChestScene";
     public static string targetScene;
     public static int targetCharacterIndex;
 }

@@ -45,9 +45,9 @@ public class Summoner : BaseCharacter
             base.SetUpgradeInformation();
             if (Level < profile.characterLevelDatas.Count - 1)
             {
-                SetStatInfo(6, "Grave Stack", GraveStack, GraveStackByLevels[Level + 1]);
-                SetStatInfo(7, "Undead Count", UndeadCount, UndeadCountByLevels[Level + 1]);
-                SetStatInfo(8, "Undead HP", UndeadHP, UndeadHPByLevels[Level + 1]);
+                SetStatInfo(6, "Grave Stack", GraveStack, GraveStackByLevels[Level + 1], true);
+                SetStatInfo(7, "Undead Count", UndeadCount, UndeadCountByLevels[Level + 1], true);
+                SetStatInfo(8, "Undead HP", UndeadHP, UndeadHPByLevels[Level + 1], true);
             }
         }
     }

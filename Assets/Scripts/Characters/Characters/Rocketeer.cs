@@ -24,7 +24,7 @@ public class Rocketeer : BaseCharacter
             base.SetUpgradeInformation();
             if (Level < profile.characterLevelDatas.Count - 1)
             {
-                SetStatInfo(6, "Explosion Radius", ExplosionRadius, ExplosionRadiusByLevels[Level + 1]);
+                SetStatInfo(6, "Explosion Radius", ExplosionRadius, ExplosionRadiusByLevels[Level + 1], true);
             }
         }
     }

@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+
 
 public class CharacterAttack : MonoBehaviour
 {
@@ -12,6 +14,21 @@ public class CharacterAttack : MonoBehaviour
     protected Vector3 CircleScale;
     protected RangeScript range;
     private BaseCharacter character;
+    private int CurrentPriorityIndex;
+    private Dictionary<int, IAttackPriority> AttackPriorityByIndex = new Dictionary<int, IAttackPriority>()
+    {
+        {0, new FirstPriority() },
+        {1, new LastPriority() },
+        {2, new FarthestPriority() },
+        {3, new ClosestPriority() },
+        {4, new StrongestPriority() },
+        {5, new WeakestPriority() },
+        {6, new RandomPriority() },
+    };
+    private void Awake()
+    {
+        CurrentPriorityIndex = 0;
+    }
     private void Start()
     {
         character = GetComponent<BaseCharacter>();
@@ -24,6 +41,15 @@ public class CharacterAttack : MonoBehaviour
     {
         return range.enemies_in_range.Count;
     }
+    public string MoveAttackPriority()
+    {
+        CurrentPriorityIndex = (CurrentPriorityIndex + 1) % AttackPriorityByIndex.Count;
+        return AttackPriorityByIndex[CurrentPriorityIndex].PriorityName;
+    }
+    public string GetAttackPriority()
+    {
+        return AttackPriorityByIndex[CurrentPriorityIndex].PriorityName;
+    }
     public void ResetCharacterAttack()
     {
         CircleScale = new Vector3(0.25f, 0.25f, 0.25f);
@@ -33,57 +59,75 @@ public class CharacterAttack : MonoBehaviour
     }
     public BaseEnemy FindFirstEnemy()
     {
-        int max_position = -1;
-        float max_distance = 0f;
-        for (int i = 0; i < range.enemies_in_range.Count; i++)
+        if (range.enemies_in_range.Count <= 0) return null;
+        if (AttackPriorityByIndex[CurrentPriorityIndex].IsRandom)
+        {
+            return range.enemies_in_range[UnityEngine.Random.Range(0, range.enemies_in_range.Count)];
+        }
+        BaseEnemy BestEnemy = range.enemies_in_range[0];
+        for (int i = 1; i < range.enemies_in_range.Count; i++)
         {
             if (range.enemies_in_range[i].isDieOrNot()) continue;
             if (range.enemies_in_range[i].isHidden && !character.hasHiddenDetectionOrNot()) continue;
-            if (max_distance < range.enemies_in_range[i].Distance)
+            if (AttackPriorityByIndex[CurrentPriorityIndex].Priority(BestEnemy, range.enemies_in_range[i], character))
             {
-                max_distance = range.enemies_in_range[i].Distance;
-                max_position = i;
+                BestEnemy = range.enemies_in_range[i];
             }
         }
-        if (max_position == -1) return null;
-        else
+        Wizard wizard = character as Wizard;
+        if (wizard == null)
         {
-            Wizard wizard = character as Wizard;
-            if (wizard == null)
-            {
-                range.enemies_in_range[max_position].TakeIncomingDamage(character.GetDamage(), character.canStrikethroughOrNot());
-            }
-            return range.enemies_in_range[max_position];
+            BestEnemy.TakeIncomingDamage(character.GetDamage(), character.canStrikethroughOrNot());
         }
+        return BestEnemy;
     }
     // tối ưu hóa theo bài toán TopK => Priority queue
     public List<BaseEnemy> FindThreeFirstEnemies()
     {
-        PriorityQueue<BaseEnemy, float> queue = new PriorityQueue<BaseEnemy, float>();
+        IAttackPriority strategy = AttackPriorityByIndex[CurrentPriorityIndex];
+        List<BaseEnemy> candidates = new List<BaseEnemy>();
         foreach (BaseEnemy enemy in range.enemies_in_range)
         {
             if (enemy.isDieOrNot()) continue;
             if (enemy.isHidden && !character.hasHiddenDetectionOrNot()) continue;
-            if (queue.Count < 3)
+            candidates.Add(enemy);
+        }
+        List<BaseEnemy> Enemies_Result;
+        if (strategy.IsRandom)
+        {
+            // Random không có khái niệm "tệ hơn/tốt hơn" => xáo trộn rồi lấy 3
+            for (int i = candidates.Count - 1; i > 0; i--)
             {
-                queue.Enqueue(enemy, enemy.Distance);
+                int j = UnityEngine.Random.Range(0, i + 1);
+                (candidates[i], candidates[j]) = (candidates[j], candidates[i]);
             }
-            else
+            Enemies_Result = candidates.GetRange(0, Mathf.Min(3, candidates.Count));
+        }
+        else
+        {
+            PriorityQueue<BaseEnemy, BaseCharacter> queue = new PriorityQueue<BaseEnemy, BaseCharacter>(strategy.Priority);
+            foreach (BaseEnemy enemy in candidates)
             {
-                if (enemy.Distance > queue.PeekPriority())
+                if (queue.Count < 3)
                 {
-                    queue.Dequeue();
-                    queue.Enqueue(enemy, enemy.Distance);
+                    queue.Enqueue(enemy, character);
+                }
+                else if (strategy.Priority(queue.Peek(), enemy, character)) // root tệ hơn enemy => enemy tốt hơn => thay
+                {
+                    queue.Dequeue(character);
+                    queue.Enqueue(enemy, character);
                 }
             }
+            Enemies_Result = new List<BaseEnemy>();
+            while (queue.Count > 0)
+            {
+                Enemies_Result.Add(queue.Dequeue(character));
+            }
         }
-        List<BaseEnemy> Enemies_Result = new List<BaseEnemy>();
-        while (queue.Count > 0)
+        Wizard wizard = character as Wizard;
+        if (wizard == null)
         {
-            BaseEnemy enemy = queue.Dequeue();
-            Enemies_Result.Add(enemy);
-            Wizard wizard = character as Wizard;
-            if (wizard == null)
+            foreach (BaseEnemy enemy in Enemies_Result)
             {
                 enemy.TakeIncomingDamage(character.GetDamage(), character.canStrikethroughOrNot());
             }
@@ -92,46 +136,77 @@ public class CharacterAttack : MonoBehaviour
     }
 }
 
-
-// internal giúp class này chỉ xuất hiện trong code
-internal class PriorityQueue<TElement, TPriority> where TPriority : System.IComparable<TPriority>
+internal class PriorityQueue<TElement, TCharacter>
 {
-    private List<(TElement Element, TPriority Priority)> _nodes = new List<(TElement, TPriority)>();
-    public int Count => _nodes.Count;
-    public void Enqueue(TElement element, TPriority priority)
+    // Mảng lưu các phần tử, biểu diễn dưới dạng heap
+    private readonly List<TElement> items = new List<TElement>();
+    // Hàm so sánh: isWorseThan(a, b) == true nghĩa là "a tệ hơn b"
+    // Ví dụ với tiêu chí Closest: a tệ hơn b khi a xa hơn b
+    private readonly Func<TElement, TElement, TCharacter, bool> isWorseThan;
+    public PriorityQueue(Func<TElement, TElement, TCharacter, bool> isWorseThanFunc)
     {
-        _nodes.Add((element, priority));
-        int i = _nodes.Count - 1;
-        // Shift-up
-        while (i > 0)
+        isWorseThan = isWorseThanFunc;
+    }
+    public int Count => items.Count;
+    public TElement Peek()
+    {
+        return items[0];
+    }
+    public void Enqueue(TElement newItem, TCharacter character)
+    {
+        items.Add(newItem);
+        int currentIndex = items.Count - 1;
+        while (currentIndex > 0)
         {
-            int parent = (i - 1) / 2;
-            if (_nodes[i].Priority.CompareTo(_nodes[parent].Priority) >= 0) break;
-            var temp = _nodes[i]; _nodes[i] = _nodes[parent]; _nodes[parent] = temp;
-            i = parent;
+            int parentIndex = GetParentIndex(currentIndex);
+            bool currentIsWorseThanParent = isWorseThan(items[currentIndex], items[parentIndex], character);
+            if (!currentIsWorseThanParent)
+            {
+                break;
+            }
+            Swap(currentIndex, parentIndex);
+            currentIndex = parentIndex;
         }
     }
-    public TElement Dequeue()
+    public TElement Dequeue(TCharacter character)
     {
-        var result = _nodes[0].Element;
-        _nodes[0] = _nodes[_nodes.Count - 1];
-        _nodes.RemoveAt(_nodes.Count - 1);
-        int i = 0;
-        // Heapify
+        TElement worstItem = items[0];
+        int lastIndex = items.Count - 1;
+        items[0] = items[lastIndex];
+        items.RemoveAt(lastIndex);
+        ShiftDown(0, character);
+        return worstItem;
+    }
+    private void ShiftDown(int index, TCharacter character)
+    {
         while (true)
         {
-            int left = 2 * i + 1;
-            int right = 2 * i + 2;
-            int smallest = i;
-
-            if (left < _nodes.Count && _nodes[left].Priority.CompareTo(_nodes[smallest].Priority) < 0) smallest = left;
-            if (right < _nodes.Count && _nodes[right].Priority.CompareTo(_nodes[smallest].Priority) < 0) smallest = right;
-
-            if (smallest == i) break;
-            var temp = _nodes[i]; _nodes[i] = _nodes[smallest]; _nodes[smallest] = temp;
-            i = smallest;
+            int leftChildIndex = GetLeftChildIndex(index);
+            int rightChildIndex = GetRightChildIndex(index);
+            int worstIndex = index;
+            if (leftChildIndex < items.Count && isWorseThan(items[leftChildIndex], items[worstIndex], character))
+            {
+                worstIndex = leftChildIndex;
+            }
+            if (rightChildIndex < items.Count && isWorseThan(items[rightChildIndex], items[worstIndex], character))
+            {
+                worstIndex = rightChildIndex;
+            }
+            if (worstIndex == index)
+            {
+                break;
+            }
+            Swap(index, worstIndex);
+            index = worstIndex;
         }
-        return result;
     }
-    public TPriority PeekPriority() => _nodes[0].Priority;
+    private void Swap(int indexA, int indexB)
+    {
+        TElement temp = items[indexA];
+        items[indexA] = items[indexB];
+        items[indexB] = temp;
+    }
+    private int GetParentIndex(int index) => (index - 1) / 2;
+    private int GetLeftChildIndex(int index) => index * 2 + 1;
+    private int GetRightChildIndex(int index) => index * 2 + 2;
 }

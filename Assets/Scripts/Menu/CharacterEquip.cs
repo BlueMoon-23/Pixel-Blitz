@@ -17,11 +17,10 @@ public class CharacterEquip : MonoBehaviour
     public TextMeshProUGUI DamageStat;
     public TextMeshProUGUI CooldownStat;
     public TextMeshProUGUI CostStat;
-    public CharacterInfomation chosenCharacter;
+    [field: SerializeField] public CharacterInfomation chosenCharacter { get; private set; }
     // Thay đổi image và tiền màu xanh của loadout
     public List<CharacterInfomation> characterLoadout = new List<CharacterInfomation>();
-    public Image[] CharacterLoadoutImages = new Image[4];
-    public TextMeshProUGUI[] CharacterLoadoutCosts = new TextMeshProUGUI[4];
+    public List<CharacterLoadoutUI> CharacterLoadoutUIs = new List<CharacterLoadoutUI>(4);
     private int CurrentIndex = 0; // 0, 1, 2, 3
     public GameObject Equip_Button;
     public GameObject Unequip_Button;
@@ -96,10 +95,8 @@ public class CharacterEquip : MonoBehaviour
                     if (characterKeys[i] == characterSource[j].characterData.characterID)
                     {
                         // Chỉnh thông tin trên loadout
-                        CharacterLoadoutImages[i].gameObject.SetActive(true);
-                        CharacterLoadoutCosts[i].gameObject.SetActive(true);
-                        CharacterLoadoutImages[i].sprite = characterSource[j].characterData.characterProfile.CharacterImage;
-                        CharacterLoadoutCosts[i].text = "$" + characterSource[j].characterData.characterProfile.CostStat.ToString();
+                        CharacterLoadoutUIs[i].Setup(characterSource[j]);
+                        CharacterLoadoutUIs[i].gameObject.SetActive(true);
                         characterLoadout.Add(characterSource[j]);
                         break;
                     }
@@ -107,18 +104,15 @@ public class CharacterEquip : MonoBehaviour
             }
         }
     }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public void Close()
     {
-        CharacterInfo.SetActive(false);
+        CharacterInfo.SetActive(false);  
+        WeaponEquip.instance.Close();
         MapInfo.SetActive(true);
     }
     public void ChooseCharacter(CharacterInfomation character)
     {
+        if (character == null) return;
         MapInfo.SetActive(false);
         CharacterInfo.SetActive(true);
         // Chỉnh thông tin
@@ -127,6 +121,17 @@ public class CharacterEquip : MonoBehaviour
         CharacterName.color = chosenCharacter.characterData.characterProfile.CharacterColor;
         CharacterGlow.color = chosenCharacter.characterData.characterProfile.CharacterColor;
         CharacterImage.sprite = chosenCharacter.characterData.characterProfile.CharacterImage;
+        // Hiện weapon của character ngay khi choose character
+        foreach (CharacterData characterData in AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters)
+        {
+            if (characterData.characterID == chosenCharacter.characterData.characterID)
+            {
+                WeaponEquip.instance.characterWeaponBox.InitCharacterWeapon(characterData, character);
+                break;
+            }
+        }
+        // Gán current character cho weaponEquip, không để weaponEquip.Open() nữa
+        WeaponEquip.instance.CurrentCharacter = chosenCharacter.characterData;
         // Kiểm tra người chơi có character này chưa
         if (!character.hasOwned)
         {
@@ -138,16 +143,34 @@ public class CharacterEquip : MonoBehaviour
             DamageStat.text = "?";
             CooldownStat.text = "?";
             CostStat.text = "?";
+            if (WeaponEquip.instance != null)
+            {
+                WeaponEquip.instance.HideWeaponButton();
+            }
             return;
         }
         else
         {
+            if (WeaponEquip.instance != null)
+            {
+                WeaponEquip.instance.ShowWeaponButton();
+            }
             CharacterImage.color = Color.white;
             Purchase_Button.gameObject.SetActive(false);
-            RangeStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].RangeStat.ToString();
-            DamageStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].DamageStat.ToString();
-            CooldownStat.text = chosenCharacter.characterData.characterProfile.characterLevelDatas[0].CooldownStat.ToString();
-            CostStat.text = chosenCharacter.characterData.characterProfile.CostStat.ToString();
+            var baseLevelData = chosenCharacter.characterData.characterProfile.characterLevelDatas[0];
+            var weaponData = chosenCharacter.characterData.WeaponEquippedData;
+            float oldRange = baseLevelData.RangeStat;
+            float newRange = WeaponCalculator.CalculateRange(oldRange, weaponData);
+            UpdateStatText(RangeStat, oldRange, newRange, isHigherBetter: true);
+            float oldDamage = baseLevelData.DamageStat;
+            float newDamage = WeaponCalculator.CalculateDamage(oldDamage, weaponData);
+            UpdateStatText(DamageStat, oldDamage, newDamage, isHigherBetter: true);
+            float oldCooldown = baseLevelData.CooldownStat;
+            float newCooldown = WeaponCalculator.CalculateCooldown(oldCooldown, weaponData);
+            UpdateStatText(CooldownStat, oldCooldown, newCooldown, isHigherBetter: false);
+            float oldCost = chosenCharacter.characterData.characterProfile.CostStat;
+            float newCost = WeaponCalculator.CalculateCost(oldCost, weaponData);
+            UpdateStatText(CostStat, oldCost, newCost, isHigherBetter: false);
         }
         // Kiểm tra đã được equip vào loadout chưa
         for (int i = 0; i < characterLoadout.Count; i++)
@@ -162,23 +185,35 @@ public class CharacterEquip : MonoBehaviour
         Unequip_Button.gameObject.SetActive(false);
         Equip_Button.gameObject.SetActive(true);
     }
+    private void UpdateStatText(TMP_Text textComponent, float oldVal, float newVal, bool isHigherBetter)
+    {
+        textComponent.text = newVal.ToString();
+        if (Mathf.Approximately(newVal, oldVal))
+        {
+            textComponent.color = Color.white; // Hoặc màu mặc định của UI
+        }
+        else if (newVal > oldVal)
+        {
+            textComponent.color = isHigherBetter ? new Color32(165, 255, 107, 255) : new Color32(255, 100, 76, 255);
+        }
+        else // newVal < oldVal
+        {
+            textComponent.color = isHigherBetter ? new Color32(255, 100, 76, 255) : new Color32(165, 255, 107, 255); ;
+        }
+    }
     public void Equip()
     {
         if (CurrentIndex >= 4)
         {
             for (int i = 0; i < 3; i++)
             {
-                CharacterLoadoutImages[i].sprite = CharacterLoadoutImages[i + 1].sprite;
-                CharacterLoadoutCosts[i].text = CharacterLoadoutCosts[i + 1].text;
+                CharacterLoadoutUIs[i].Setup(CharacterLoadoutUIs[i + 1].characterInfo);
             }
             characterLoadout.RemoveAt(0); // tự động dồn các phần tử lên luôn rồi
             CurrentIndex--;
         }
         // Chỉnh thông tin trên loadout
-        CharacterLoadoutImages[CurrentIndex].gameObject.SetActive(true);
-        CharacterLoadoutCosts[CurrentIndex].gameObject.SetActive(true);
-        CharacterLoadoutImages[CurrentIndex].sprite = chosenCharacter.characterData.characterProfile.CharacterImage;
-        CharacterLoadoutCosts[CurrentIndex].text = "$" + chosenCharacter.characterData.characterProfile.CostStat.ToString();
+        CharacterLoadoutUIs[CurrentIndex].Setup(chosenCharacter);
         // Kéo chosenCharacter vào List<CharacterInfomation> CharacterLoadout. CharacterLoadout save luôn, để khi nhấn nút purchase xong quay lại sẽ tiện
         characterLoadout.Add(chosenCharacter);
         if (CharacterLoadout.instance != null)
@@ -199,16 +234,14 @@ public class CharacterEquip : MonoBehaviour
                 // Kéo các phần tử cuối lên lấp lại vị trí trống
                 for (int j = i; j < 3; j++)
                 {
-                    CharacterLoadoutImages[j].sprite = CharacterLoadoutImages[j + 1].sprite;
-                    CharacterLoadoutCosts[j].text = CharacterLoadoutCosts[j + 1].text;
+                    CharacterLoadoutUIs[j].Setup(CharacterLoadoutUIs[j + 1].characterInfo);
                 }
                 // Tạo khoảng trống ngăn không cho lấy lộn value
-                CharacterLoadoutImages[3].sprite = null;
-                CharacterLoadoutCosts[3].text = null;
+                CharacterLoadoutUIs[3].ResetToNull();
                 // Cài lại current index, sau đó tắt tại chỗ đó đi
                 CurrentIndex = characterLoadout.Count;
-                CharacterLoadoutImages[CurrentIndex].gameObject.SetActive(false);
-                CharacterLoadoutCosts[CurrentIndex].gameObject.SetActive(false);
+                CharacterLoadoutUIs[CurrentIndex].CharacterLoadoutImage.gameObject.SetActive(false);
+                CharacterLoadoutUIs[CurrentIndex].CharacterLoadoutCost.gameObject.SetActive(false);
                 break;
             }
         }

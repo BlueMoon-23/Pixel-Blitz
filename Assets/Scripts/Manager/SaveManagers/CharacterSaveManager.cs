@@ -49,4 +49,20 @@ public class CharacterSaveManager : MonoBehaviour
             }
         }
     }
+    public void ReloadUserCharacter()
+    {
+        if (AccountSaveManager.instance != null)
+        {
+            for (int i = 0; i < AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters.Count; i++)
+            {
+                for (int j = 0; j < allCharacters.Count; j++)
+                {
+                    if (AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters[i].characterID == allCharacters[j].characterID)
+                    {
+                        AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters[i].characterProfile = allCharacters[j].characterProfile;
+                    }
+                }
+            }
+        }
+    }
 }

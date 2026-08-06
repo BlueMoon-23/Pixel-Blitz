@@ -313,7 +313,8 @@ public class BaseEnemy : MonoBehaviour
                 slow_factor = enemyModifiers.GetMinSlowPercent();
                 boost_factor = enemyModifiers.GetMaxBoostPercent();
             }
-            Speed = enemyStats.OldSpeed * slow_factor * boost_factor;
+            if (enemyStats != null) Speed = enemyStats.OldSpeed * slow_factor * boost_factor;
+            else Debug.Log("enemy stats = null");
         }
         else
         {
@@ -328,10 +329,27 @@ public class BaseEnemy : MonoBehaviour
     public bool CanBeTargeted()
     {
         if (!gameObject.activeInHierarchy) return false;
-        if (enemyTeleport != null && enemyTeleport.isTeleporting)
+        /*if (enemyTeleport != null && enemyTeleport.isTeleporting)
         {
             return false;
-        }
+        }*/
         return true;
+    }
+    /// <summary>
+    /// Tìm Waypoint nào vừa nằm trong portal vừa nằm trong danh sách waypoint của enemy
+    /// </summary>
+    public void TeleportToWaypoint(GameObject[] WaypointLocations)
+    {
+        foreach (GameObject PortalWaypoint in WaypointLocations)
+        {
+            for (int i = 0; i < Waypoints.Length; i++)
+            {
+                if (PortalWaypoint == Waypoints[i])
+                {
+                    Waypoint_CurrentIndex = i + 1;
+                    return;
+                }
+            }
+        }
     }
 }

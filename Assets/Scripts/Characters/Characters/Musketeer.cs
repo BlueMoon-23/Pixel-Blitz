@@ -5,6 +5,7 @@ using UnityEngine;
 public class Musketeer : BaseCharacter
 {
     public bool didAttackImmediately;
+    private Coroutine AttackImmediatelyCoroutine;
     protected override void OnEnable()
     {
         base.OnEnable();
@@ -34,7 +35,13 @@ public class Musketeer : BaseCharacter
             }
         }
     }
-    public void AttackImmediately()
+    public IEnumerator AttackImmediately()
+    {
+        if (AttackImmediatelyCoroutine != null) StopCoroutine(AttackImmediatelyCoroutine);
+        yield return null;
+        PerformAttackImmediately();
+    }
+    public void PerformAttackImmediately()
     {
         if (characterEffect.isStunned || didAttackImmediately || Level < 3) { return; }
         BaseEnemy first_enemy = characterAttack.FindFirstEnemy();

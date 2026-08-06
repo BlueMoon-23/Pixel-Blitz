@@ -5,7 +5,7 @@ using UnityEngine.TextCore.Text;
 
 public class StarExplosion : BaseExplosion
 {
-    private BaseCharacter wizard;
+    private BaseCharacter Character;
     private float damageValue;
     // Start is called before the first frame update
     void Start()
@@ -20,7 +20,7 @@ public class StarExplosion : BaseExplosion
     }
     public void Initialize(BaseCharacter character, float Damage)
     {
-        wizard = character;
+        Character = character;
         damageValue = Damage;
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -28,7 +28,8 @@ public class StarExplosion : BaseExplosion
         BaseEnemy baseEnemy = collision.gameObject.GetComponent<BaseEnemy>();
         if (baseEnemy != null)
         {
-            baseEnemy.TakeDamage(wizard, damageValue, true);
+            bool doStrikethrough = Character != null ? Character.canStrikethroughOrNot() : false;
+            baseEnemy.TakeDamage(Character, damageValue, doStrikethrough);
             if (baseEnemy.GetHP() > 0) baseEnemy.StartCoroutine(baseEnemy.enemyEffect.GetStunned(1f));
         }
     }

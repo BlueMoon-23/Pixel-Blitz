@@ -18,6 +18,10 @@ public class MapUI : MonoBehaviour
     public TextMeshProUGUI mapReq;
     void Start()
     {
+        Initialize();
+    }
+    public void Initialize()
+    {
         mapImage.sprite = mapData.mapInformation.MapImage;
         mapStarRate.text = mapData.mapInformation.StarRate.ToString();
         mapDifficulty.text = mapData.gamemode.name;
@@ -31,15 +35,23 @@ public class MapUI : MonoBehaviour
             }
             else
             {
+                UnlockFill.SetActive(true);
+                mapReq.gameObject.SetActive(true);
                 mapReq.text = "Require " + mapData.CharacterRequirement().ToString() + " characters in your inventory to unlock!";
             }
         }
     }
     public void ChooseFromMapIndex()
     {
-        if (MapChoose.instance != null)
+        if (AccountSaveManager.CurrentAccount != null)
         {
-            MapChoose.instance.CompareMapData(mapData);
+            if (AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters.Count >= mapData.CharacterRequirement())
+            {
+                if (MapChoose.instance != null)
+                {
+                    MapChoose.instance.CompareMapData(mapData);
+                }
+            }
         }
     }
     // Update is called once per frame

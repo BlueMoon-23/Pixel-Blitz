@@ -57,8 +57,20 @@ public class WaveManager : MonoBehaviour
                 }
                 // Reset lại vụ skip
                 Ready_Skip.instance.WantToSkip = false; // khong co lenh nay la neu skip roi thi wanttoskip = true, break vong while
-                if (skipCoroutine != null) { StopCoroutine(skipCoroutine); }
-                if (mode.GetType() != typeof(TutorialMode) && currentWave < MaxWave) { skipCoroutine = StartCoroutine(Ready_Skip.instance.Skip()); }
+                if (skipCoroutine != null)
+                {
+                    StopCoroutine(skipCoroutine);
+                    skipCoroutine = null;
+                }
+                if (Ready_Skip.instance != null)
+                {
+                    Ready_Skip.instance.CancelSkipUI();
+                }
+
+                if (mode.GetType() != typeof(TutorialMode) && currentWave < MaxWave)
+                {
+                    skipCoroutine = StartCoroutine(Ready_Skip.instance.Skip());
+                }
                 // Time handle
                 int time = 60;
                 if (currentWave == MaxWave) { 
@@ -78,7 +90,15 @@ public class WaveManager : MonoBehaviour
                     // Skip luon neu khong co enemy
                     if (EnemyManager.instance != null && EnemyManager.instance.isEmptyEnemies() && mode.isFinished_spawning())
                     {
-                        if (skipCoroutine != null) { StopCoroutine(skipCoroutine); } // có tình huống khi do skip như này thì cục UI skip vẫn hiện lên, nên phải để ở đây vì phải dừng cái skip cũ để thực hiện skip mới
+                        if (skipCoroutine != null)
+                        {
+                            StopCoroutine(skipCoroutine);
+                            skipCoroutine = null;
+                        }
+                        if (Ready_Skip.instance != null)
+                        {
+                            Ready_Skip.instance.CancelSkipUI();
+                        }
                         Ready_Skip.instance.DoSkip();
                     }
                 }

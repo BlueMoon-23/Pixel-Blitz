@@ -8,29 +8,29 @@ using UnityEngine.UI;
 public class ShopManager : MonoBehaviour
 {
     // Tiền người chơi
-    public TextMeshProUGUI Gems_Text;
-    public TextMeshProUGUI Diamonds_Text;
+    [SerializeField] private TextMeshProUGUI Gems_Text;
+    [SerializeField] private TextMeshProUGUI Diamonds_Text;
     // Thông tin character
     // Cơ bản
-    public TextMeshProUGUI CharacterName;
-    public Image CharacterImage;
-    public TextMeshProUGUI RangeStat;
-    public TextMeshProUGUI DamageStat;
-    public TextMeshProUGUI CooldownStat;
-    public TextMeshProUGUI CostStat;
+    [SerializeField] private TextMeshProUGUI CharacterName;
+    [SerializeField] private Image CharacterImage;
+    [SerializeField] private TextMeshProUGUI RangeStat;
+    [SerializeField] private TextMeshProUGUI DamageStat;
+    [SerializeField] private TextMeshProUGUI CooldownStat;
+    [SerializeField] private TextMeshProUGUI CostStat;
     // Của UI
-    public TextMeshProUGUI Tier;
-    public TextMeshProUGUI Description;
-    public TextMeshProUGUI Special;
-    public TextMeshProUGUI HiddenDetection;
-    public TextMeshProUGUI Strikethrough;
+    [SerializeField] private TextMeshProUGUI Tier;
+    [SerializeField] private TextMeshProUGUI Description;
+    [SerializeField] private TextMeshProUGUI Special;
+    [SerializeField] private TextMeshProUGUI HiddenDetection;
+    [SerializeField] private TextMeshProUGUI Strikethrough;
     // Giá tiền
-    public TextMeshProUGUI GemRequire;
-    public TextMeshProUGUI DiamondRequire;
+    [SerializeField] private TextMeshProUGUI GemRequire;
+    [SerializeField] private TextMeshProUGUI DiamondRequire;
     private int currentIndex = 0;
-    public GameObject purchaseButton;
-    public GameObject cantpurchaseButton;
-    public GameObject ownedButton;
+    [SerializeField] private GameObject purchaseButton;
+    [SerializeField] private GameObject cantpurchaseButton;
+    [SerializeField] private GameObject ownedButton;
     public static ShopManager instance;
     private void Awake()
     {

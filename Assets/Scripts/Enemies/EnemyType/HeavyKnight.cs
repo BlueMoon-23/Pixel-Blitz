@@ -8,22 +8,18 @@ public class HeavyKnight : BaseEnemy
     public GameObject LowGraphic_StompEffect;
     private int StompID;
     private int LowGraphic_StompID;
+    private Coroutine StompCoroutine;
     void Start()
     {
         StompID = StompEffect.GetComponent<BaseExplosion>().ExplosionID;
         LowGraphic_StompID = LowGraphic_StompEffect.GetComponent<BaseExplosion>().ExplosionID;
-        // Move road
-        if (WaypointManager.instance != null)
-        {
-            Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
-        }
         isFinalBoss = false;
-        StartCoroutine(StompGround());
     }
     protected override IEnumerator ResetStats()
     {
         yield return StartCoroutine(base.ResetStats());
         yield return null;
+        StompCoroutine = StartCoroutine(StompGround());
         isFinalBoss = false;
     }
     protected IEnumerator StompGround()
@@ -61,5 +57,13 @@ public class HeavyKnight : BaseEnemy
             yield return new WaitForSeconds(14f);
         }
         while (true);
+    }
+    private void OnDisable()
+    {
+        if (StompCoroutine != null)
+        {
+            StopCoroutine(StompCoroutine);
+            StompCoroutine = null;
+        }
     }
 }

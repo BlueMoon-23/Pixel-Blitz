@@ -31,7 +31,7 @@ public class Wizard : BaseCharacter
     }
     public override float GetDamage()
     {
-        return profile.characterLevelDatas[Level].DamageStat; // damage con này khi lên lv4 sẽ hiện lên rất kỳ, nên phải dùng cơ chế đa hình để đảm bảo sát thương của fireball
+        return WeaponCalculator.CalculateDamage(profile.characterLevelDatas[Level].DamageStat, characterWeapon.WeaponEquipped); // damage con này khi lên lv4 sẽ hiện lên rất kỳ, nên phải dùng cơ chế đa hình để đảm bảo sát thương của fireball
     }
     public void SetDamage(float UIDamage) { Damage = UIDamage; }
     public override void SetUpgradeInformation()
@@ -39,9 +39,9 @@ public class Wizard : BaseCharacter
         if (characterUI != null)
         {
             // Chưa nghĩ ra cách nào khác để đưa đúng tinh thần open/closed cho việc cài description current ability theo đúng damage
-            profile.characterLevelDatas[1].Special = "Next Ability: cast a line of 5 stars under enemy's feet which deals " + profile.characterLevelDatas[1].DamageStat + " damage and stun for 1s.";
-            profile.characterLevelDatas[2].Special = "Next Ability: create a vortex at enemy that exists in 3 seconds, each 0.1s deals " + profile.characterLevelDatas[2].DamageStat + " damage.";
-            profile.characterLevelDatas[3].Special = "Next Ability: cast 3 fireballs in burst. Each fireball explodes and deals " + profile.characterLevelDatas[3].DamageStat + " damage to all enemies hit.";
+            profile.characterLevelDatas[1].Special = "Next Ability: cast a line of 5 stars under enemy's feet which deals " + WeaponCalculator.CalculateDamage(profile.characterLevelDatas[1].DamageStat, characterWeapon.WeaponEquipped) + " damage and stun for 1s.";
+            profile.characterLevelDatas[2].Special = "Next Ability: create a vortex at enemy that exists in 3 seconds, each 0.1s deals " + WeaponCalculator.CalculateDamage(profile.characterLevelDatas[2].DamageStat, characterWeapon.WeaponEquipped) + " damage.";
+            profile.characterLevelDatas[3].Special = "Next Ability: cast 3 fireballs in burst. Each fireball explodes and deals " + WeaponCalculator.CalculateDamage(profile.characterLevelDatas[3].DamageStat, characterWeapon.WeaponEquipped) + " damage to all enemies hit.";
             profile.characterLevelDatas[4].Special = "Next Ability: use 3 abilities chosen by the player in burst!";
             base.SetUpgradeInformation();
         }
@@ -119,7 +119,7 @@ public class Wizard : BaseCharacter
                 StarSequence starSequence = stars.GetComponent<StarSequence>();
                 if (starSequence != null)
                 {
-                    starSequence.Initialize(this, profile.characterLevelDatas[1].DamageStat);
+                    starSequence.Initialize(this, WeaponCalculator.CalculateDamage(profile.characterLevelDatas[1].DamageStat, characterWeapon.WeaponEquipped));
                 }
             }
         }
@@ -145,7 +145,7 @@ public class Wizard : BaseCharacter
                 WizardVortex wizardVortex = vortex.GetComponent<WizardVortex>();
                 if (wizardVortex != null)
                 {
-                    wizardVortex.Initialize(this, profile.characterLevelDatas[2].DamageStat);
+                    wizardVortex.Initialize(this, WeaponCalculator.CalculateDamage(profile.characterLevelDatas[2].DamageStat, characterWeapon.WeaponEquipped));
                 }
             }
             else

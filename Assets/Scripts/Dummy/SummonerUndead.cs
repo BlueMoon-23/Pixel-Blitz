@@ -26,6 +26,10 @@ public class SummonerUndead : MonoBehaviour, IStunnable, ISide
     public GameObject EnemyRoot;
     // ResetStats
     public bool StatsReseted = false; // mặc định phải là false, true là update sẽ chạy trước
+    private void Awake()
+    {
+        Original_x_HPScale = HP_RedBar.transform.localScale.x;
+    }
     protected void OnEnable()
     {
         StartCoroutine(ResetStats());
@@ -34,6 +38,7 @@ public class SummonerUndead : MonoBehaviour, IStunnable, ISide
     {
         StatsReseted = false;
         isProtected = false;
+        HP_RedBar.transform.localScale = new Vector3(Original_x_HPScale * HP / MaxHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
         yield return null;
         // Awake
         // Move animation
@@ -51,8 +56,6 @@ public class SummonerUndead : MonoBehaviour, IStunnable, ISide
         {
             IndexPair[state] = 0;
         }
-        // HP Bar
-        Original_x_HPScale = HP_RedBar.transform.localScale.x;
         yield return null;
         // Start
         ValidWaypoint.Clear(); // clear kết quả trước đó
@@ -82,10 +85,6 @@ public class SummonerUndead : MonoBehaviour, IStunnable, ISide
             }
         }
         StatsReseted = true;
-    }
-    public void ReduceWaypoint()
-    {
-        Waypoint_CurrentIndex--;
     }
     public void SetCharacter(BaseCharacter character)
     {
@@ -205,5 +204,22 @@ public class SummonerUndead : MonoBehaviour, IStunnable, ISide
     public SIDE GetSide()
     {
         return SIDE.Dummy;
+    }
+    /// <summary>
+    /// Tìm waypoint nào vừa nằm trong portal vừa nằm trong danh sách waypoint của undead
+    /// </summary>
+    public void TeleportToWaypoint(GameObject[] WaypointLocations)
+    {
+        foreach (GameObject PortalWaypoint in WaypointLocations)
+        {
+            for (int i = 0; i < Waypoints.Length; i++)
+            {
+                if (PortalWaypoint == Waypoints[i])
+                {
+                    Waypoint_CurrentIndex = i - 1;
+                    return;
+                }
+            }
+        }
     }
 }

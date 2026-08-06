@@ -55,7 +55,6 @@ public class UserCharacterData
             .FindIndex(c => c.characterID == characterID);
         if (index >= 0)
         {
-            // Nếu có rồi thì lấy ra giảm số lần dùng xuống (đoạn này logic cũ ghi chú là tăng nhưng code là --, mình giữ nguyên -- nhé)
             var data = AccountSaveManager.CurrentAccount.userCharacterData.Character_with_UsedTimes[index];
             data.usedTimes--;
             AccountSaveManager.CurrentAccount.userCharacterData.Character_with_UsedTimes[index] = data;
@@ -85,5 +84,54 @@ public class UserCharacterData
             }
         }
         return Result;
+    }
+    public void CharacterEquipWeapon(CharacterData character, WeaponData weapon)
+    {
+        CharacterData targetCharacter = OwnedCharacters.Find(c => c.characterID == character.characterID);
+        if (targetCharacter != null)
+        {
+            targetCharacter.WeaponEquippedData = weapon;
+        }
+        // Tìm theo instanceID
+        WeaponData itemToRemove = AccountSaveManager.CurrentAccount.userWeaponData.OwnedWeapons
+            .Find(w => w != null && w.WeaponInstanceID == weapon.WeaponInstanceID);
+        if (itemToRemove != null)
+        {
+            AccountSaveManager.CurrentAccount.userWeaponData.OwnedWeapons.Remove(itemToRemove);
+        }
+        else
+        {
+            Debug.LogError("Item to remove = null");
+        }
+        if (!AccountSaveManager.CurrentAccount.userWeaponData.UsedWeapons.Contains(weapon))
+        {
+            AccountSaveManager.CurrentAccount.userWeaponData.UsedWeapons.Add(weapon);
+        }
+        AccountSaveManager.instance.SaveAccounts();
+    }
+
+    public void CharacterUnequipWeapon(CharacterData character, WeaponData weapon)
+    {
+        character.WeaponEquippedData = null; // ngắt WeaponData của chosenCharacter (CurrentCharacter) để CharacterEquip.instance.UpdateCharacterLoadoutCost() cập nhật đúng giá
+        CharacterData targetCharacter = OwnedCharacters.Find(c => c.characterID == character.characterID);
+        if (targetCharacter != null)
+        {
+            targetCharacter.WeaponEquippedData = null; // chỉ là ngắt WeaponData trong cái Account thôi
+        }
+        WeaponData itemToRemove = AccountSaveManager.CurrentAccount.userWeaponData.UsedWeapons
+            .Find(w => w != null && w.WeaponInstanceID == weapon.WeaponInstanceID);
+        if (itemToRemove != null)
+        {
+            AccountSaveManager.CurrentAccount.userWeaponData.UsedWeapons.Remove(itemToRemove);
+        }
+        else
+        {
+            Debug.LogError("Item to remove = null");
+        }
+        if (!AccountSaveManager.CurrentAccount.userWeaponData.OwnedWeapons.Contains(weapon))
+        {
+            AccountSaveManager.CurrentAccount.userWeaponData.OwnedWeapons.Add(weapon);
+        }
+        AccountSaveManager.instance.SaveAccounts();
     }
 }

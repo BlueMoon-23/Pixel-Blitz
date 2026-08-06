@@ -6,12 +6,13 @@ using UnityEngine;
 public class Healer : BaseEnemy
 {
     public GameObject MagicCircle;
+    private Coroutine HealCoroutine;
     protected override IEnumerator ResetStats()
     {
         StartCoroutine(base.ResetStats());
         yield return null;
         isFinalBoss = false;
-        StartCoroutine(HealEnemiesInCircle());
+        HealCoroutine = StartCoroutine(HealEnemiesInCircle());
     }
     private IEnumerator HealEnemiesInCircle()
     {
@@ -32,5 +33,13 @@ public class Healer : BaseEnemy
             yield return new WaitForSeconds(2f);
         }
         while (true);
+    }
+    private void OnDisable()
+    {
+        if (HealCoroutine != null)
+        {
+            StopCoroutine(HealCoroutine);
+            HealCoroutine = null;
+        }
     }
 }

@@ -26,7 +26,7 @@ public class MusketeerBullet : BaseBullets
                     Musketeer musketeer = character as Musketeer;
                     if (musketeer != null)
                     {
-                        musketeer.AttackImmediately();
+                        musketeer.StartCoroutine(musketeer.AttackImmediately());
                     }
                 }
             }

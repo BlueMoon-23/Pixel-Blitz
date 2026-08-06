@@ -48,10 +48,13 @@ public class CharacterControll : MonoBehaviour
             Range_Prefab[i].GetComponent<Renderer>().enabled = false;
         }
         character.characterAttack.Range_Prefab.GetComponent<Renderer>().enabled = true;
-        character.characterAttack.Range_Prefab.transform.DOScale(character.characterAttack.Range_Prefab.transform.localScale, 0.05f).From(0f);
+        // character.characterAttack.Range_Prefab.transform.DOScale(character.characterAttack.Range_Prefab.transform.localScale, 0.05f).From(0f);
+        Vector3 targetScale = new Vector3(0.25f, 0.25f, 0.25f) * character.GetRange();
+        character.characterAttack.Range_Prefab.transform.DOScale(targetScale, 0.05f).From(0f);
         characterUI.gameObject.SetActive(true);
         characterUI.CurrentCharacter = character;
         characterUI.CurrentCharacter.SetUpgradeInformation();
+        characterUI.ShowAttackPriority();
         if (characterUI.CurrentCharacter.hasAbility)
         {
             characterUI.AbilityButton.gameObject.SetActive(true);

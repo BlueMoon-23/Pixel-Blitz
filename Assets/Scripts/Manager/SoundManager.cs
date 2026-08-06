@@ -38,6 +38,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip CloseButton_Sound; // Click_Close_scifi, dùng cho close button và exit
     public AudioClip ChooseMap_Sound; // UI_Screen_Swoosh_4
     public AudioClip Setting_Sound; // UI_Click_Select_2
+    public AudioClip Chest_Opening; 
     // Nhóm Sound Effects
     [Header("Enemy Sound Effects")]
     public AudioClip StompGround_Sound;
@@ -98,6 +99,14 @@ public class SoundManager : MonoBehaviour
         MusicSource.clip = nextClip;
         MusicSource.loop = true;
         MusicSource.Play();
+    }
+    public void PauseBGM()
+    {
+        if (MusicSource.isPlaying) MusicSource.Pause();
+    }
+    public void ResumeBGM()
+    {
+        if (!MusicSource.isPlaying) MusicSource.UnPause();
     }
     public void SetMusicVolume(float value)
     {

@@ -96,6 +96,12 @@ public class MainMenu : MonoBehaviour
         SceneKey.targetScene = SceneKey.TutorialScene;
         SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
     }
+    public void Chests()
+    {
+        if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);
+        SceneKey.targetScene = SceneKey.ChestScene;
+        SceneManager.LoadSceneAsync(SceneKey.LoadingScene);
+    }
     public void Play()
     {
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.OpenButton_Sound);

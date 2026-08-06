@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class Mauler : BaseEnemy
 {
-    public GameObject MaulerAim; 
+    public GameObject MaulerAim;
+    private Coroutine SmashCoroutine;
     protected override IEnumerator ResetStats()
     {
         yield return StartCoroutine(base.ResetStats());
         yield return null;
         isFinalBoss = false;
-        StartCoroutine(SmashGround());
+        SmashCoroutine = StartCoroutine(SmashGround());
     }
     private IEnumerator SmashGround()
     {
@@ -42,6 +43,14 @@ public class Mauler : BaseEnemy
             {
                 maulerAim.SetAimedCharacter(CharacterManager.instance.GetCharacterByIndex(character_index_position));
             }
+        }
+    }
+    private void OnDisable()
+    {
+        if (SmashCoroutine != null)
+        {
+            StopCoroutine(SmashCoroutine);
+            SmashCoroutine = null;
         }
     }
 }

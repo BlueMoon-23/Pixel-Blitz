@@ -25,7 +25,7 @@ public class EnemyTeleport : MonoBehaviour, ITeleportable
             EndPortal = enemyPortal;
             isTeleporting = true;
             enemy.gameObject.transform.position = EndPortal.gameObject.transform.position;
-            enemy.Waypoint_CurrentIndex++;
+            enemy.TeleportToWaypoint(EndPortal.WaypointLocations);
         }
     }
     public void StopTeleport(EnemyPortal enemyPortal)

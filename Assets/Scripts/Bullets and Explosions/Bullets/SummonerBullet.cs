@@ -7,21 +7,24 @@ public class SummonerBullet : BaseBullets
     private bool isBounced = false;
     private GameObject TargetWaypoint;
     private Vector3 TargetDirection;
-    // Start is called before the first frame update
+    private Coroutine returnCoroutine; // phải lưu reference coroutine return bullet, để khi đạn bị hủy thật thì coroutine kia sẽ không ám cái đạn mới nữa
     void OnEnable()
     {
         isBounced = false;
         if (BulletPooler.instance != null)
         {
-            BulletPooler.instance.StartCoroutine(BulletPooler.instance.ReturnBulletWithDelay(this, 1.25f));
+            returnCoroutine = BulletPooler.instance.StartCoroutine(BulletPooler.instance.ReturnBulletWithDelay(this, 1.25f));
         }
     }
-
     // Update is called once per frame
     void Update()
     {
         if (!isBounced) { Move(); }
         else { BouncedMove(); }
+        if (enemy != null)
+        {
+            TargetWaypoint = enemy.Waypoints[enemy.Waypoint_CurrentIndex - 1]; // update liên tục thay vì chỉ lúc đạn nổ mới cài, tránh hiện tượng enemy chết trước khi nổ
+        }
     }
     protected override void ExplodeOnImpact()
     {
@@ -47,7 +50,6 @@ public class SummonerBullet : BaseBullets
             else // Đạn nảy
             {
                 isBounced = true;
-                TargetWaypoint = enemy.Waypoints[enemy.Waypoint_CurrentIndex - 1];
                 if (WaypointManager.instance != null)
                 {
                     foreach (WaypointInformation Path in WaypointManager.instance.List_of_Waypoints)
@@ -123,6 +125,14 @@ public class SummonerBullet : BaseBullets
         {
             Debug.Log("targetwaypoint = null");
             Move();
+        }
+    }
+    void OnDisable()
+    {
+        if (returnCoroutine != null && BulletPooler.instance != null)
+        {
+            BulletPooler.instance.StopCoroutine(returnCoroutine);
+            returnCoroutine = null;
         }
     }
 }

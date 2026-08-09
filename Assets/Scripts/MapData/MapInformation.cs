@@ -15,7 +15,7 @@ public class MapInformation : MonoBehaviour
     public Tilemap ViewBounds;
     [Header("Placing")]
     public Tilemap PlacingGround;
-    public Tilemap PlacingCliff;
+    public Tilemap[] PlacingCliff;
     public Tilemap PlacingWaypoint;
     public GameObject PlacingGroundUI;
     public GameObject PlacingCliffUI;

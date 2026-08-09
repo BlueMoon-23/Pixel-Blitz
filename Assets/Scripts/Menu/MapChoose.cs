@@ -37,7 +37,7 @@ public class MapChoose : MonoBehaviour
         {
             ModeManager.instance.DestroyGamemodeObject();
         }
-        Maps.Sort((x, y) => x.Difficulty().CompareTo(y.Difficulty()));
+        Maps.Sort();
     }
     void Start()
     {
@@ -141,7 +141,8 @@ public class MapChoose : MonoBehaviour
                 currentMapDataIndex = i;
                 break;
             }
-            else if (mapData.Difficulty() < Maps[i].Difficulty()) right = i - 1;
+            // Nếu chỉ dựa vào difficulty làm chiều di chuyển thì trường hợp 2 map khác nhau có cùng difficulty thì sẽ xảy ra lỗi
+            else if (mapData < Maps[i]) right = i - 1;
             else left = i + 1;
         }
         ShowMapUI(currentMapDataIndex);

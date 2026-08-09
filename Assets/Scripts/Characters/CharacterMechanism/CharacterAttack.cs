@@ -55,6 +55,7 @@ public class CharacterAttack : MonoBehaviour
         CircleScale = new Vector3(0.25f, 0.25f, 0.25f);
         Range_Prefab.transform.localScale = CircleScale * character.GetRange();
         Range_Prefab.GetComponent<Renderer>().enabled = false;
+        Range_Prefab.GetComponent<LineRenderer>().enabled = false;
         range = Range_Prefab.GetComponent<RangeScript>();
     }
     public BaseEnemy FindFirstEnemy()
@@ -79,6 +80,8 @@ public class CharacterAttack : MonoBehaviour
         {
             BestEnemy.TakeIncomingDamage(character.GetDamage(), character.canStrikethroughOrNot());
         }
+        // Xác nhận một lần nữa enemy vừa tìm có hidden mà mình không có không
+        if (BestEnemy.isHidden && !character.hasHiddenDetectionOrNot()) return null;
         return BestEnemy;
     }
     // tối ưu hóa theo bài toán TopK => Priority queue

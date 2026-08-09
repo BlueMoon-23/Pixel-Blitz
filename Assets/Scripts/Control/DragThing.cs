@@ -4,6 +4,19 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 
+public struct DropPosition
+{
+    public Vector3 Position;
+    public Tilemap CliffTilemap;
+    public static DropPosition DefaultDropPosition()
+    {
+        DropPosition DropPosition;
+        DropPosition.Position = Vector3.zero;
+        DropPosition.CliffTilemap = null;
+        return DropPosition;
+    }
+}
+
 public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler
 {
     public static Canvas canvas;
@@ -12,7 +25,7 @@ public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler
     protected CanvasGroup canvasGroup;
     protected Vector2 previous_RectTransform;
     public static Tilemap PlacingGround;
-    public static Tilemap PlacingCliff;
+    public static Tilemap[] PlacingCliff;
     public static Tilemap PlacingWaypoint;
     //
     public GameObject CharacterPrefab;
@@ -69,34 +82,40 @@ public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
         OnDrag_Specific(eventData);
     }
-    protected Vector3 GetDropPosition(Vector3 MousePosition)
+    protected DropPosition GetDropPosition(Vector3 MousePosition)
     {
         Camera camera = Camera.main;
         MousePosition.z = Mathf.Abs(camera.transform.position.z);
         Vector3 WorldPosition = camera.ScreenToWorldPoint(MousePosition);
         if (baseCharacter.profile.isCliff)
         {
-            Vector3Int TilePosition = PlacingCliff.WorldToCell(WorldPosition);
-            // Kiểm tra có nằm ngoài phạm vi PlacingGround không
-            if (PlacingCliff.HasTile(TilePosition))
+            foreach (Tilemap Cliff in PlacingCliff)
             {
-                return PlacingCliff.GetCellCenterWorld(TilePosition) - (new Vector3(0f, 0.4f, 0f));
+                Vector3Int TilePosition = Cliff.WorldToCell(WorldPosition);
+                // Kiểm tra có nằm ngoài phạm vi PlacingGround không
+                if (Cliff.HasTile(TilePosition))
+                {
+                    DropPosition Result;
+                    Result.Position = Cliff.GetCellCenterWorld(TilePosition) - (new Vector3(0f, 0.4f, 0f));
+                    Result.CliffTilemap = Cliff;
+                    return Result;
+                }
             }
-            else
-            {
-                return Vector3.zero;
-            }
+            return DropPosition.DefaultDropPosition();
         }
         else
         {
             Vector3Int TilePosition = PlacingGround.WorldToCell(WorldPosition);
             if (PlacingGround.HasTile(TilePosition))
             {
-                return PlacingGround.GetCellCenterWorld(TilePosition) - (new Vector3(0f, 0.4f, 0f));
+                DropPosition Result;
+                Result.Position = PlacingGround.GetCellCenterWorld(TilePosition) - (new Vector3(0f, 0.4f, 0f));
+                Result.CliffTilemap = PlacingGround;
+                return Result;
             }
             else
             {
-                return Vector3.zero;
+                return DropPosition.DefaultDropPosition();
             }
         }
     }
@@ -130,5 +149,25 @@ public abstract class DragThing : MonoBehaviour, IBeginDragHandler, IDragHandler
         );
         m_RectTransform.anchoredPosition = localPoint + offset;
         range_RectTransform.anchoredPosition = m_RectTransform.anchoredPosition - new Vector2(0f, 30f);
+        Camera camera = Camera.main;
+        Vector3 mousePosition = eventData.position;
+        mousePosition.z = Mathf.Abs(camera.transform.position.z);
+        Vector3 worldPosition = camera.ScreenToWorldPoint(mousePosition);
+        foreach (Tilemap Cliff in PlacingCliff)
+        {
+            Vector3Int tilePos = Cliff.WorldToCell(worldPosition);
+            // check xem Cliff có chứa eventData.position không
+            if (Cliff.HasTile(tilePos))
+            {
+                // nếu có, sửa range_RectTransform.anchoredPosition
+                RangeProjection rangeProjection = Cliff.GetComponent<RangeProjection>();
+                if (rangeProjection != null)
+                {
+                    range_RectTransform.anchoredPosition =
+                        m_RectTransform.anchoredPosition - new Vector2(0f, 30f) - new Vector2(0f, rangeProjection.Adjusted_Y_Position * (-133f));
+                }
+                break; // đã tìm thấy tilemap trúng, không cần xét tiếp
+            }
+        }
     }
 }

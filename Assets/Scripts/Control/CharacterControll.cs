@@ -46,11 +46,17 @@ public class CharacterControll : MonoBehaviour
         for (int i = 0; i < Range_Prefab.Length; i++)
         {
             Range_Prefab[i].GetComponent<Renderer>().enabled = false;
+            Range_Prefab[i].GetComponent<LineRenderer>().enabled = false;
         }
         character.characterAttack.Range_Prefab.GetComponent<Renderer>().enabled = true;
         // character.characterAttack.Range_Prefab.transform.DOScale(character.characterAttack.Range_Prefab.transform.localScale, 0.05f).From(0f);
         Vector3 targetScale = new Vector3(0.25f, 0.25f, 0.25f) * character.GetRange();
         character.characterAttack.Range_Prefab.transform.DOScale(targetScale, 0.05f).From(0f);
+        // Hiện line định vị center của range
+        LineRenderer SpotLine = character.characterAttack.Range_Prefab.GetComponent<LineRenderer>();
+        SpotLine.enabled = true;
+        SpotLine.SetPosition(0, character.transform.position + new Vector3(0, 0.3f, 0));
+        SpotLine.SetPosition(1, character.characterAttack.Range_Prefab.transform.position);
         characterUI.gameObject.SetActive(true);
         characterUI.CurrentCharacter = character;
         characterUI.CurrentCharacter.SetUpgradeInformation();

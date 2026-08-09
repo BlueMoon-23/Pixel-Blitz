@@ -111,7 +111,7 @@ public class DragAbility : DragThing
             return;
         }
         //
-        currentCharacter.Ability(GetDropPosition(eventData.position));
+        currentCharacter.Ability(GetDropPosition(eventData.position).Position);
         //
         m_RectTransform.anchoredPosition = previous_RectTransform;
         range_RectTransform.anchoredPosition = m_RectTransform.anchoredPosition - new Vector2(0f, 30f);

@@ -72,6 +72,7 @@ public class CharacterUIControll : MonoBehaviour
         for (int i = 0; i < Range_Prefab.Length; i++)
         {
             Range_Prefab[i].GetComponent<Renderer>().enabled = false;
+            Range_Prefab[i].GetComponent<LineRenderer>().enabled = false;
         }
         // Wizard tắt script dragability, nên phải bật lại ở nút close để character khác còn dùng
         if (DragAbility.instance != null)

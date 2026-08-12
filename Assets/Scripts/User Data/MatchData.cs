@@ -8,11 +8,11 @@ public class MatchData
     public string MapName;
     public string Gamemode;
     public string Status;
-    public List<string> CharacterLoadout;
+    public List<CharacterName> CharacterLoadout;
     public int Attempted;
     public string TimePlayed;
     public MatchData()
     {
-        CharacterLoadout = new List<string>();
+        CharacterLoadout = new List<CharacterName>();
     }
 }

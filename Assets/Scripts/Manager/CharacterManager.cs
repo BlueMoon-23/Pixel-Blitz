@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
-using static CharacterManager;
+public enum CharacterName { Archer, Freezer, Musketeer, Minigunner, MinigunnerClone, Ranger, Rocketeer, Summoner, Pulser, Wizard, Guardian};
 public class CharacterManager : MonoBehaviour
 {
     // Quản lý danh sách character
@@ -23,6 +23,17 @@ public class CharacterManager : MonoBehaviour
         }
         characterList = new List<BaseCharacter> ();
         CharacterPositions = new List<Vector3>();
+        if (CharacterSaveManager.instance != null)
+        {
+            foreach (CharacterName name in Enum.GetValues(typeof(CharacterName))) { // duyệt danh sách enum
+                CharacterData characterData = CharacterSaveManager.instance.allCharacters.Find(c => c.characterProfile.NameForManager == name);
+                if (characterData != null)
+                {
+                    Debug.Log("Limit: " + name.ToString() + ", " + characterData.characterProfile.LimitPlacement);
+                    Limit_for_1_Character.Add(name, characterData.characterProfile.LimitPlacement); 
+                }
+            }
+        }
     }
     private List<BaseCharacter> characterList; // danh sách các character đang active
     // Mảng lưu vị trí character để kiểm tra tránh trùng lặp
@@ -30,20 +41,7 @@ public class CharacterManager : MonoBehaviour
     private int Character_LimitPlacement = 20;
     public TextMeshProUGUI CurrentCharacter;
     public TextMeshProUGUI Announcement;
-    public enum CharacterName { Archer, Freezer, Musketeer, Minigunner, MinigunnerClone, Ranger, Rocketeer, Summoner, Pulser, Wizard, Guardian};
-    private Dictionary<CharacterName, int> Limit_for_1_Character = new Dictionary<CharacterName, int> { 
-        { CharacterName.Archer, 8 },
-        { CharacterName.Freezer, 4 },
-        { CharacterName.Musketeer, 8 },
-        { CharacterName.Minigunner, 4 },
-        //{ CharacterName.MinigunnerClone, 4 },
-        { CharacterName.Ranger, 5 },
-        { CharacterName.Rocketeer, 5 },
-        { CharacterName.Summoner, 3 },
-        { CharacterName.Pulser, 4 },
-        { CharacterName.Wizard, 6 },
-        { CharacterName.Guardian, 2 },
-    };
+    private Dictionary<CharacterName, int> Limit_for_1_Character = new Dictionary<CharacterName, int>();
     private Dictionary<CharacterName, int> CharacterQuantity = new Dictionary<CharacterName, int> {
         { CharacterName.Archer, 0 },
         { CharacterName.Freezer, 0 },

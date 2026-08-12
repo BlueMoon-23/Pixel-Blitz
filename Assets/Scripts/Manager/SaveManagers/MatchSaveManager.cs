@@ -48,7 +48,7 @@ public class MatchSaveManager : MonoBehaviour
             foreach (CharacterInfomation character1 in loadout)
             {
                 bool isFound = false;
-                foreach (string character2 in userMatchData.list[userMatchData.list.Count - 1].CharacterLoadout)
+                foreach (CharacterName character2 in userMatchData.list[userMatchData.list.Count - 1].CharacterLoadout)
                 {
                     if (character1.characterData.characterID == character2)
                     {
@@ -103,7 +103,7 @@ public class MatchSaveManager : MonoBehaviour
         MatchData newMatch = new MatchData();
         newMatch.MapName = userMatchData.list[userMatchData.list.Count - 1].MapName;
         newMatch.Gamemode = userMatchData.list[userMatchData.list.Count - 1].Gamemode;
-        foreach (string character in userMatchData.list[userMatchData.list.Count - 1].CharacterLoadout)
+        foreach (CharacterName character in userMatchData.list[userMatchData.list.Count - 1].CharacterLoadout)
         {
             newMatch.CharacterLoadout.Add(character);
         }
@@ -128,7 +128,7 @@ public class MatchSaveManager : MonoBehaviour
                 userMatchData.list[userMatchData.list.Count - 1].Attempted--;
             }
             AccountSaveManager.CurrentAccount.AttemptTimes--;
-            foreach (string character in userMatchData.list[userMatchData.list.Count - 1].CharacterLoadout)
+            foreach (CharacterName character in userMatchData.list[userMatchData.list.Count - 1].CharacterLoadout)
             {
                 AccountSaveManager.CurrentAccount.userCharacterData.CancelCharacter(character);
             }

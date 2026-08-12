@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -68,7 +69,7 @@ public class CharacterEquip : MonoBehaviour
                 }
             }
             CurrentIndex = oldLoadoutLength;
-            List<string> characterKeys = new List<string>(oldLoadoutLength);
+            List<CharacterName> characterKeys = new List<CharacterName>(oldLoadoutLength);
             for (int i = 0; i < oldLoadoutLength; i++)
             {
                 int j = 0;
@@ -82,8 +83,11 @@ public class CharacterEquip : MonoBehaviour
                     if (loadoutKey[j] != ',') { res += loadoutKey[j]; }
                     else // nghĩa là đã chạm dấu phẩy, break vòng này
                     {
-                        characterKeys.Add(res);
-                        break;
+                        if (Enum.TryParse(res, out CharacterName result))
+                        {
+                            characterKeys.Add(result);
+                            break;
+                        }
                     }
                 }
             }

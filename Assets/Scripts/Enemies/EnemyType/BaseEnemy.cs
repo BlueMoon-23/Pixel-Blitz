@@ -91,10 +91,10 @@ public class BaseEnemy : MonoBehaviour
                 Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
             }
             // Reset Stats thiệt nè
-            HP = enemyStats.MaxHP;
-            Speed = enemyStats.OldSpeed;
-            _isHidden = enemyStats.isHidden;
-            isArmored = enemyStats.isArmored;
+            HP = enemyStats.enemyProfile.MaxHP;
+            Speed = enemyStats.enemyProfile.OldSpeed;
+            _isHidden = enemyStats.enemyProfile.isHidden;
+            isArmored = enemyStats.enemyProfile.isArmored;
             incomingDamage = 0f;
             lastrecordedDamage = Time.time;
             if (!isSummoned) Distance = 0f;
@@ -167,7 +167,7 @@ public class BaseEnemy : MonoBehaviour
                 EarnCoinVFX earnCoinVFX = EarnCoin.GetComponent<EarnCoinVFX>();
                 if (earnCoinVFX != null)
                 {
-                    earnCoinVFX.SetEarnCoinText(this.enemyStats.MaxHP);
+                    earnCoinVFX.SetEarnCoinText(this.enemyStats.enemyProfile.MaxHP);
                 }
             }
             if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
@@ -182,7 +182,7 @@ public class BaseEnemy : MonoBehaviour
             }
             if (EconomyManager.instance != null)
             {
-                EconomyManager.instance.AddCoin(this.enemyStats.MaxHP);
+                EconomyManager.instance.AddCoin(this.enemyStats.enemyProfile.MaxHP);
                 EconomyManager.instance.Change_CurrentCoin();
             }
             //Destroy(this.gameObject);
@@ -260,7 +260,7 @@ public class BaseEnemy : MonoBehaviour
         {
             HP += amount;
             incomingDamage -= amount;
-            if (HP >= enemyStats.MaxHP) { HP = enemyStats.MaxHP; }
+            if (HP >= enemyStats.enemyProfile.MaxHP) { HP = enemyStats.enemyProfile.MaxHP; }
         }
     }
     public bool ContainsModifier(float percent)
@@ -287,11 +287,11 @@ public class BaseEnemy : MonoBehaviour
                 slow_factor = enemyModifiers.GetMinSlowPercent();
                 boost_factor = enemyModifiers.GetMaxBoostPercent();
             }
-            if (enemyStats != null) Speed = enemyStats.OldSpeed * slow_factor * boost_factor;
+            if (enemyStats != null) Speed = enemyStats.enemyProfile.OldSpeed * slow_factor * boost_factor;
         }
         else
         {
-            if (enemyStats != null) Speed = enemyStats.OldSpeed;
+            if (enemyStats != null) Speed = enemyStats.enemyProfile.OldSpeed;
         }
     }
     public void RemoveModifySpeed(float percent)
@@ -313,12 +313,12 @@ public class BaseEnemy : MonoBehaviour
                 slow_factor = enemyModifiers.GetMinSlowPercent();
                 boost_factor = enemyModifiers.GetMaxBoostPercent();
             }
-            if (enemyStats != null) Speed = enemyStats.OldSpeed * slow_factor * boost_factor;
+            if (enemyStats != null) Speed = enemyStats.enemyProfile.OldSpeed * slow_factor * boost_factor;
             else Debug.Log("enemy stats = null");
         }
         else
         {
-            Speed = enemyStats.OldSpeed;
+            Speed = enemyStats.enemyProfile.OldSpeed;
         }
     }
     /// <summary>

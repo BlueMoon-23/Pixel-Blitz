@@ -24,6 +24,7 @@ public class ShopManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI Special;
     [SerializeField] private TextMeshProUGUI HiddenDetection;
     [SerializeField] private TextMeshProUGUI Strikethrough;
+    [SerializeField] private TextMeshProUGUI LimitPlacement;
     // Giá tiền
     [SerializeField] private TextMeshProUGUI GemRequire;
     [SerializeField] private TextMeshProUGUI DiamondRequire;
@@ -161,6 +162,7 @@ public class ShopManager : MonoBehaviour
                 Strikethrough.text = StrikethroughText(CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile);
                 GemRequire.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.GemRequire.ToString();
                 DiamondRequire.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.DiamondRequire.ToString();
+                LimitPlacement.text = CharacterSaveManager.instance.allCharacters[allCharacter_index].characterProfile.LimitPlacement.ToString();
             }
             // Kiểm tra xem đã có character hay chưa
             bool hasOwned = false;

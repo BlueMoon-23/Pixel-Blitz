@@ -12,7 +12,7 @@ public class UserCharacterData
     [System.Serializable]
     public struct CharacterUsedTime
     {
-        public string characterID;
+        public CharacterName characterID;
         public int usedTimes;
     }
     // Đổi Dictionary thành List này để hiển thị được Inspector VÀ lưu được JSON
@@ -48,7 +48,7 @@ public class UserCharacterData
         PlayerPrefs.Save();
         AccountSaveManager.instance.SaveAccounts();
     }
-    public void CancelCharacter(string characterID) // Đã sửa tham số thành string
+    public void CancelCharacter(CharacterName characterID) // Đã sửa tham số thành string
     {
         // Tìm xem trong List đã có characterID này chưa bằng cách so sánh trực tiếp với chuỗi characterID truyền vào
         int index = AccountSaveManager.CurrentAccount.userCharacterData.Character_with_UsedTimes

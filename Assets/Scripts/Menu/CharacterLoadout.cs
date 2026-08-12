@@ -27,9 +27,10 @@ public class CharacterLoadout : MonoBehaviour
             string Loadout_Key = "";
             for (int i = 0; i < characterLoadout.Count; i++)
             {
-                Loadout_Key += characterLoadout[i].characterData.characterID;
+                Loadout_Key += characterLoadout[i].characterData.characterID.ToString();
                 Loadout_Key += ",";
             }
+            Debug.Log(Loadout_Key);
             PlayerPrefs.SetString(UserDataKey.LOADOUTKEY, Loadout_Key);
         }
     }

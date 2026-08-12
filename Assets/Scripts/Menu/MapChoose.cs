@@ -14,6 +14,7 @@ public class MapChoose : MonoBehaviour
     [SerializeField] private int currentMapDataIndex;
     public Image MapImage;
     public TextMeshProUGUI MapName;
+    public TextMeshProUGUI MapDescription;
     public TextMeshProUGUI MapStarRate;
     public TextMeshProUGUI Gamemode;
     // Map Index
@@ -121,6 +122,7 @@ public class MapChoose : MonoBehaviour
     {
         MapImage.sprite = Maps[index].mapInformation.MapImage;
         MapName.text = Maps[index].mapInformation.MapName;
+        MapDescription.text = Maps[index].mapInformation.Description;
         MapStarRate.text = Maps[index].mapInformation.StarRate.ToString();
         Gamemode.text = Maps[index].gamemode.name;
         Gamemode.color = Maps[index].gamemode.getColor();

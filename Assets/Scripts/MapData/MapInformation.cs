@@ -8,6 +8,7 @@ public class MapInformation : MonoBehaviour
 {
     public Sprite MapImage;
     public string MapName;
+    public string Description;
     public float StarRate;
     public bool isMultiPath;
     public AudioClip MapBGM;

@@ -57,12 +57,12 @@ public class BaseEnemy : MonoBehaviour
     {
         // Awake
         StatsReseted = false; // khóa update/move cho đến khi xong stats
-        yield return null;
         enemyStats = GetComponent<EnemyStats>();
         enemyModifiers = GetComponent<EnemyModifiers>();
         enemyEffect = GetComponent<EnemyEffect>();
         enemyHit = GetComponent<EnemyHit>();
         enemyTeleport = GetComponent<EnemyTeleport>();
+        yield return null;
         if (enemyStats != null)
         {
             if (!isSummoned) Waypoint_CurrentIndex = 1; // xem lại tình huống ở necromancer và mystery enemies
@@ -91,8 +91,8 @@ public class BaseEnemy : MonoBehaviour
                 Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
             }
             // Reset Stats thiệt nè
-            HP = enemyStats.enemyProfile.MaxHP;
-            Speed = enemyStats.enemyProfile.OldSpeed;
+            HP = enemyModifiers.ModifiedHP;
+            Speed = enemyModifiers.ModifiedSpeed;
             _isHidden = enemyStats.enemyProfile.isHidden;
             isArmored = enemyStats.enemyProfile.isArmored;
             incomingDamage = 0f;
@@ -104,7 +104,7 @@ public class BaseEnemy : MonoBehaviour
             enemyEffect.ResetEnemyEffect();
         }
         yield return null;
-        enemyHit.GetHit(enemyStats, this);
+        enemyHit.GetHit(enemyStats, enemyModifiers, this);
     }
     // Update is called once per frame
     protected void Update()
@@ -151,7 +151,7 @@ public class BaseEnemy : MonoBehaviour
             else { HP -= Damage; }
             if (incomingDamage - Damage <= 0) { incomingDamage = 0; }
             else { incomingDamage -= Damage; }
-            if (enemyHit != null) enemyHit.GetHit(enemyStats, this);
+            if (enemyHit != null) enemyHit.GetHit(enemyStats, enemyModifiers, this);
             if (character != null) character.AddTotalDamage(oldHP - HP);
         }
     }
@@ -167,7 +167,7 @@ public class BaseEnemy : MonoBehaviour
                 EarnCoinVFX earnCoinVFX = EarnCoin.GetComponent<EarnCoinVFX>();
                 if (earnCoinVFX != null)
                 {
-                    earnCoinVFX.SetEarnCoinText(this.enemyStats.enemyProfile.MaxHP);
+                    earnCoinVFX.SetEarnCoinText(enemyModifiers.ModifiedHP);
                 }
             }
             if (ExplosionPooler.instance != null && GameSetting.instance != null && GameSetting.instance._showExplosion)
@@ -182,11 +182,11 @@ public class BaseEnemy : MonoBehaviour
             }
             if (EconomyManager.instance != null)
             {
-                EconomyManager.instance.AddCoin(this.enemyStats.enemyProfile.MaxHP);
+                EconomyManager.instance.AddCoin(enemyModifiers.ModifiedHP);
                 EconomyManager.instance.Change_CurrentCoin();
             }
             //Destroy(this.gameObject);
-            enemyHit.GetHit(enemyStats, this);
+            enemyHit.GetHit(enemyStats, enemyModifiers, this);
             if (EnemyManager.instance != null)
             {
                 EnemyManager.instance.ReturnEnemy(this);
@@ -260,7 +260,7 @@ public class BaseEnemy : MonoBehaviour
         {
             HP += amount;
             incomingDamage -= amount;
-            if (HP >= enemyStats.enemyProfile.MaxHP) { HP = enemyStats.enemyProfile.MaxHP; }
+            if (HP >= enemyModifiers.ModifiedHP) { HP = enemyModifiers.ModifiedHP; }
         }
     }
     public bool ContainsModifier(float percent)
@@ -271,9 +271,6 @@ public class BaseEnemy : MonoBehaviour
     {
         if (!isFinalBoss)
         {
-            // mong muốn: speed = oldspeed * min của mảng slowmodifier * mã cua mảng boostmodifier
-            float slow_factor = 1f;
-            float boost_factor = 1f;
             if (enemyModifiers != null)
             {
                 if (percent >= 1)
@@ -284,22 +281,14 @@ public class BaseEnemy : MonoBehaviour
                 {
                     enemyModifiers.AddSlowModifier(percent);
                 }
-                slow_factor = enemyModifiers.GetMinSlowPercent();
-                boost_factor = enemyModifiers.GetMaxBoostPercent();
             }
-            if (enemyStats != null) Speed = enemyStats.enemyProfile.OldSpeed * slow_factor * boost_factor;
         }
-        else
-        {
-            if (enemyStats != null) Speed = enemyStats.enemyProfile.OldSpeed;
-        }
+        Speed = enemyModifiers.ModifiedSpeed;
     }
     public void RemoveModifySpeed(float percent)
     {
         if (!isFinalBoss)
         {
-            float slow_factor = 1f;
-            float boost_factor = 1f;
             if (enemyModifiers != null)
             {
                 if (percent >= 1)
@@ -310,16 +299,9 @@ public class BaseEnemy : MonoBehaviour
                 {
                     enemyModifiers.RemoveSlowModifier(percent);
                 }
-                slow_factor = enemyModifiers.GetMinSlowPercent();
-                boost_factor = enemyModifiers.GetMaxBoostPercent();
             }
-            if (enemyStats != null) Speed = enemyStats.enemyProfile.OldSpeed * slow_factor * boost_factor;
-            else Debug.Log("enemy stats = null");
         }
-        else
-        {
-            Speed = enemyStats.enemyProfile.OldSpeed;
-        }
+        Speed = enemyModifiers.ModifiedSpeed;
     }
     /// <summary>
     /// có thể chọn làm mục tiêu khi: đang active và không teleport

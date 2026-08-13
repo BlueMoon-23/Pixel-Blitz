@@ -179,6 +179,5 @@ public class GameSetting : MonoBehaviour
         int fps = 30 + ((int)sliderValue * 15);
         Application.targetFrameRate = fps;
         QualitySettings.vSyncCount = 0; // Luôn tắt VSync khi dùng targetFrameRate
-        Debug.Log($"FPS Applied: {fps}");
     }
 }

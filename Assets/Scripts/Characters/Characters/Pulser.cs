@@ -8,17 +8,15 @@ public class Pulser : BaseCharacter
     public GameObject PulseBar;
     private float currentPulse = 0f;
     [SerializeField] private float[] MaxPulseByLevels;
-    [SerializeField] private float[] ChargeTimeByLevels;
     private float MaxPulse;
     private bool reachedMaxPulse;
-    private float ChargeTime = 4f;
     private float Original_x_PulseBarScale;
     private GameObject currentLaser;
+    private PulserLaser currentPulserLaser;
     protected override void OnEnable()
     {
         base.OnEnable();
         currentPulse = 0f;
-        ChargeTime = ChargeTimeByLevels[0];
         reachedMaxPulse = false;
         MaxPulse = MaxPulseByLevels[0];
         Original_x_PulseBarScale = 4.5f;
@@ -26,6 +24,8 @@ public class Pulser : BaseCharacter
         PulseBar.transform.localScale = new Vector3(Original_x_PulseBarScale * currentPulse / MaxPulse, PulseBar.transform.localScale.y, PulseBar.transform.localScale.z);
         // Instantiate cục laser và tắt nó đi. Tái chế nó
         currentLaser = Instantiate(bullet_Prefab, Bullet_StartPosition.transform.position, Quaternion.identity);
+        currentPulserLaser = currentLaser.GetComponent<PulserLaser>();
+        currentPulserLaser.SetCharacter(this);
         currentLaser.SetActive(false);
     }
 
@@ -34,7 +34,7 @@ public class Pulser : BaseCharacter
     {
         if (StatsReseted)
         {
-            if (!characterEffect.isStunned && !reachedMaxPulse) 
+            if (!characterEffect.isStunned) 
             { 
                 AttackWithoutAnimation(); 
             }
@@ -48,7 +48,6 @@ public class Pulser : BaseCharacter
     {
         base.Upgrade();
         MaxPulse = MaxPulseByLevels[Level];
-        ChargeTime = ChargeTimeByLevels[Level];
     }
     public override void SetUpgradeInformation()
     {
@@ -58,7 +57,6 @@ public class Pulser : BaseCharacter
             if (Level < profile.characterLevelDatas.Count - 1)
             {
                 SetStatInfo(6, "Max Pulse", MaxPulse, MaxPulseByLevels[Level + 1], true);
-                SetStatInfo(7, "Charge Time", ChargeTime, ChargeTimeByLevels[Level + 1], false);
             }
         }
     }
@@ -81,10 +79,8 @@ public class Pulser : BaseCharacter
                     // Bật laser
                     currentLaser.SetActive(true);
                     // Gán headgun, gắn enemy cho laser
-                    PulserLaser pulserLaser = currentLaser.GetComponent<PulserLaser>();
-                    pulserLaser.HeadGun = Bullet_StartPosition;
-                    pulserLaser.SetCharacter(this);
-                    pulserLaser.SetEnemy(first_enemy);
+                    currentPulserLaser.HeadGun = Bullet_StartPosition;                    
+                    currentPulserLaser.SetEnemy(first_enemy);
                     // Tạo hiệu ứng nổ đạn (muzzle)
                     MuzzleEffect(Angle_in_Quaternion);
                     Clock = 0f;
@@ -98,24 +94,34 @@ public class Pulser : BaseCharacter
             }
         }
     }
+    /// <summary>
+    /// Trả về false nếu đang bắn laser thường, true nếu đang bắn bomb
+    /// </summary>
+    public bool isReachingMaxPulse()
+    {
+        return reachedMaxPulse;
+    }
     public void StackPulse(float damage)
     {
         currentPulse += damage;
         if (currentPulse >= MaxPulse)
         {
-            currentPulse = 0f;
-            StartCoroutine(StopAttack());
+            currentPulse = MaxPulse;
+            if (SoundManager.Instance != null) SoundManager.Instance.SoundEffectSource.PlayOneShot(SoundManager.Instance.PulserLaserEnd);
+            reachedMaxPulse = true;
         }
         PulseBar.transform.localScale = new Vector3(Original_x_PulseBarScale * currentPulse / MaxPulse, PulseBar.transform.localScale.y, PulseBar.transform.localScale.z);
     }
-    public IEnumerator StopAttack()
+    public void DrainPulse(float damage)
     {
-        if (SoundManager.Instance != null) SoundManager.Instance.SoundEffectSource.PlayOneShot(SoundManager.Instance.PulserLaserEnd);
-        // Dừng tấn công trong 4s
-        reachedMaxPulse = true;
-        currentLaser.SetActive(false);
-        yield return new WaitForSeconds(ChargeTime);
-        reachedMaxPulse = false;
+        currentPulse -= damage;
+        if (currentPulse <= 0)
+        {
+            currentPulse = 0;
+            if (SoundManager.Instance != null) SoundManager.Instance.SoundEffectSource.PlayOneShot(SoundManager.Instance.PulserLaserEnd);
+            reachedMaxPulse = false;
+        }
+        PulseBar.transform.localScale = new Vector3(Original_x_PulseBarScale * currentPulse / MaxPulse, PulseBar.transform.localScale.y, PulseBar.transform.localScale.z);
     }
     private void OnDisable()
     {

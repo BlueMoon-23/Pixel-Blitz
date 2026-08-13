@@ -5,7 +5,6 @@ using DG.Tweening;
 public class FinalBoss : BaseEnemy
 {
     protected bool hasDied = false;
-    protected float ModifiedHP;
     // Easy: 25k HP, dậm sàn gây choáng toàn map
     // Medium: 100k HP, dậm sàn và ném kiếm vào character
     // Hard: 250k HP, dậm sàn, ném kiếm. khi máu còn 100k HP thì dậm sàn và chạy nhanh hơn (không ném kiếm nữa)
@@ -30,12 +29,11 @@ public class FinalBoss : BaseEnemy
         if (LowGraphic_StompEffect != null) LowGraphic_StompID = LowGraphic_StompEffect.GetComponent<BaseExplosion>().ExplosionID;
         if (SpiralStunEffect != null) SpiralStunID = SpiralStunEffect.GetComponent<BaseExplosion>().ExplosionID;
         if (LowGraphic_SpiralStunEffect != null) LowGraphic_SpiralStunID = LowGraphic_SpiralStunEffect.GetComponent<BaseExplosion>().ExplosionID;
-        // Chỉnh máu của boss theo số character mang theo của người chơi
-        ModifiedHP = enemyStats.enemyProfile.MaxHP;
+        // Chỉnh máu của boss theo số character mang theo của người chơi => đưa về enemy modifiers
         if (CharacterLoadout.instance != null)
         {
             HP *= (1 + (CharacterLoadout.instance.characterLoadout.Count - 1) / 3f);
-            ModifiedHP *= (1 + (CharacterLoadout.instance.characterLoadout.Count - 1) / 3f);
+            enemyModifiers.AddHPModifier((1 + (CharacterLoadout.instance.characterLoadout.Count - 1) / 3f));
         }
         yield return new WaitForSeconds(0.01f);
         if (BossManager.instance != null)
@@ -43,7 +41,7 @@ public class FinalBoss : BaseEnemy
             int tag_index = Waypoint_SelectedIndex <= BossManager.instance.bossHP.Length ? Waypoint_SelectedIndex : BossManager.instance.bossHP.Length;
             BossManager.instance.bossHP[tag_index].bossHPGroup.SetActive(true);
             BossManager.instance.bossHP[tag_index].BossName.text = ModeManager.instance.currentGamemode.FinalBossName;
-            BossManager.instance.bossHP[tag_index].BossHPText.text = HP + " / " + ModifiedHP;
+            BossManager.instance.bossHP[tag_index].BossHPText.text = HP + " / " + enemyModifiers.ModifiedHP;
         }
         StartCoroutine(DoAbility(AbilityCount));
     }
@@ -58,7 +56,7 @@ public class FinalBoss : BaseEnemy
                 Die();
             }
             ResetIncomingDamage();
-            if (shouldCastLowHpSkill && HP <= ModifiedHP / 2f)
+            if (shouldCastLowHpSkill && HP <= enemyModifiers.ModifiedHP / 2f)
             {
                 EnragedAbility();
             }
@@ -99,7 +97,6 @@ public class FinalBoss : BaseEnemy
         if (GameSetting.instance != null && GameSetting.instance._shakeEffect) 
         {
             if (ShakeFeedback.instance != null) {
-                Debug.Log("Shake");
                 ShakeFeedback.instance.ShakeCamera(); 
             }
         }
@@ -184,9 +181,9 @@ public class FinalBoss : BaseEnemy
         if (BossManager.instance != null)
         {
             int tag_index = Waypoint_SelectedIndex <= BossManager.instance.bossHP.Length ? Waypoint_SelectedIndex : BossManager.instance.bossHP.Length;
-            BossManager.instance.bossHP[tag_index].BossHPText.text = HP + " / " + ModifiedHP;
-            BossManager.instance.bossHP[tag_index].BossHP_RedBar.transform.localScale = new Vector3(HP / ModifiedHP, BossManager.instance.bossHP[tag_index].BossHP_RedBar.transform.localScale.y, BossManager.instance.bossHP[tag_index].BossHP_RedBar.transform.localScale.z);
-            BossManager.instance.bossHP[tag_index].BossHP_WhiteBar.transform.DOScaleX(HP / ModifiedHP, 0.35f);
+            BossManager.instance.bossHP[tag_index].BossHPText.text = HP + " / " + enemyModifiers.ModifiedHP;
+            BossManager.instance.bossHP[tag_index].BossHP_RedBar.transform.localScale = new Vector3(HP / enemyModifiers.ModifiedHP, BossManager.instance.bossHP[tag_index].BossHP_RedBar.transform.localScale.y, BossManager.instance.bossHP[tag_index].BossHP_RedBar.transform.localScale.z);
+            BossManager.instance.bossHP[tag_index].BossHP_WhiteBar.transform.DOScaleX(HP / enemyModifiers.ModifiedHP, 0.35f);
         }
     }
     protected override void Die()
@@ -196,7 +193,7 @@ public class FinalBoss : BaseEnemy
             hasDied = true;
             if (EconomyManager.instance != null)
             {
-                EconomyManager.instance.AddCoin(ModifiedHP);
+                EconomyManager.instance.AddCoin(enemyModifiers.ModifiedHP);
                 EconomyManager.instance.Change_CurrentCoin();
             }
             HP = 0;

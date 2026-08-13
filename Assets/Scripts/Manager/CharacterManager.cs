@@ -29,7 +29,6 @@ public class CharacterManager : MonoBehaviour
                 CharacterData characterData = CharacterSaveManager.instance.allCharacters.Find(c => c.characterProfile.NameForManager == name);
                 if (characterData != null)
                 {
-                    Debug.Log("Limit: " + name.ToString() + ", " + characterData.characterProfile.LimitPlacement);
                     Limit_for_1_Character.Add(name, characterData.characterProfile.LimitPlacement); 
                 }
             }

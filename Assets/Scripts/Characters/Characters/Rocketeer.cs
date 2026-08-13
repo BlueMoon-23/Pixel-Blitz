@@ -25,6 +25,7 @@ public class Rocketeer : BaseCharacter
             if (Level < profile.characterLevelDatas.Count - 1)
             {
                 SetStatInfo(6, "Explosion Radius", ExplosionRadius, ExplosionRadiusByLevels[Level + 1], true);
+                profile.characterLevelDatas[4].Special = "Rockets now launch 4 bombs on its impact, each deals " + WeaponCalculator.CalculateDamage(50, characterWeapon.WeaponEquipped) + " damages.";
             }
         }
     }

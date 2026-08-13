@@ -49,7 +49,6 @@ public class WizardComboCustomizer : MonoBehaviour
         for (int i = 0; i < SkillBoxes.Length; i++)
         {
             currentWizard.SkillOrderID[i] = SkillBoxes[i].GetCurrentSkillID();
-            totalDamage += currentWizard.profile.characterLevelDatas[currentWizard.SkillOrderID[i]].DamageStat;
             totalDamage += WeaponCalculator.CalculateDamage(currentWizard.profile.characterLevelDatas[currentWizard.SkillOrderID[i]].DamageStat, currentWizard.characterWeapon.WeaponEquipped);
         }
         currentWizard.SetDamage(totalDamage);

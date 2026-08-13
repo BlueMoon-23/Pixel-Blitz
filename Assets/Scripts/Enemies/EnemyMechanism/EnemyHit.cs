@@ -17,11 +17,11 @@ public class EnemyHit : MonoBehaviour
     {
         //HPBar_Renderer = HP_RedBar.GetComponent<SpriteRenderer>();
     }
-    public void GetHit(EnemyStats enemyStats, BaseEnemy enemy)
+    public void GetHit(EnemyStats enemyStats, EnemyModifiers enemyModifiers, BaseEnemy enemy)
     {
         if (enemyStats != null)
         {
-            HP_RedBar.transform.localScale = new Vector3(enemyStats.Original_x_HPScale * enemy.GetHP() / enemyStats.enemyProfile.MaxHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
+            HP_RedBar.transform.localScale = new Vector3(enemyStats.Original_x_HPScale * enemy.GetHP() / enemyModifiers.ModifiedHP, HP_RedBar.transform.localScale.y, HP_RedBar.transform.localScale.z);
             // Thanh trắng
             if (!HP_WhiteBar.activeSelf)
             {
@@ -31,7 +31,7 @@ public class EnemyHit : MonoBehaviour
             {
                 whiteBarTween.Kill();
             }
-            HP_WhiteBar.transform.DOScaleX(enemyStats.Original_x_HPScale * enemy.GetHP() / enemyStats.enemyProfile.MaxHP, 0.08f)
+            HP_WhiteBar.transform.DOScaleX(enemyStats.Original_x_HPScale * enemy.GetHP() / enemyModifiers.ModifiedHP, 0.08f)
                 .OnComplete(() =>
                 {
                     HP_WhiteBar.SetActive(false);

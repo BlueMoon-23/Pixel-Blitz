@@ -186,8 +186,8 @@ public class Medium : Gamemodes
     }
     public override void setGemReward(int wave, ref double BaseGem, ref int BonusGem, bool doVictory)
     {
-        BaseGem = 2 * Mathf.Pow(wave, 1.5f);
-        if (doVictory) { BonusGem = 171; }
+        BaseGem = 3.8 * Mathf.Pow(wave, 1.5f);
+        if (doVictory) { BonusGem = 25; }
     }
     public override void setCoinFormula(int wave, ref float Formula)
     {

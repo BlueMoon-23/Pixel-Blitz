@@ -153,8 +153,8 @@ public class Easy : Gamemodes
     }
     public override void setGemReward(int wave, ref double BaseGem, ref int BonusGem, bool doVictory)
     {
-        BaseGem = 2 * Mathf.Pow(wave, 1.25f);
-        if (doVictory) { BonusGem = 138; }
+        BaseGem = 4 * Mathf.Pow(wave, 1.4f);
+        if (doVictory) { BonusGem = 10; }
     }
     public override void setCoinFormula(int wave, ref float Formula)
     {

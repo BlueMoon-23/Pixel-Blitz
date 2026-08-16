@@ -75,6 +75,7 @@ public class Win_Lose : MonoBehaviour
     private void RecordMatch()
     {
         if (AccountSaveManager.instance == null || MatchSaveManager.instance == null) return;
+        if (ModeManager.instance != null && ModeManager.instance.currentGamemode.GetType() == typeof(TutorialMode)) return;
         if (!Defeated) AccountSaveManager.CurrentAccount.ClearedTimes++;
         AccountSaveManager.CurrentAccount.AttemptTimes++;
         MatchSaveManager.instance.UpdateCurrentMatch(!Defeated, TimeManager.instance.Get_TimePlayed());

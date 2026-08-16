@@ -213,17 +213,17 @@ public class Hard : Gamemodes
                 }
             case 30:
                 {
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 5, 0.75f));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Ghost, 5, 0.75f));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 5, 0.75f));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 4, 1f));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 3, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HeavyKnight, 4, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Ghost, 4, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Soul, 4, 0.75f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 3, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 2, 1f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Charger, 1, 1f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HardFinalBoss, 1, 1.25f));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.BossMystery, 10, 0.75f));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.King, 3, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Mauler, 2, 1f));
                     yield return StartCoroutine(SpawnEnemyLayout(EnemyName.HorseRider, 1, 1.25f));
-                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 4, 1f));
+                    yield return StartCoroutine(SpawnEnemyLayout(EnemyName.Healer, 3, 1f));
                     break;
                 }
             default:
@@ -235,8 +235,8 @@ public class Hard : Gamemodes
     }
     public override void setGemReward(int wave, ref double BaseGem, ref int BonusGem, bool doVictory)
     {
-        BaseGem = 0.28 * Mathf.Pow(wave, 2f) + 4.75 * wave;
-        if (doVictory) { BonusGem = 497; }
+        BaseGem = 2.75 * Mathf.Pow(wave, 1.6f);
+        if (doVictory) { BonusGem = 50; }
     }
     public override void setCoinFormula(int wave, ref float Formula)
     {

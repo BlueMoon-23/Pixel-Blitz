@@ -90,6 +90,9 @@ public class BaseEnemy : MonoBehaviour
             {
                 Waypoints = WaypointManager.instance.GetWaypointsWithIndex(Waypoint_SelectedIndex);
             }
+            // Reset modifiers
+            enemyModifiers.ResetModifiers();
+            enemyEffect.ResetEnemyEffect();
             // Reset Stats thiệt nè
             HP = enemyModifiers.ModifiedHP;
             Speed = enemyModifiers.ModifiedSpeed;
@@ -99,9 +102,6 @@ public class BaseEnemy : MonoBehaviour
             lastrecordedDamage = Time.time;
             if (!isSummoned) Distance = 0f;
             StatsReseted = true;
-            // Reset modifiers
-            enemyModifiers.ResetModifiers();
-            enemyEffect.ResetEnemyEffect();
         }
         yield return null;
         enemyHit.GetHit(enemyStats, enemyModifiers, this);

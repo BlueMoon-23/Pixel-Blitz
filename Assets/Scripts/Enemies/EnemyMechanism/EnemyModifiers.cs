@@ -32,10 +32,12 @@ public class EnemyModifiers : MonoBehaviour
     public void AddSlowModifier(float percent)
     {
         slowModifiers.Add(percent);
+        RecalculateSpeed();
     }
     public void AddSpeedUpModifier(float percent)
     {
         boostModifiers.Add(percent);
+        RecalculateSpeed();
     }
     public bool ContainsModifier(float percent)
     {

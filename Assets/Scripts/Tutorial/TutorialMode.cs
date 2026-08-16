@@ -49,7 +49,7 @@ public class TutorialMode : Gamemodes
     }
     public override void setCoinFormula(int wave, ref float Formula)
     {
-        Formula = (int)Mathf.Pow(150 + 65 * wave, 1.2f);
+        Formula = (int)Mathf.Pow(250 + 100 * wave, 1.2f);
     }
     public override int getMaxWave()
     {

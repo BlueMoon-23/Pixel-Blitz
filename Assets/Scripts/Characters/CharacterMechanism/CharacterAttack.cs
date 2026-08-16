@@ -65,14 +65,20 @@ public class CharacterAttack : MonoBehaviour
         {
             return range.enemies_in_range[UnityEngine.Random.Range(0, range.enemies_in_range.Count)];
         }
-        BaseEnemy BestEnemy = range.enemies_in_range[0];
-        for (int i = 1; i < range.enemies_in_range.Count; i++)
+        List<BaseEnemy> candidates = new List<BaseEnemy>();
+        foreach (BaseEnemy enemy in range.enemies_in_range)
         {
-            if (range.enemies_in_range[i].isDieOrNot()) continue;
-            if (range.enemies_in_range[i].isHidden && !character.hasHiddenDetectionOrNot()) continue;
-            if (AttackPriorityByIndex[CurrentPriorityIndex].Priority(BestEnemy, range.enemies_in_range[i], character))
+            if (enemy.isDieOrNot()) continue;
+            if (enemy.isHidden && !character.hasHiddenDetectionOrNot()) continue;
+            candidates.Add(enemy);
+        }
+        if (candidates.Count <= 0) return null;
+        BaseEnemy BestEnemy = candidates[0];
+        for (int i = 1; i < candidates.Count; i++)
+        {
+            if (AttackPriorityByIndex[CurrentPriorityIndex].Priority(BestEnemy, candidates[i], character))
             {
-                BestEnemy = range.enemies_in_range[i];
+                BestEnemy = candidates[i];
             }
         }
         Wizard wizard = character as Wizard;
@@ -80,8 +86,6 @@ public class CharacterAttack : MonoBehaviour
         {
             BestEnemy.TakeIncomingDamage(character.GetDamage(), character.canStrikethroughOrNot());
         }
-        // Xác nhận một lần nữa enemy vừa tìm có hidden mà mình không có không
-        if (BestEnemy.isHidden && !character.hasHiddenDetectionOrNot()) return null;
         return BestEnemy;
     }
     // tối ưu hóa theo bài toán TopK => Priority queue

@@ -30,7 +30,8 @@ public class CharacterLoadout : MonoBehaviour
                 Loadout_Key += characterLoadout[i].characterData.characterID.ToString();
                 Loadout_Key += ",";
             }
-            PlayerPrefs.SetString(UserDataKey.LOADOUTKEY, Loadout_Key);
+            AccountSaveManager.CurrentAccount.userLoadoutKey = Loadout_Key;
+            AccountSaveManager.instance.SaveAccounts();
         }
     }
     public void Set_CharacterLoadout_Prefab()

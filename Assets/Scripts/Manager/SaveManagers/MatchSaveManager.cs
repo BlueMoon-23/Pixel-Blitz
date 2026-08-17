@@ -28,10 +28,30 @@ public class MatchSaveManager : MonoBehaviour
     }
     private void Start()
     {
-        if (PlayerPrefs.HasKey(UserDataKey.MATCHHISTORY_KEY))
+        LoadMatchHistoryForCurrentAccount();
+        if (!string.IsNullOrEmpty(AccountSaveManager.CurrentAccount.userMatchDataKey))
         {
-            string jsonData = PlayerPrefs.GetString(UserDataKey.MATCHHISTORY_KEY);
+            string jsonData = AccountSaveManager.CurrentAccount.userMatchDataKey;
             userMatchData = JsonUtility.FromJson<MatchDataWrapper>(jsonData);
+        }
+        else
+        {
+            userMatchData = new MatchDataWrapper();
+        }
+    }
+    private void LoadMatchHistoryForCurrentAccount()
+    {
+        var currentAcc = AccountSaveManager.CurrentAccount;
+        if (currentAcc == null) return;
+        if (string.IsNullOrEmpty(currentAcc.userMatchDataKey) && PlayerPrefs.HasKey(UserDataKey.MATCHHISTORY_KEY))
+        {
+            string oldJson = PlayerPrefs.GetString(UserDataKey.MATCHHISTORY_KEY);
+            currentAcc.userMatchDataKey = oldJson; // Đẩy sang acc hiện tại
+            // Xóa key chung cũ đi để dọn rác hệ thống
+            PlayerPrefs.DeleteKey(UserDataKey.MATCHHISTORY_KEY);
+            PlayerPrefs.Save();
+            AccountSaveManager.instance.SaveAccounts(); // Lưu lại file JSON tổng của tài khoản
+            Debug.Log("[MatchSaveManager] Đã di trú MatchHistory cũ vào tài khoản: " + currentAcc.Username);
         }
     }
     /// <summary>
@@ -141,8 +161,7 @@ public class MatchSaveManager : MonoBehaviour
                 currentMatch.Status = doVictory ? "Victory" : "Defeat";
                 currentMatch.TimePlayed = (timePlayed / 60).ToString("D2") + " : " + (TimeManager.instance.Get_TimePlayed() % 60).ToString("D2");
                 string json = JsonUtility.ToJson(userMatchData);
-                PlayerPrefs.SetString(UserDataKey.MATCHHISTORY_KEY, json);
-                PlayerPrefs.Save();
+                AccountSaveManager.CurrentAccount.userMatchDataKey = json;
                 AccountSaveManager.instance.SaveAccounts();
             }
         }

@@ -53,9 +53,10 @@ public class CharacterEquip : MonoBehaviour
     }
     void Start()
     {
-        if (PlayerPrefs.HasKey(UserDataKey.LOADOUTKEY)) 
+        MigrateLegacyLoadout();
+        if (!string.IsNullOrEmpty(AccountSaveManager.CurrentAccount.userLoadoutKey))
         {
-            string loadoutKey = PlayerPrefs.GetString(UserDataKey.LOADOUTKEY);
+            string loadoutKey = AccountSaveManager.CurrentAccount.userLoadoutKey;
             // string có dạng: archer,freezer,minigunner,ranger, 
             // tách chuỗi ra từng cái 1
             int oldLoadoutLength = 0;
@@ -106,6 +107,25 @@ public class CharacterEquip : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+    public void MigrateLegacyLoadout()
+    {
+        var account = AccountSaveManager.CurrentAccount;
+        if (account == null || account.userLoadoutKey != null && account.userLoadoutKey.Length > 0)
+            return; // Đã migrat rồi hoặc acc mới không cần
+        // Lôi data cũ từ PlayerPrefs
+        if (PlayerPrefs.HasKey("LoadoutKey"))
+        {
+            string legacyData = PlayerPrefs.GetString("LoadoutKey");
+            // 3. Chuyển đổi từ định dạng cũ (string "Archer,Musketeer...") sang format mới (List<int>)
+            account.userLoadoutKey = legacyData;
+            // 4. Lưu lại vào file save JSON của Account
+            AccountSaveManager.instance.SaveAccounts();
+            // 5. Xóa key cũ sau khi đã chuyển thành công
+            PlayerPrefs.DeleteKey("LoadoutKey");
+            PlayerPrefs.Save();
+            Debug.Log("Đã di trú thành công Loadout cũ cho account: " + account.Username);
         }
     }
     public void Close()

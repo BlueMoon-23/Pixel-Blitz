@@ -107,29 +107,32 @@ public class MapChoose : MonoBehaviour
     }
     public void NextMap()
     {
-        if (currentMapDataIndex < Maps.Count - 1)
+        if (Maps == null || Maps.Count == 0) return;
+        int startIndex = currentMapDataIndex;
+        int nextIndex = (currentMapDataIndex < Maps.Count - 1) ? currentMapDataIndex + 1 : 0;
+        int ownedCount = AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters.Count;
+        // Vòng lặp duyệt tối đa đúng số lượng map, tìm map đủ điều kiện nhân vật
+        for (int i = 0; i < Maps.Count; i++)
         {
-            currentMapDataIndex++;
-        }
-        else
-        {
-            currentMapDataIndex = 0;
+            if (ownedCount >= Maps[nextIndex].CharacterRequirement())
+            {
+                currentMapDataIndex = nextIndex;
+                break;
+            }
+            nextIndex = (nextIndex < Maps.Count - 1) ? nextIndex + 1 : 0;
         }
         if (SoundManager.Instance != null) SoundManager.Instance.UISource.PlayOneShot(SoundManager.Instance.MoveButton_Sound);
         ShowMapUI(currentMapDataIndex);
     }
     public void ShowMapUI(int index)
     {
+        if (Maps == null || Maps.Count == 0 || index < 0 || index >= Maps.Count) return;
         MapImage.sprite = Maps[index].mapInformation.MapImage;
         MapName.text = Maps[index].mapInformation.MapName;
         MapDescription.text = Maps[index].mapInformation.Description;
         MapStarRate.text = Maps[index].mapInformation.StarRate.ToString();
         Gamemode.text = Maps[index].gamemode.name;
         Gamemode.color = Maps[index].gamemode.getColor();
-        if (AccountSaveManager.CurrentAccount.userCharacterData.OwnedCharacters.Count < Maps[index].CharacterRequirement())
-        {
-            NextMap();
-        }
     }
     public void CompareMapData(MapData mapData)
     {

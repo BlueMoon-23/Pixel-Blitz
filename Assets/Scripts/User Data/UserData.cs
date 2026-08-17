@@ -14,8 +14,11 @@ public class UserData
     public List<UserCodeData> redeemedCodes;
     // Cái này hỏi CharacterSaveManager
     public UserCharacterData userCharacterData;
+    // Character loadout
+    public string userLoadoutKey;
     // Cái này hỏi MatchSaveManager
     public List<MatchData> userMatchData;
+    public string userMatchDataKey;
     // Cái này hỏi WeaponSaveManager
     public UserWeaponData userWeaponData;
     // Cái này bên win_lose sẽ sửa
